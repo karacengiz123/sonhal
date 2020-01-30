@@ -1,0 +1,146 @@
+,{% extends 'layout/login_base.html.twig' %}
+
+{% block title %} {% endblock %}
+{% block customCss %}
+    <link href="/assets/dist/css/pages/chat-app-page.css" rel="stylesheet">
+
+{% endblock %}
+{% block customScript %}
+    <script src="/assets/dist/js/custom.min.js"></script>
+    <script src="/assets/dist/js/pages/chat.js"></script>
+    <script src="{{ asset('assets/js/vue.min.js') }}"></script>
+    <script>
+      var fetchDataTimer;
+      var checkDataTimer;
+
+      var chat = new Vue({
+        delimiters: ['${', '}'],
+        el: '#chat',
+
+        data: {
+          you: '',
+          staff: '',
+          chatStatus: '{{ chat.status }}',
+          message: '',
+          chats: []
+        },
+
+
+        computed: {},
+
+        mounted: function () {
+          this.fetchData();
+          if (this.chatStatus == 1) {
+            fetchDataTimer = setInterval(this.fetchData, 2000);
+          } else if(this.chatStatus == 0) {
+            checkDataTimer = setInterval(this.checkData, 2000);
+          }
+        },
+        created: function () {
+
+        },
+        methods: {
+          reverse: function (chatMessage) {
+            classObject = {reverse: false};
+            if (chatMessage == 1) {
+              classObject.reverse = true;
+            }
+            return classObject;
+          },
+          sendMessage: function () {
+            $.post('https://tbxdevchat.ibb.gov.tr/send-message', {'message': this.message}, function () {
+            });
+            this.message = '';
+
+          },
+          scrollToEnd: function () {
+            -$('.chat-rbox ').animate({
+              scrollTop: $('.chat-rbox ').get(0).scrollHeight
+            }, 'slow');
+          },
+          fetchData: function () {
+            _this = this;
+            $.get('https://tbxdevchat.ibb.gov.tr/chat-ajax', function (data) {
+              _this.chats = data;
+
+              _this.$nextTick(function () {
+                _this.scrollToEnd();
+              })
+
+
+            });
+          }, // End of Fetch Data
+
+          checkData: function () {
+            _this = this;
+            $.get('https://tbxdevchat.ibb.gov.tr/chat-control', function (data) {
+                if(data.chatStatus  == 1) {
+                  _this.chatStatus = 1;
+                  _this.staff = data.name;
+
+                  fetchDataTimer = setInterval(_this.fetchData, 2000);
+
+                  clearInterval(checkDataTimer);
+                }
+            });
+          }, // End of Check Data
+
+        }
+      })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="chat" class="row">
+        <div class="col-12">
+            <div class="card m-b-0">
+                <!-- .chat-row -->
+                <div class="chat-main-box">
+                    <div class="chat-right-aside">
+                        <div class="chat-main-header">
+                            <div class="p-3 b-b">
+                                <h4 class="box-title">Sohbet Geçmişi</h4>
+                            </div>
+                        </div>
+                        <div class="chat-rbox ps ps--theme_default ps--active-y"
+                             data-ps-id="bae6a8e6-9e5f-687b-330e-65d9e1ab4241" style="min-height: 700px">
+                            <ul class="chat-list p-3" style="height: 0px;">
+                                <li v-for="chatMessage in chats" class="messages" :class="reverse(chatMessage.sender)">
+                                    <div>
+                                        <div class="chat-content">
+                                            <h5 v-show="chatMessage.sender == 1">${ you }</h5>
+                                            <h5 v-show="chatMessage.sender == 2">${ staff }</h5>
+                                            <div class="box bg-light-info">${chatMessage.message}</div>
+                                            <div class="chat-time">${chatMessage.createdAt.date}</div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            </ul>
+                            <div class="ps__scrollbar-x-rail" style="left: 0px; bottom: -506px;">
+                                <div class="ps__scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps__scrollbar-y-rail" style="top: 506px; right: 0px; height: 175px;">
+                                <div class="ps__scrollbar-y" tabindex="0" style="top: 131px; height: 44px;"></div>
+                            </div>
+                        </div>
+                        <div class="card-body border-top">
+                            <div class="row">
+                                <div class="col-8">
+                                    <textarea v-on:keyup.enter="sendMessage()" v-model="message"
+                                              placeholder="Mesajınızı Buraya Yazınız"
+                                              class="form-control border-0"></textarea>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <button v-on:click="sendMessage()" type="button"
+                                            class="btn btn-info btn-circle btn-lg"><i
+                                                class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

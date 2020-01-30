@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+    <h1>Chat</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ chat.id }}</td>
+            </tr>
+            <tr>
+                <th>Tcid</th>
+                <td>{{ chat.tcid }}</td>
+            </tr>
+            <tr>
+                <th>StartTime</th>
+                <td>{{ chat.startTime ? chat.startTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EndTime</th>
+                <td>{{ chat.endTime ? chat.endTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ chat.status }}</td>
+            </tr>
+            <tr>
+                <th>Citizen</th>
+                <td>{{ chat.citizen }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ chat.createdAt ? chat.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ chat.updatedAt ? chat.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DeletedAt</th>
+                <td>{{ chat.deletedAt ? chat.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('chat_index') }}">back to list</a>
+
+    <a href="{{ path('chat_edit', {'id': chat.id}) }}">edit</a>
+
+    {{ include('chat/_delete_form.html.twig') }}
+{% endblock %}

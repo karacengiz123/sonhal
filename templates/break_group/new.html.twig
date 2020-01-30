@@ -1,0 +1,27 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}New BreakGroup{% endblock %}
+
+{% block body %}
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".successBtn form button").attr('class', 'btn btn-success');
+        });
+    </script>
+    <h1 style="padding: 20px">Yeni Mola Grubu Oluştur</h1>
+<div class="col-lg-12 aaa" style="padding: 20px; background-color: white">
+    <a  class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('break_group_index') }}">Listeye Geri Dön</a>
+
+    <div class="successBtn">
+    {{ include('break_group/_form.html.twig') }}
+    </div>
+    <br/>
+    <br/>
+</div>
+{% endblock %}

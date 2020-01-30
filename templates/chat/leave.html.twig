@@ -1,0 +1,33 @@
+{% extends 'layout/login_base.html.twig' %}
+
+{% block title %} {% endblock %}
+{% block customCss %}
+    <link href="/assets/dist/css/pages/chat-app-page.css" rel="stylesheet">
+
+{% endblock %}
+{% block customScript %}
+    <script src="/assets/dist/js/custom.min.js"></script>
+    <script src="/assets/dist/js/pages/chat.js"></script>
+    <script src="{{ asset('assets/js/vue.min.js') }}"></script>
+
+{% endblock %}
+
+{% block body %}
+    <div id="chat" class="row">
+        <div class="col-12">
+            <div class="card m-b-0">
+                <!-- .chat-row -->
+                <div class="chat-main-box">
+                    <div class="chat-right-aside">
+                        <div class="chat-main-header">
+                            <div class="p-3 b-b">
+                                <h2 class="box-title">Sohbet Kapatıldı</h2>
+                                <p>Görüşme Sonlandırılmıştır. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

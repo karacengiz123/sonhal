@@ -1,0 +1,203 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Değerlendiren + Dış Firma Süreci Tablosu{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+        #form_formTemplateId  {
+            color: #f00 !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice{
+            background-color: #03a9f3;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: default;
+            float: left;
+            margin-right: 10px;
+            margin-top: 10px;
+            padding: 0 5px;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#evaluatorExternalCountListTableDiv").css("display", "none");
+                $('#evaluatorExternalCountListTable').dataTable().fnDestroy();
+                $('#evaluatorExternalCountListTable').html("");
+                tableFilling = false;
+            }
+
+        }
+
+        function displayBlockTableDiv() {
+            $("#evaluatorExternalCountListTableDiv").css("display", "block");
+        }
+
+        function ModalStart(modalText = null) {
+            $("#evaluatorExternalCountDetail").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#evaluatorExternalCountDetailText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#evaluatorExternalCountDetailText").html(modalText);
+            }
+        }
+
+        function ModalFinish() {
+            $("#evaluatorExternalCountDetail").modal('hide');
+            $("#evaluatorExternalCountDetailText").html("");
+        }
+
+        function evaluatorExternalCountReportDetailValidateForm() {
+            ModalStart();
+            $.ajax({
+                type: 'POST',
+                url: '/evaluatorExternalCountReportTime',
+                data: $('#evaluatorExternalCountReportDetailIdSelect').serialize(),
+                success: function (data) {
+                    console.log(data);
+                    if ($.isArray(data) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#evaluatorExternalCountListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: [
+                                {data: "dateRange", name: "dateRange", title: "Tarih"},
+                                // {data: "dateRangeTime", name: "dateRange", title: "24/15 dklık<br/>veya Saatlik"},
+                                {data: "Degerlendiren", name: "Degerlendiren", title: "Degerlendiren"},
+                                {data: "evaCount", name: "evaCount", title: "Değerlendirme Sayısı"},
+                                {data: "AVGScore", name: "AVGScore", title: "Ortalama Puan"},
+                                {data: "SumDuration", name: "SumDuration", title: "Toplam Dinleme Süresi DK"},
+                                {data: "AvgDuration", name: "AvgDuration", title: "Ortalma Çağrı Süresi DK"},
+                                {data: "MinScore", name: "MinScore", title: "Min Puan"},
+                                {data: "MaxScore", name: "MaxScore", title: "Max Puan"},
+                            ],
+                            order: [],
+                            data: data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            }, 1000);
+                        tableFilling = true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+        // var data = [
+        //
+        //     {
+        //         html: '<div style="color:green"></div>'
+        //     }];
+
+
+        $(document).ready(function () {
+            $("#form_formTemplateId").select2({
+
+                width: 1000,
+            });
+
+        })
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Değerlendiren + Dış Firma Süreci Tablosu</h1>
+
+        {{ form_start(form, {'attr': {'id': 'evaluatorExternalCountReportDetailIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="evaluatorExternalCountReportDetailValidateForm()" class="btn" value="Listele"
+               style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="evaluatorExternalCountListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="evaluatorExternalCountListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="evaluatorExternalCountDetail" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="evaluatorExternalCountDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

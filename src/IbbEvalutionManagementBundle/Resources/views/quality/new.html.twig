@@ -1,0 +1,109 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Yeni Değerlendirme{% endblock %}
+
+{% block body %}
+
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+        body
+        {
+            width: 100%!important;
+        }
+    </style>
+
+
+    <h1 style="text-align: left;padding: 20px">Yeni Değerlendirme</h1>
+
+        <h2 style="color: darkred">
+                {{ hasError }}
+        </h2>
+    <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px">
+        <div class="successBtn">
+            <div class="row" id="teamChoose">
+            Takım Seç :
+            <select class="form-control" id="agent_group" name="agent_group">
+                <option value="Temsilci Seç">Temsilci Gurubu Seçiniz..</option>
+                <option value="0">Tümünü Seçiniz</option>
+
+            </select><br><br>
+            </div>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button class="btn btn-success">{{ button_label|default('Oluştur') }}</button>
+            {{ form_end(form) }}
+
+        </div>
+        <br/>
+        <br/>
+
+    </div>
+
+
+{% endblock %}
+
+{% block customScript %}
+    <script>
+
+        var callID={{ callID }};
+        if (callID !=null)
+        {
+            $("#evaluation_source option[value='2']").attr('disabled','disabled');
+            $("#evaluation_source option[value='3']").attr('disabled','disabled');
+            $("#evaluation_source option[value='4']").attr('disabled','disabled');
+            $("#evaluation_source option[value='5']").attr('disabled','disabled');
+            $("#evaluation_source option[value='6']").attr('disabled','disabled');
+            $('#evaluation_sourceDestID').attr('readonly',true);
+        }
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#evaluation_user").select2();
+            $("#evaluation_formTemplate").select2();
+
+            var teamID={{ teamID }};
+            var sourceID=$('#evaluation_sourceDestID').val();
+            if(sourceID==""){
+                $.get("/ibb-staff/agent-select-eva/" + teamID,
+                    function (data) {
+                        $("#evaluation_user").empty().trigger('change');
+                        $('#evaluation_user').select2({
+                            placeholder: 'Agent Seçiniz..',
+                            data: data
+                        });
+                    },
+                );
+            }
+
+            $.get("{{ path('team_select_eva') }}",
+                function (data) {
+                    $('#agent_group').select2({
+                        placeholder: 'Takım Seçiniz..',
+                        data: data
+                    });
+                    $('#agent_group').val({{ teamID }}).trigger('change');
+                },
+            );
+        });
+
+        $('#agent_group').on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+            $.get("/ibb-staff/agent-select-eva/" + id,
+                function (data) {
+                    $("#evaluation_user").empty().trigger('change');
+                    $('#evaluation_user').select2({
+                        placeholder: 'Agent Seçiniz..',
+                        data: data
+                    });
+                },
+            );
+        });
+
+    </script>
+{% endblock %}

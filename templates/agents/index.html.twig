@@ -1,0 +1,432 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Hello IndexController!{% endblock %}
+{% block customCss %}
+    <style >
+        .filterDiv {
+            float: left;
+            background-color: #2196F3;
+            color: #ffffff;
+            width: 100px;
+            line-height: 100px;
+            text-align: center;
+            margin: 2px;
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .container {
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        /* Style the buttons */
+        .btn {
+            border: none;
+            outline: none;
+            padding: 12px 16px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #ddd;
+        }
+
+        .btn.active {
+            background-color: #666;
+            color: white;
+        }
+
+        #grad1 {
+
+            background: red; /* For browsers that do not support gradients */
+
+            background: -webkit-linear-gradient(left, blue , Violet, green, Yellow, Orange, Red	); /* For Safari 5.1 to 6.0 */
+            background: -o-linear-gradient(right,     blue , Violet, green, Yellow, Orange, Red); /* For Opera 11.1 to 12.0 */
+            background: -moz-linear-gradient(right,   blue , Violet, green, Yellow, Orange, Red); /* For Firefox 3.6 to 15 */
+            background: linear-gradient(to right,     blue , Violet, green, Yellow, Orange, Red); /* Standard syntax (must be last) */
+        }
+
+        div.scrollmenu {
+            overflow: auto;
+            white-space: nowrap;
+        }
+
+        div.scrollmenu a {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+        }
+
+        div.scrollmenu a:hover {
+            background-color: #777;
+
+        }
+
+        #users{
+            font-size: 22px;
+            /*background-color: #008ae6;*/
+            color: white;
+            border: 1px black solid;
+            text-align: center;
+            padding: 18px;
+
+        }
+        #breakTime{
+
+            color: black;
+            border: 1px black solid;
+            text-align: center;
+            padding: 18px;
+
+        }
+        #food{
+            color: black;
+            border: 1px black solid;
+            text-align: center;
+            padding: 18px;
+        }
+        #question{
+            color: black;
+            border: 1px black solid;
+            text-align: center;
+            padding: 18px;
+        }
+        #internalcall{
+            /*background-color: #23B5D3;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center;
+            padding: 18px;
+        }
+        #outcall{
+            /*background-color:#23B5D3;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+
+        #externalcallplayingtime{
+            /*background-color:#23B5D3;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #outcalldialtimebreak{
+            /*background-color:#23B5D3;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+
+
+        #calltimetotal{
+            /*background-color:#EA526F;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #firstloginlastouttotal{
+            /*background-color:#AB87FF;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #ACHT {
+            /*background-color:#7AC74F;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #acw{
+            /*background-color:#6564DB;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #hold {
+            /*background-color:#e6b800;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #readywaitingtime {
+            /*background-color:#00ff55;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #meeting {
+            /*background-color:#ff8000;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #education {
+            /*background-color:#E9AFA3;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #feedback {
+            /*background-color:#4d94ff;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #incomingcalltimetotal {
+            /*background-color:#99B2DD;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #transfernumber {
+            /*background-color:#FF5D73;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+        #questiontime {
+            /*background-color:#FF5D73;*/
+            color: black;
+            border: 1px black solid;
+            text-align: center; padding: 18px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="scrollmenu">
+
+
+    </div>
+
+
+
+
+    <div class="table-responsive m-t-40">
+        <div id="example23" class="dataTables_wrapper dt-bootstrap4">
+            <div class="dt-buttons"> <button class="dt-button buttons-copy buttons-html5 btn btn-primary mr-1" tabindex="0" aria-controls="example23">
+                    <span>Copy</span></button> <button class="dt-button buttons-csv buttons-html5 btn btn-primary mr-1" tabindex="0" aria-controls="example23"><span>CSV</span></button> <button class="dt-button buttons-excel buttons-html5 btn btn-primary mr-1" tabindex="0" aria-controls="example23"><span>Excel</span></button> <button class="dt-button buttons-pdf buttons-html5 btn btn-primary mr-1" tabindex="0" aria-controls="example23"><span>PDF</span></button> <button class="dt-button buttons-print btn btn-primary mr-1" tabindex="0" aria-controls="example23"><span>Print</span></button> </div><div id="example23_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="example23"></label></div><table id="example23" class="display nowrap table table-hover table-striped table-bordered dataTable" cellspacing="0" width="100%" role="grid" aria-describedby="example23_info" style="width: 100%;">
+
+                <thead id="grad1" >
+                <tr role="row">
+
+                    <th id="users">TC</th>
+                    <th id="users">PERSONEL</th>
+
+                    <th id="breakTime">MOLA<br/>sn</th>
+                    <th id="breakTime">MOLA<br/>dk</th>
+                    <th id="breakTime">MOLA<br/>SaatFormatı</th>
+                    <th id="breakTime">MOLA<br/>TuşlamaSayısı</th>
+
+                    <th id="food">YEMEK <br>sn</th>
+                    <th id="food">YEMEK <br>dk</th>
+                    <th id="food">YEMEK <br>SaatFormatı</th>
+                    <th id="food">YEMEK <br>TuşlamaSayısı</th>
+
+                    <th id="question">SORU  <br>sn</th>
+                    <th id="question">SORU  <br>dk</th>
+                    <th id="question">SORU  <br>SaatFormatı</th>
+                    <th id="question">SORU  <br>TuşlamaSayısı</th>
+
+                    <th id="internalcall">DAHİLİ ARAMA<br>sn</th>
+                    <th id="internalcall">DAHİLİ ARAMA<br>dk</th>
+                    <th id="internalcall">DAHİLİ ARAMA<br>SaatFormatı</th>
+                    <th id="internalcall">DAHİLİ ARAMA<br>TuşlamaSayısı</th>
+
+                    <th id="outcall">DIŞ ARAMA<br>sn</th>
+                    <th id="outcall">DIŞ ARAMA<br>dk</th>
+                    <th id="outcall">DIŞ ARAMA<br>SaatFormatı</th>
+                    <th id="outcall">DIŞ ARAMA<br>TuşlamaSayısı</th>
+
+                    <th id="externalcallplayingtime">DIŞ ARAMA ÇALMA SÜRESİ<br>sn</th>
+                    <th id="externalcallplayingtime">DIŞ ARAMA ÇALMA SÜRESİ<br>dk</th>
+                    <th id="externalcallplayingtime">DIŞ ARAMA ÇALMA SÜRESİ<br>SaatFormatı</th>
+                    <th id="externalcallplayingtime">DIŞ ARAMA ÇALMA SÜRESİ<br>TuşlamaSayısı</th>
+
+                    <th id="outcalldialtimebreak">DIŞ ARAMA TUŞLAMA SÜRESİ MOLA<br>sn</th>
+                    <th id="outcalldialtimebreak">DIŞ ARAMA TUŞLAMA SÜRESİ MOLA<br>dk</th>
+                    <th id="outcalldialtimebreak">DIŞ ARAMA TUŞLAMA SÜRESİ MOLA<br>SaatFormatı</th>
+                    <th id="outcalldialtimebreak">DIŞ ARAMA TUŞLAMA SÜRESİ MOLA<br>TuşlamaSayısı</th>
+
+                    <th id="calltimetotal">ÇALMA SÜRESİ TOPLAM <br>sn</th>
+                    <th id="calltimetotal">ÇALMA SÜRESİ TOPLAM <br>dk</th>
+                    <th id="calltimetotal">ÇALMA SÜRESİ TOPLAM <br>SaatFormatı</th>
+                    <th id="calltimetotal">ÇALMA SÜRESİ TOPLAM <br>TuşlamaSayısı</th>
+
+                    <th id="firstloginlastouttotal">Login ilk giriş son çıkış TOPLAM <br>sn</th>
+                    <th id="firstloginlastouttotal">Login ilk giriş son çıkış TOPLAM <br>dk</th>
+                    <th id="firstloginlastouttotal">Login ilk giriş son çıkış TOPLAM <br>SaatFormatı</th>
+                    <th id="firstloginlastouttotal">Login ilk giriş son çıkış TOPLAM <br>TuşlamaSayısı</th>
+
+                    <th id="ACHT">ACHT <br>sn</th>
+                    <th id="ACHT">ACHT <br>dk</th>
+                    <th id="ACHT">ACHT <br>SaatFormatı</th>
+                    <th id="ACHT">ACHT <br>TuşlamaSayısı</th>
+
+                    <th id="acw">ACW  <br>sn</th>
+                    <th id="acw">ACW  <br>dk</th>
+                    <th id="acw">ACW  <br>SaatFormatı</th>
+                    <th id="acw">ACW  <br>TuşlamaSayısı</th>
+
+                    <th id="hold">HOLD <br>sn</th>
+                    <th id="hold">HOLD <br>dk</th>
+                    <th id="hold">HOLD <br>SaatFormatı</th>
+                    <th id="hold">HOLD <br>TuşlamaSayısı</th>
+
+                    <th id="readywaitingtime">HAZIRDA BEKLEME SÜRESİ<br>sn</th>
+                    <th id="readywaitingtime">HAZIRDA BEKLEME SÜRESİ<br>dk</th>
+                    <th id="readywaitingtime">HAZIRDA BEKLEME SÜRESİ<br>SaatFormatı</th>
+                    <th id="readywaitingtime">HAZIRDA BEKLEME SÜRESİ<br>TuşlamaSayısı</th>
+
+                    <th id="meeting">TOPLANTI <br>sn</th>
+                    <th id="meeting">TOPLANTI <br>dk</th>
+                    <th id="meeting">TOPLANTI <br>SaatFormatı</th>
+                    <th id="meeting">TOPLANTI <br>TuşlamaSayısı</th>
+
+                    <th id="education">EĞİTİM <br>sn</th>
+                    <th id="education">EĞİTİM <br>dk</th>
+                    <th id="education">EĞİTİM <br>SaatFormatı</th>
+                    <th id="education">EĞİTİM <br>TuşlamaSayısı</th>
+
+                    <th id="feedback">GERİ BİLDİRİM <br>sn</th>
+                    <th id="feedback">GERİ BİLDİRİM <br>dk</th>
+                    <th id="feedback">GERİ BİLDİRİM <br>SaatFormatı</th>
+                    <th id="feedback">GERİ BİLDİRİM <br>TuşlamaSayısı</th>
+
+                    <th id="incomingcalltimetotal" >GELEN ÇAĞRI SÜRESİ TOPLAM <br>sn</th>
+                    <th id="incomingcalltimetotal" >GELEN ÇAĞRI SÜRESİ TOPLAM <br>dk</th>
+                    <th id="incomingcalltimetotal" >GELEN ÇAĞRI SÜRESİ TOPLAM <br>SaatFormatı</th>
+                    <th id="incomingcalltimetotal" >GELEN ÇAĞRI SÜRESİ TOPLAM <br>TuşlamaSayısı</th>
+
+                    <th id="transfernumber">TRANSFER SAYISI <br>TuşlamaSayısı</th>
+                    <th id="transfernumber">SINAV TUŞLAMA <br>TuşlamaSayısı</th>
+                    <th id="questiontime">SINAV SÜRESİ <br>dk</th>
+
+                </tr>
+                </thead>
+                <tfoot>
+                </tfoot>
+                <tbody>
+                    {% for cc in cdrs %}
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>{{ cc.personel }}</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>{{ cc.dahiliDenDahiliyeKonusmaSuresi }}</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="dataTables_info" id="example23_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div>
+            <div class="dataTables_paginate paging_simple_numbers" id="example23_paginate"><ul class="pagination">
+                    <li class="paginate_button page-item previous disabled" id="example23_previous">
+                        <a href="#" aria-controls="example23" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+                    </li><li class="paginate_button page-item active">
+                        <a href="#" aria-controls="example23" data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
+                    <li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
+                    <li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="3" tabindex="0" class="page-link">3</a></li>
+                    <li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="4" tabindex="0" class="page-link">4</a></li>
+                    <li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="5" tabindex="0" class="page-link">5</a></li>
+                    <li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="6" tabindex="0" class="page-link">6</a></li>
+                    <li class="paginate_button page-item next" id="example23_next"><a href="#" aria-controls="example23" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>
+                </ul></div></div>
+    </div>
+
+
+
+
+{% endblock %}
+{% block customScript %}
+
+    <script>
+        $('#example23').DataTable({
+            dom: 'frtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        });
+        $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
+    </script>
+
+{% endblock %}

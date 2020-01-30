@@ -1,0 +1,49 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Guide{% endblock %}
+
+{% block body %}
+    <h1 style="padding: 20px">Rehber</h1>
+<div style="padding: 20px!important; background-color: white">
+    <a class="btn btn-info" style="float: right;margin-bottom: 20px" href="{{ path('guide_index') }}">Listeye Geri Dön</a>
+
+    <table class="table table-striped table-bordered">
+        <tbody>
+
+            <tr>
+                <th>Telefon</th>
+                <td>{{ guide.phone }}</td>
+            </tr>
+            <tr>
+                <th>İsim Soyisim</th>
+                <td>{{ guide.nameSurname }}</td>
+            </tr>
+            <tr>
+                <th>Ünvan</th>
+                <td>{{ guide.title }}</td>
+            </tr>
+            <tr>
+                <th>Hedef Tipi</th>
+                <td>{{ guide.targetType }}</td>
+            </tr>
+            <tr>
+                <th>Hedef Numarası</th>
+                <td>{{ guide.targetId }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-warning" style="float: right;" href="{{ path('guide_edit', {'id': guide.id}) }}">Güncelle</a>
+
+<div style="float: right;!important;margin-right: 10px;" >
+    {{ include('guide/_delete_form.html.twig') }}</div>
+
+    <br>
+    <br>
+
+    <br>
+    <br>
+
+</div>
+
+{% endblock %}

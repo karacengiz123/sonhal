@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RecordListenLog{% endblock %}
+
+{% block body %}
+    <h1>RecordListenLog</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ record_listen_log.id }}</td>
+            </tr>
+            <tr>
+                <th>ClientIp</th>
+                <td>{{ record_listen_log.clientIp }}</td>
+            </tr>
+            <tr>
+                <th>ListenTime</th>
+                <td>{{ record_listen_log.listenTime ? record_listen_log.listenTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('record_listen_log_index') }}">back to list</a>
+
+    <a href="{{ path('record_listen_log_edit', {'id': record_listen_log.id}) }}">edit</a>
+
+    {{ include('record_listen_log/_delete_form.html.twig') }}
+{% endblock %}

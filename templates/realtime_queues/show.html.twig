@@ -1,0 +1,238 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RealtimeQueues{% endblock %}
+
+{% block body %}
+    <h1>RealtimeQueues</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Name</th>
+                <td>{{ realtime_queue.name }}</td>
+            </tr>
+            <tr>
+                <th>Musiconhold</th>
+                <td>{{ realtime_queue.musiconhold }}</td>
+            </tr>
+            <tr>
+                <th>Announce</th>
+                <td>{{ realtime_queue.announce }}</td>
+            </tr>
+            <tr>
+                <th>Context</th>
+                <td>{{ realtime_queue.context }}</td>
+            </tr>
+            <tr>
+                <th>Timeout</th>
+                <td>{{ realtime_queue.timeout }}</td>
+            </tr>
+            <tr>
+                <th>Ringinuse</th>
+                <td>{{ realtime_queue.ringinuse }}</td>
+            </tr>
+            <tr>
+                <th>Setinterfacevar</th>
+                <td>{{ realtime_queue.setinterfacevar }}</td>
+            </tr>
+            <tr>
+                <th>Setqueuevar</th>
+                <td>{{ realtime_queue.setqueuevar }}</td>
+            </tr>
+            <tr>
+                <th>Setqueueentryvar</th>
+                <td>{{ realtime_queue.setqueueentryvar }}</td>
+            </tr>
+            <tr>
+                <th>MonitorFormat</th>
+                <td>{{ realtime_queue.monitorFormat }}</td>
+            </tr>
+            <tr>
+                <th>Membermacro</th>
+                <td>{{ realtime_queue.membermacro }}</td>
+            </tr>
+            <tr>
+                <th>Membergosub</th>
+                <td>{{ realtime_queue.membergosub }}</td>
+            </tr>
+            <tr>
+                <th>QueueYouarenext</th>
+                <td>{{ realtime_queue.queueYouarenext }}</td>
+            </tr>
+            <tr>
+                <th>QueueThereare</th>
+                <td>{{ realtime_queue.queueThereare }}</td>
+            </tr>
+            <tr>
+                <th>QueueCallswaiting</th>
+                <td>{{ realtime_queue.queueCallswaiting }}</td>
+            </tr>
+            <tr>
+                <th>QueueQuantity1</th>
+                <td>{{ realtime_queue.queueQuantity1 }}</td>
+            </tr>
+            <tr>
+                <th>QueueQuantity2</th>
+                <td>{{ realtime_queue.queueQuantity2 }}</td>
+            </tr>
+            <tr>
+                <th>QueueHoldtime</th>
+                <td>{{ realtime_queue.queueHoldtime }}</td>
+            </tr>
+            <tr>
+                <th>QueueMinutes</th>
+                <td>{{ realtime_queue.queueMinutes }}</td>
+            </tr>
+            <tr>
+                <th>QueueMinute</th>
+                <td>{{ realtime_queue.queueMinute }}</td>
+            </tr>
+            <tr>
+                <th>QueueSeconds</th>
+                <td>{{ realtime_queue.queueSeconds }}</td>
+            </tr>
+            <tr>
+                <th>QueueThankyou</th>
+                <td>{{ realtime_queue.queueThankyou }}</td>
+            </tr>
+            <tr>
+                <th>QueueCallerannounce</th>
+                <td>{{ realtime_queue.queueCallerannounce }}</td>
+            </tr>
+            <tr>
+                <th>QueueReporthold</th>
+                <td>{{ realtime_queue.queueReporthold }}</td>
+            </tr>
+            <tr>
+                <th>AnnounceFrequency</th>
+                <td>{{ realtime_queue.announceFrequency }}</td>
+            </tr>
+            <tr>
+                <th>AnnounceToFirstUser</th>
+                <td>{{ realtime_queue.announceToFirstUser }}</td>
+            </tr>
+            <tr>
+                <th>MinAnnounceFrequency</th>
+                <td>{{ realtime_queue.minAnnounceFrequency }}</td>
+            </tr>
+            <tr>
+                <th>AnnounceRoundSeconds</th>
+                <td>{{ realtime_queue.announceRoundSeconds }}</td>
+            </tr>
+            <tr>
+                <th>AnnounceHoldtime</th>
+                <td>{{ realtime_queue.announceHoldtime }}</td>
+            </tr>
+            <tr>
+                <th>AnnouncePosition</th>
+                <td>{{ realtime_queue.announcePosition }}</td>
+            </tr>
+            <tr>
+                <th>AnnouncePositionLimit</th>
+                <td>{{ realtime_queue.announcePositionLimit }}</td>
+            </tr>
+            <tr>
+                <th>PeriodicAnnounce</th>
+                <td>{{ realtime_queue.periodicAnnounce }}</td>
+            </tr>
+            <tr>
+                <th>PeriodicAnnounceFrequency</th>
+                <td>{{ realtime_queue.periodicAnnounceFrequency }}</td>
+            </tr>
+            <tr>
+                <th>RelativePeriodicAnnounce</th>
+                <td>{{ realtime_queue.relativePeriodicAnnounce }}</td>
+            </tr>
+            <tr>
+                <th>RandomPeriodicAnnounce</th>
+                <td>{{ realtime_queue.randomPeriodicAnnounce }}</td>
+            </tr>
+            <tr>
+                <th>Retry</th>
+                <td>{{ realtime_queue.retry }}</td>
+            </tr>
+            <tr>
+                <th>Wrapuptime</th>
+                <td>{{ realtime_queue.wrapuptime }}</td>
+            </tr>
+            <tr>
+                <th>Penaltymemberslimit</th>
+                <td>{{ realtime_queue.penaltymemberslimit }}</td>
+            </tr>
+            <tr>
+                <th>Autofill</th>
+                <td>{{ realtime_queue.autofill }}</td>
+            </tr>
+            <tr>
+                <th>MonitorType</th>
+                <td>{{ realtime_queue.monitorType }}</td>
+            </tr>
+            <tr>
+                <th>Autopause</th>
+                <td>{{ realtime_queue.autopause }}</td>
+            </tr>
+            <tr>
+                <th>Autopausedelay</th>
+                <td>{{ realtime_queue.autopausedelay }}</td>
+            </tr>
+            <tr>
+                <th>Autopausebusy</th>
+                <td>{{ realtime_queue.autopausebusy }}</td>
+            </tr>
+            <tr>
+                <th>Autopauseunavail</th>
+                <td>{{ realtime_queue.autopauseunavail }}</td>
+            </tr>
+            <tr>
+                <th>Maxlen</th>
+                <td>{{ realtime_queue.maxlen }}</td>
+            </tr>
+            <tr>
+                <th>Servicelevel</th>
+                <td>{{ realtime_queue.servicelevel }}</td>
+            </tr>
+            <tr>
+                <th>Strategy</th>
+                <td>{{ realtime_queue.strategy }}</td>
+            </tr>
+            <tr>
+                <th>Joinempty</th>
+                <td>{{ realtime_queue.joinempty }}</td>
+            </tr>
+            <tr>
+                <th>Leavewhenempty</th>
+                <td>{{ realtime_queue.leavewhenempty }}</td>
+            </tr>
+            <tr>
+                <th>Reportholdtime</th>
+                <td>{{ realtime_queue.reportholdtime }}</td>
+            </tr>
+            <tr>
+                <th>Memberdelay</th>
+                <td>{{ realtime_queue.memberdelay }}</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>{{ realtime_queue.weight }}</td>
+            </tr>
+            <tr>
+                <th>Timeoutrestart</th>
+                <td>{{ realtime_queue.timeoutrestart }}</td>
+            </tr>
+            <tr>
+                <th>Defaultrule</th>
+                <td>{{ realtime_queue.defaultrule }}</td>
+            </tr>
+            <tr>
+                <th>Timeoutpriority</th>
+                <td>{{ realtime_queue.timeoutpriority }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('realtime_queues_index') }}">back to list</a>
+
+    <a href="{{ path('realtime_queues_edit', {'name': realtime_queue.name}) }}">edit</a>
+
+    {{ include('realtime_queues/_delete_form.html.twig') }}
+{% endblock %}

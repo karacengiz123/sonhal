@@ -1,0 +1,362 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Kuyruk Yönetimi{% endblock %}
+{% block customCss %}
+    <style>
+        .table_kapasite tbody tr td {
+            border: 1px solid #dcdcdc !important;
+        }
+    </style>
+{% endblock %}
+
+{% block customScript %}
+<script  type="text/javascript">
+
+    $(document).ready(function () {
+        $.get("{{ path('queue_select_two') }}",
+            function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    data[i] ={id: data[i].queue, text:data[i].description};
+                }
+                $('#agent_group').select2({
+                    placeholder: 'Kuyruk Seçiniz..',
+                    data: data
+                });
+            },
+        );
+    });
+
+    $('#agent_group').on('select2:select', function (e) {
+        var queue = e.params.data.id;
+        var text = e.params.data.text;
+        $.get("/queue-skill-managament/queue-as-agent-select/" + queue,
+            function (data) {
+                $('.tbody_agent_skill').empty();
+                var queueAgents = data;
+                queueAgents.forEach(function (queueAgents) {
+                    $('.tbody_agent_skill').append('<tr><td>' + queueAgents.user + '</td></tr>')
+                });
+            },
+        );
+
+        // $('#agent_select').on('select2:select', function (e) {
+        //     var id = e.params.data.id;
+        //     var text = e.params.data.text;
+        //
+        //     $.ajax({
+        //         type: 'get',
+        //         url: '/my/queue-skill-agent-select/' + id,
+        //
+        //         success: function (data) {
+        //             console.log(data);
+        //             $('.agent_callerId').html(data.extens.callerId);
+        //             $('.agent_exten').html(data.extens.exten);
+        //
+        //             $('.tbody_agent_skill').empty();
+        //             var agentQueues = data.agentQueues;
+        //             agentQueues.forEach(function (agentQueue) {
+        //                 $('.tbody_agent_skill').append('<tr><td>' + agentQueue.description + '</td></tr>')
+        //             });
+        //         }
+        //     });
+        // });
+
+        $('#add').click(function () {
+
+            var agent_exten = $('#agent_select').select2('data');
+            var skill = $('#skill_select').select2('data');
+            var level = $('#level').val();
+
+            if (agent_exten.length <= 15) {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("Lütfen Bekleyiniz");
+                var getPost = 'agent_exten=' + JSON.stringify(agent_exten) + '&skill_id=' + JSON.stringify(skill) + '&level=' + level;
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('agent_skill_add_activation') }}',
+                    data: getPost,
+                    success:
+                        function (result) {
+                            // console.log(result);
+                            $("#skillModalText").html(result);
+                            setTimeout(function () {
+                                $('#skillModal').modal('hide');
+                                $("#skillModalText").html("");
+                                location.reload();
+                            }, 1000);
+                        }
+                });
+            } else {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("15 Kişiden fazla seçemezsiniz");
+                setTimeout(function () {
+                    $('#skillModal').modal('hide');
+                    $("#skillModalText").html("");
+                }, 1000);
+            }
+
+        });
+
+        $('#update').click(function () {
+
+            var agent_exten = $('#agent_select').select2('data');
+            var skill = $('#skill_select').select2('data');
+            var level = $('#level').val();
+
+            if (agent_exten.length <= 15) {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("Lütfen Bekleyiniz");
+                var getPost = 'agent_exten=' + JSON.stringify(agent_exten) + '&skill_id=' + JSON.stringify(skill) + '&level=' + level;
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('agent_skill_update') }}',
+                    data: getPost,
+                    success:
+                        function (result) {
+                            $("#skillModalText").html(result.update);
+                            $('.tbody_agent_skill').empty();
+                            var agentQueue = result.agentQueues;
+                            agentQueue.forEach(function (agentQueue) {
+                                $('.tbody_agent_skill').append('<tr><td>' + agentQueue.description + '</td><td>' + agentQueue.penalty + '</td></tr>')
+                            });
+                            setTimeout(function () {
+                                $('#skillModal').modal('hide');
+                                $("#skillModalText").html("");
+                            }, 1000);
+                        }
+                });
+            } else {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("15 Kişiden fazla seçemezsiniz");
+                setTimeout(function () {
+                    $('#skillModal').modal('hide');
+                    $("#skillModalText").html("");
+                }, 1000);
+            }
+        });
+
+        $('#delete').click(function () {
+
+            var agent_exten = $('#agent_select').select2('data');
+            var skill = $('#skill_select').select2('data');
+
+            if (agent_exten.length <= 15) {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("Lütfen Bekleyiniz");
+                var getPost = 'agent_exten=' + JSON.stringify(agent_exten) + '&skill_id=' + JSON.stringify(skill);
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('agent_skill_delete') }}',
+                    data: getPost,
+                    success:
+                        function (result) {
+                            $("#skillModalText").html(result);
+                            setTimeout(function () {
+                                $('#skillModal').modal('hide');
+                                $("#skillModalText").html("");
+                                location.reload();
+                            }, 1000);
+                        }
+                });
+            } else {
+                $('#skillModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#skillModalText").html("15 Kişiden fazla seçemezsiniz");
+                setTimeout(function () {
+                    $('#skillModal').modal('hide');
+                    $("#skillModalText").html("");
+                }, 1000);
+            }
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h4 class="text-themecolor">Kuyruk Yönetimi</h4>
+        </div>
+        <div class="col-md-7 align-self-center text-right">
+            <div class="d-flex justify-content-end align-items-center">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Anasayfa</a></li>
+                    <li class="breadcrumb-item active">Kuyruk Yönetimi</li>
+                </ol>
+                {#<button type="button" class="btn btn-info  d-lg-block m-l-15"><i class="far fa-save"></i> Kaydet</button>#}
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Start Page Content -->
+    <!-- ============================================================== -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive m-t-40 table_mola_kontrol_div">
+                        <div class="col-sm-12">
+                            <div class="col-md-12 skill_management_div_left">
+                                <div class="col-md-2 skill_form_group_div">
+                                    <label class="control-label text-right">Kuyruk  Seçimi</label>
+                                    <div class="form-group row">
+                                        <div style="min-width: 90%!important; width: 90%!important;">
+                                            <select class="form-control" id="agent_group" name="agent_group">
+                                                <option value="Temsilci Seç">Kuyruk Seçiniz..</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+{#                                <div class="col-md-2 skill_form_group_div">#}
+{#                                    <label class="control-label text-right">Agent Seçimi</label>#}
+{#                                    <div class="form-group row">#}
+{#                                        <div style="min-width: 90%!important; width: 90%!important;">#}
+{#                                            <select class="form-control" multiple="" id="agent_select" name="agent">#}
+
+{#                                            </select>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="col-md-2 skill_form_group_div">#}
+{#                                    <label class="control-label text-right">Skill Seçimi</label>#}
+{#                                    <div class="form-group row">#}
+{#                                        <div style="min-width: 90%!important; width: 90%!important;">#}
+{#                                            <select class="form-control" multiple="" id="skill_select" name="skill">#}
+
+{#                                            </select>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="col-md-6 skill_form_group_div">#}
+{#                                    <div class="form-group row col-md-12 agent_arama_div">#}
+{#                                        <div class="col-md-12">#}
+{#                                            <div class="col-md-12 input-group agent_arama_name">#}
+{#                                                <h2>Seviye</h2>#}
+{#                                            </div>#}
+{#                                            <div class="input-group col-md-12"#}
+{#                                                 style="margin: 0px!important; padding: 0px!important;">#}
+{#                                                <input type="text" name="level" class="form-control col-md-5" id="level"#}
+{#                                                       placeholder="Seviye Belirleyiniz">#}
+{#                                                <div class="col-md-2 input-group agent_arama_btn">#}
+{#                                                    <button type="button" name="save" id="add"#}
+{#                                                            class="btn btn-success  d-lg-block m-l-15">Ekle<i#}
+{#                                                                class="fas fa-save"></i></button>#}
+{#                                                </div>#}
+{#                                                <div class="col-md-3 input-group agent_arama_btn">#}
+{#                                                    <button type="button" name="edit" id="update"#}
+{#                                                            class="btn btn-primary  d-lg-block m-l-15">Güncelle<i#}
+{#                                                                class="fas fa-sync-alt"></i></button>#}
+{#                                                </div>#}
+{#                                                <div class="col-md-2 input-group agent_arama_btn">#}
+{#                                                    <button type="button" name="delete" id="delete"#}
+{#                                                            class="btn btn-danger  d-lg-block m-l-15">sil<i#}
+{#                                                                class="fas fa-minus-circle"></i></button>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+                            </div>
+                            <div class="col-md-12 skill_management_div_right">
+
+                                <div class="row col-md-12 div_table_agent_bilgileri">
+                                    <div class="card col-md-12 div_table_agent_bilgileri">
+                                        <div class="card-body col-md-12 div_table_agent_bilgileri">
+{#                                            <h4 class="card-title">Agent:</h4>#}
+{#                                            <p><span class="agent_callerId"></span> | <span class="agent_exten"></span>#}
+{#                                            </p>#}
+{#                                            <h4 class="card-title">Kapasite:</h4>#}
+                                            <div class="table-responsive col-md-12 div_table_agent_bilgileri">
+                                                <table class="table full-color-table full-primary-table hover-table table_kapasite">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>SKİLL</th>
+{#                                                        <th>VALUE</th>#}
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody class="tbody_agent_skill">
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="skillModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="skillModalText"></h1>
+                            <div class="outer">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+        </div>
+    </div>
+{% endblock %}

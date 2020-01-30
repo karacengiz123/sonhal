@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SkillMember index{% endblock %}
+
+{% block body %}
+    <h1>SkillMember index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Queue</th>
+                <th>Member</th>
+                <th>Penalty</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for skill_member in skill_members %}
+            <tr>
+                <td>{{ skill_member.id }}</td>
+                <td>{{ skill_member.queue }}</td>
+                <td>{{ skill_member.member }}</td>
+                <td>{{ skill_member.penalty }}</td>
+                <td>
+                    <a href="{{ path('skill_member_show', {'id': skill_member.id}) }}">show</a>
+                    <a href="{{ path('skill_member_edit', {'id': skill_member.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('skill_member_new') }}">Create new</a>
+{% endblock %}

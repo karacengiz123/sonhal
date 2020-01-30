@@ -1,0 +1,167 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Temsilci Detay{% endblock %}
+{%  block customCss %}
+<style>
+    .dt-buttons{
+        margin-left: 20px;
+    }
+</style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#agentDetailListTableDiv").css("display","none");
+                $('#agentDetailListTable').dataTable().fnDestroy();
+                $('#agentDetailListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#agentDetailListTableDiv").css("display","block");
+        }
+        function modalStart(modalText=null) {
+            $("#loadagentDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#loadagentDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#loadagentDetailText").html(modalText);
+            }
+        }
+        function modalFinish() {
+            $("#loadagentDetail").modal('hide');
+            $("#loadagentDetailText").html("");
+        }
+        function agentDetailValidateForm() {
+            modalStart();
+            $.ajax({
+                type:'POST',
+                url:'/agentdetails',
+                data:$('#formagentDetailIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data)
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#agentDetailListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "24/15 dklık<br/>veya Saatlik"},
+                                { data: "agentTc" , name: "agentTc" , title: "TC NUMARASI"},
+                                { data: "agent" , name: "agent" , title: "İSİM SOYİSİM"},
+                                { data: "type" , name: "type" , title: "DURUM"},
+                                { data: "startTime" , name: "startTime" , title: "Başlangıç Zamanı"},
+                                { data: "endTime" , name: "endTime" , title: "Bitiş Zamanı"},
+                                { data: "diff" , name: "diff" , title: "Toplam Süre  Saniye"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        tableFilling=true;
+
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            },1000);
+                    } else {
+                        modalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Temsilci  Detay</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formagentDetailIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="agentDetailValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="agentDetailListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="agentDetailListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadagentDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadagentDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

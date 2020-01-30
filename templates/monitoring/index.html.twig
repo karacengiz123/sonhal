@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<title> Monitoring</title>
+
+{% block body %}
+
+<style type="text/css">
+    .dis_bolme {
+        float: left;
+        width: 550px;
+        height: 50px;
+        margin-right: 10px;
+    }
+
+    .ic_bolme {
+        width: 550px;
+        float: left;
+        height: 50px;
+        background: rebeccapurple;
+
+    }
+
+    .icisi_bolme {
+        float: left;
+        height: 50px;
+        background: violet;
+    }
+
+    .yazi {
+        position: relative;
+        text-align: center;
+        top: 50%;
+        left: 50%;
+        font-size: 45px;
+        transform: translate(-50%, -50%);
+
+</style>
+
+
+    <div class="dis_bolme"><b>10.5.95.155</b>
+        <div class="ic_bolme">
+            <div class="yazi">
+                {{ bos }}
+                {% set UsedDiskData = (550/100) * UsedDisk %}
+                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">
+                    {{ UsedDisk }}
+                </div>
+            </div>
+            {% set UsedRamData = (550/100) * usedPercent %}
+            <div class="ic_bolme">
+                <div class="yazi">
+                    {{ freePercent }}
+                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">
+                        {{ usedPercent }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br><br><br><br><br><br>
+    <div style="margin-right: 5px" class="dis_bolme"><b>10.5.95.156</b>
+        <div class="ic_bolme">
+            <div class="yazi">
+                {{ boss }}
+                {% set UsedDisksData = (550/100) * UsedDisks %}
+                <div class="icisi_bolme" style="width: {{ UsedDisksData }}px!important;">
+                    {{ UsedDisks }}
+                </div>
+            </div>
+            {% set UsedRamsData = (550/100) * usedPercents %}
+            <div class="ic_bolme">
+                <div class="yazi">
+                    {{ freePercents }}
+                    <div class="icisi_bolme" style="width: {{ UsedRamsData }}px!important;">
+                        {{ usedPercents }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br><br><br><br><br><br><br>
+    <div class="dis_bolme"><b>10.5.95.157</b>
+        <div class="ic_bolme">
+            <div class="yazi">
+                {{ bosa }}
+                {% set UsedDiskssData = (550/100) * UsedDiskss %}
+                <div class="icisi_bolme" style="width: {{ UsedDiskssData }}px!important;">
+                    {{ UsedDiskss }}
+                </div>
+            </div>
+            {% set UsedRamData = (550/100) * usedPercentss %}
+            <div class="ic_bolme">
+                <div class="yazi">
+                    {{ freePercentss }}
+                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">
+                        {{ usedPercentss }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{#    <div class="dis_bolme"><b>10.5.95.154</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="dis_bolme"><b>10.6.30.153</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="dis_bolme"><b>10.6.30.154</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="dis_bolme"><b>10.6.30.155</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="dis_bolme"><b>10.6.30.156</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="dis_bolme"><b>10.6.30.157</b>#}
+{#        <div class="ic_bolme">#}
+{#            <div class="yazi">#}
+{#                {{ bos }}#}
+{#                {% set UsedDiskData = (550/100) * UsedDisk %}#}
+{#                <div class="icisi_bolme" style="width: {{ UsedDiskData }}px!important;">#}
+{#                    {{ UsedDisk }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% set UsedRamData = (550/100) * usedPercent %}#}
+{#            <div class="ic_bolme">#}
+{#                <div class="yazi">#}
+{#                    {{ freePercent }}#}
+{#                    <div class="icisi_bolme" style="width: {{ UsedRamData }}px!important;">#}
+{#                        {{ usedPercent }}#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+
+
+
+
+
+
+
+
+
+
+
+
+        {#    <div style="max-width: 550px; height: 50px; "> <b>10.5.95.155</b>#}
+        {#    <div style="max-width: {{TotalDisk}}%!important; height: 50px; background: rebeccapurple; ">#}
+        {#        <span style="align-content: center">Total Disk:{{ TotalDisk }}</span>#}
+        {#    <div style="max-width: {{UsedDisk}}%!important; height: 50px; background:violet;">#}
+        {#            <span style="align-content: center">Used Disk:{{ UsedDisk }}</span>#}
+        {#    </div>#}
+        {#</div>#}
+        {#</div>#}
+        {#<p>User Disk:{{ UsedDisk }} </p>#}
+        {#<p>Total Disk:{{ TotalDisk }} </p>#}
+        {#    {{ dump(TotalDisk) }}#}
+        {#    {{ dump (UsedDisk) }}#}
+
+        {% endblock %}
+

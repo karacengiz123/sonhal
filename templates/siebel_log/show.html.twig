@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SiebelLog{% endblock %}
+
+{% block body %}
+    <h1>SiebelLog</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ siebel_log.id }}</td>
+            </tr>
+            <tr>
+                <th>Callid</th>
+                <td>{{ siebel_log.callid }}</td>
+            </tr>
+            <tr>
+                <th>Response</th>
+                <td>{{ siebel_log.response }}</td>
+            </tr>
+            <tr>
+                <th>Request</th>
+                <td>{{ siebel_log.request }}</td>
+            </tr>
+            <tr>
+                <th>CreatedDate</th>
+                <td>{{ siebel_log.createdDate ? siebel_log.createdDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ActivityId</th>
+                <td>{{ siebel_log.activityId }}</td>
+            </tr>
+            <tr>
+                <th>SRId</th>
+                <td>{{ siebel_log.SRId }}</td>
+            </tr>
+            <tr>
+                <th>ContactId</th>
+                <td>{{ siebel_log.ContactId }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('siebel_log_index') }}">back to list</a>
+
+    <a href="{{ path('siebel_log_edit', {'id': siebel_log.id}) }}">edit</a>
+
+    {{ include('siebel_log/_delete_form.html.twig') }}
+{% endblock %}

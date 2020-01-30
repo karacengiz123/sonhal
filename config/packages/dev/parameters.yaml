@@ -1,0 +1,37 @@
+parameters:
+  env(LDAP_HOST): 'ibb.gov.tr'
+  env(REQUIRES_CHANNEL): 'https'
+  env(RETHINK_PORT): '28015'
+  env(RETHINK_DB): 'ibb'
+  listenerExten: '9341001999'
+  serverIpAdress: '%env(SERVER_IP_ADRESS)%'
+
+#   Prod
+  siebeliFrameLink: 'https://crmbeyazmasa.ibb.gov.tr/epublicsector_trk/start.swe?SWECmd=Start&SWEHo=crmbeyazmasa.ibb.gov.tr'
+  siebelCreateActivityLink: 'https://mobilservis.ibb.gov.tr/crm-prod/RESTInvokeBS/CreateActivity'
+  createChatActivityLink: 'https://mobilservis.ibb.gov.tr/crm-prod/RESTInvokeBS/CreateActivity'
+
+#  Test
+#  siebeliFrameLink: 'https://sbltestweb1.ibb.gov.tr/epublicsectortest_trk/start.swe?SWECmd=Start&SWEHo=sbltestweb1.ibb.gov.tr'
+#  siebelCreateActivityLink: 'https://mobilservis.ibb.gov.tr/crm-test/siebel-rest/v1.0/service/RESTInvokeBS/CreateActivity'
+#  createChatActivityLink: 'https://mobilservis.ibb.gov.tr/crm-test/siebel-rest/v1.0/service/RESTInvokeBS/CreateActivity'
+
+
+  createPollActivityLink: 'https://mobilservis.ibb.gov.tr/crm-prod/RESTInvokeBS/AssessmentInsert'
+  chatGetUserInfoLink: 'https://mobilservis.ibb.gov.tr/crm-test/siebel-rest/v1.0/service/IBB Portal User Create Service/GetUserInfo'
+
+  # SCREEN HTML PARAMETER
+
+  # IVR PARAMETER
+  tkmApiLink: 'http://tkmdev2.ibb.gov.tr/avaya/AvayaWebService.asmx/getIVRData?ivrCode='
+  tkmAvayaApiLink: 'http://tkmdev2.ibb.gov.tr/avaya/AvayaWebService.asmx/getAvayaData'
+  busStopApiLink: 'http://duraktahmin.iett.gov.tr/bilgi/duraktahminIVR.php?user=oho&pass=oho123&durak_kodu='
+  busStopSMSLink: "https://osb-mwwebgate.ibb.gov.tr/Internal/Sms/SmsService/ProxyService/SmsServiceSOAPPS?wsdl"
+  cardControllerApiLink: 'https://etugraadaptor.belbim.istanbul/EParaAdapter/SoapAdapter/IVRService.asmx?WSDL'
+  igdasApiLink: 'http://igcrmiis.igdas.com.tr:85/wsBBSIgdasCRMIVR.asmx?WSDL'
+
+  # prod
+  tbxSipServer: 'cmtemsilci1test.ibb.gov.tr'
+  tbxSipServerTwo: 'cmtemsilci2test.ibb.gov.tr'
+  appServerLink: 'tbxdev.ibb.gov.tr'
+  chatServerLink: 'tbxchat.ibb.gov.tr'

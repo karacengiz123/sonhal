@@ -1,0 +1,24 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Mola Türünü Düzenle{% endblock %}
+
+{% block body %}
+
+    <h1 style="padding: 20px"><br>Mola Türünü Düzenle</h1>
+    <style>
+        .aaa form button {
+            float: right;
+            margin: 5px;
+        }
+    </style>
+
+    <div class="col-lg-12 aaa" style=" background-color: white;  margin: auto; padding: 25px;">
+        <a class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('break_type_index') }}" > Listeye Geri Dön</a>
+
+                    {{ include('break_type/_form.html.twig', {'button_label': 'Güncelle'}) }}
+                    {{ include('break_type/_delete_form.html.twig') }}
+                    <br>
+                    <br>
+    </div>
+
+{% endblock %}

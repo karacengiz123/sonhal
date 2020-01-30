@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormCategory index{% endblock %}
+
+{% block body %}
+    <h1>FormCategory index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>MinScore</th>
+                <th>Sort</th>
+                <th>MaxScore</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_category in form_categories %}
+            <tr>
+                <td>{{ form_category.id }}</td>
+                <td>{{ form_category.title }}</td>
+                <td>{{ form_category.minScore }}</td>
+                <td>{{ form_category.sort }}</td>
+                <td>{{ form_category.maxScore }}</td>
+                <td>
+                    <a href="{{ path('form_category_show', {'id': form_category.id}) }}">show</a>
+                    <a href="{{ path('form_category_edit', {'id': form_category.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('form_category_new') }}">Create new</a>
+{% endblock %}

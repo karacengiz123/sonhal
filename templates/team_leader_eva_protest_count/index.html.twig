@@ -1,0 +1,91 @@
+{% extends "layout/base.html.twig" %}
+{% block title %} Takım Lideri Toplam İtiraz Tablosu{% endblock %}
+
+{% block customScript %}
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
+
+        for (i = 0; i <= createTableCount; i++) {
+            $("#selectCategoryTable_" + i).DataTable({
+                dom: 'lBfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ],
+                order: [],
+                "language": {
+                    url: '/assets/Turkish.json'
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <script type="text/javascript">
+        var createTableCount = 0;
+    </script>
+    <style>
+        .dataTables_length {
+            margin-right: 30px !important;
+        }
+    </style>
+
+    <div class="form-group col-md-4">
+        <h1>Takım Lideri Toplam İtiraz Tablosu</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
+
+    <div class="col-sm-12" style="padding: 20px!important;">
+
+        {% set tableCount = 0 %}
+        {% set tableName = "selectCategoryTable_" %}
+
+
+        {% set tableCount = tableCount + 1 %}
+        <script type="text/javascript">
+            createTableCount = {{ tableCount }};
+        </script>
+        <table id="{{ tableName }}{{ tableCount }}"
+               class="table table-bordered table-striped full-color-table full-primary-table hover-table"
+               style="width: 100%!important; min-width: 100%!important; max-width: 100%!important;">
+
+            <thead>
+            <tr>
+                <th>Takım Lideri</th>
+                <th>İtiraz  Sayısı</th>
+                <th>Ortalama İşlem Süresi Saat</th>
+                <th>Max İşlem Süresi Saat</th>
+                <th>48 Saati Geçen</th>
+                <th>Olumlu</th>
+                <th>Olumsuz</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for divNameVal in  datatable %}
+{#{{ dump(datatable) }}#}
+                <tr>
+                    <td>{{ divNameVal.userName}} </td>
+                    <td>{{ divNameVal.countProtest}} </td>
+                    <td>{{ divNameVal.avgDateTimeToDate}} </td>
+                    <td>{{ divNameVal.maxTimetoDate}} </td>
+                    <td>{{ divNameVal.twoDays}} </td>
+                    <td>{{ divNameVal.countOKProtest }} </td>
+                    <td>{{ divNameVal.countRedProtest }} </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+{% endblock %}

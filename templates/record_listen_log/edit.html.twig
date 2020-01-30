@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit RecordListenLog{% endblock %}
+
+{% block body %}
+    <h1>Edit RecordListenLog</h1>
+
+    {{ include('record_listen_log/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('record_listen_log_index') }}">back to list</a>
+
+    {{ include('record_listen_log/_delete_form.html.twig') }}
+{% endblock %}

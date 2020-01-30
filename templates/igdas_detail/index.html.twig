@@ -1,0 +1,171 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}İgdaş IVR Detay{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#igdDetailListTableDiv").css("display","none");
+                $('#igdDetailListTable').dataTable().fnDestroy();
+                $('#igdDetailListTable').html("");
+                tableFilling=false;
+            }
+        }
+        function displayBlockTableDiv() {
+            $("#igdDetailListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#loadigdDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#loadigdDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#loadigdDetailText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#loadigdDetail").modal('hide');
+            $("#loadigdDetailText").html("");
+        }
+        function igdDetailValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/igdasdetailsnew',
+                data:$('#formigdDetailIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#igdDetailListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "24/15 dklık<br/>veya Saatlik"},
+                                { data: "arayannumara" , name: "arayannumara" , title: "Arayan"},
+                                { data: "aranannumara" , name: "aranannumara" , title: "Aranan"},
+                                { data: "kuyrukBeklemeSuresi" , name: "kuyrukBeklemeSuresi" , title: "Kuyruk Süresi <br> Saniye"},
+                                { data: "ivrsuresi" , name: "ivrsuresi" , title: "Ivr Suresi Saniye"},
+                                { data: "calmasuresi" , name: "calmasuresi" , title: "Çalma Suresi Saniye "},
+                                { data: "konusmasuresi" , name: "konusmasuresi" , title: "Konusma Suresi <br> Saniye"},
+                                { data: "ivrmenusecim" , name: "ivrmenusecim" , title: "Ivr Menu Seçim"},
+                                { data: "kuyruk" , name: "kuyruk" , title: "Kuyruk"},
+                                { data: "temsilci" , name: "temsilci" , title: "Karsilayan"},
+                                { data: "baslangicZamani" , name: "baslangicZamani" , title: "Sistem Giriş"},
+                                { data: "bitisZamani" , name: "bitisZamani" , title: "Sistem Çıkış"},
+                                { data: "kgiris" , name: "kgiris" , title: "Kuyruk Giriş"},
+                                { data: "kbitis" , name: "kbitis" , title: "Kuyruk Çıkış"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>İgdaş IVR Detay</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formigdDetailIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="igdDetailValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="igdDetailListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="igdDetailListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadigdDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadigdDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

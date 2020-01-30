@@ -1,0 +1,77 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Acw Type index{% endblock %}
+
+{% block customCss %}
+    <style>
+        #acwTypeTable_wrapper{
+            margin-top: 5px!important;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1 style="padding: 20px">Acw Tür Listesi</h1>
+<div style="padding: 20px; background-color: white">
+    <a href="{{ path('acw_type_new') }}" style="float: right!important; margin-bottom: 20px;"><button type="button" class="btn  btn-success">Yeni Oluştur</button></a>
+
+    <table id="acwTypeTable" class="table table-striped table-bordered" style="width:100%!important;">
+        <thead>
+            <tr>
+                <th style="width: 250px">İsim</th>
+                <th>Rol Ekle</th>
+                <th style="width: 220px;text-align: center">Faaliyet</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for acw_type in acw_types %}
+            {% if acw_type.id not in [1, 2, 3] %}
+                <tr>
+                    <td>{{ acw_type.name }}</td>
+                    <td>{{ acw_type.role }}</td>
+                    <td>
+                        <a href="{{ path('acw_type_show', {'id': acw_type.id}) }}" style="float: right"><button type="button" class="btn btn-info">Göster</button></a>
+                        {% if acw_type.id not in [1, 2, 3] %}
+                            <a href="{{ path('acw_type_edit', {'id': acw_type.id}) }}" style="float: right;margin-right: 10px;"><button type="button" class="btn  btn-warning">Güncelle</button></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+{#{% block customScript %}#}
+{#    <script>#}
+{#        $(document).ready(function() {#}
+{#            $('#acwTypeTable').DataTable();#}
+{#        } );#}
+{#    </script>#}
+
+{#{% endblock %}#}
+
+{% block customScript %}
+    <script>
+
+        $('#acwTypeTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            },
+            order:[]
+        });
+        $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
+    </script>
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends '/layout/base.html.twig' %}
+{% block customCss %}
+
+
+{% endblock %}
+
+  {% block customScript %}
+      <script src="/assets/js/wavesurfer.min.js"></script>
+      <script>
+          function callSearch() {
+              var phoneNumber=$('#phoneNumberID').val();
+              console.log(phoneNumber);
+              $.ajax({
+                  url:'/quality/listen-call-search/'+phoneNumber,
+                  dataType:'json',
+                  success:function (data) {
+                      $('#callDetail').html("");
+                      var callJson=JSON.parse(JSON.stringify(data));
+                      callJson.forEach(function (callJson) {
+                          var callId=callJson.callId;
+                          $('#callDetail').append('<tr>' +
+                              '<td>' + callJson.callDate+ '</td>' +
+                              '<td>' + callJson.phoneNumber + '</td>' +
+                              '<td>' + callJson.agentName+ '</td>' +
+                              '<td>' + callJson.agent+ '</td>' +
+                              '<td>' + callJson.duration + '</td>' +
+                              '<td><button class="btn btn-success" onclick="callPlay('+callId+')">Dinle</button></td>' +
+                              '</tr>')
+                      })
+                  }  });}
+          var audio = $('#audio_hidden');
+          var durationWave = Math.round(audio[0].duration);
+          var wavesurfer = WaveSurfer.create({
+              container: '#waveform',
+              waveColor: 'violet',
+              progressColor: 'purple',
+              barWidth: "3",
+              barHeight: "3",
+              barGap: "0",
+              cursorWidth: "4",
+              duration: durationWave
+          });
+
+          // wavesurfer.load('https://tbxdev.ibb.gov.tr/153.wav');
+
+          wavesurfer.on('ready', function () {
+              $('#play-pause').click(function () {
+                  wavesurfer.playPause();
+              });
+          });
+
+          wavesurfer.on('ready', updateTimer);
+          wavesurfer.on('audioprocess', updateTimer);
+          wavesurfer.on('seek', updateTimer);
+
+          function updateTimer() {
+              var formattedTime = secondsToTimestamp(wavesurfer.getCurrentTime());
+              $('#waveform-time-indicator .time').text(formattedTime);
+          }
+
+          function secondsToTimestamp(seconds) {
+              seconds = Math.floor(seconds);
+              var h = Math.floor(seconds / 3600);
+              var m = Math.floor((seconds - (h * 3600)) / 60);
+              var s = seconds - (h * 3600) - (m * 60);
+
+              h = h < 10 ? '0' + h : h;
+              m = m < 10 ? '0' + m : m;
+              s = s < 10 ? '0' + s : s;
+              return h + ':' + m + ':' + s;
+          }
+
+          function callPlay(audioId)
+          {
+              var audioUrl = "/quality/voice-record/" + audioId;
+              $('#audio_hidden source').attr('src', audioUrl);
+              wavesurfer.load(audioUrl);
+              setTimeout(function () {
+                  wavesurfer.playPause();
+              },1500);
+          }
+
+
+      </script>
+
+  {% endblock %}
+
+{% block body %}
+    <style>
+
+        body{
+            zoom: 100%!important;
+        }
+    </style>
+    <div>
+        <input type="text" class="form-group" name="phoneNumber" id="phoneNumberID">
+        <a onclick="callSearch()" class="btn btn-warning">Ara</a>
+    </div>
+
+    <div>
+        <table  class="table table-striped table-bordered"  >
+            <thead>
+            <tr>
+                <th>Çağrı Tarihi</th>
+                <th>Arayan</th>
+                <th>Aranan</th>
+                <th>Agent Adı</th>
+                <th>Çağrı süresi</th>
+                <th>İşlemler</th>
+            </tr>
+            </thead>
+            <tbody id="callDetail">
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-body" style="padding:2px!important">
+        <table style="width:100%" class="table-bordered table-stripped">
+
+            <tr>
+                <th class="renkliTh">Çağrı Kaydı
+                    <i style="color:green" class="fa fa-volume-up"></i>
+                </th>
+                <td></td>
+            </tr>
+        </table>
+
+        <div style="display: none">
+            <audio id="audio_hidden" controls="">
+                <source src="" type="audio/wav">
+            </audio>
+        </div>
+        <div id="waveform" style="text-align:center">
+            <div id="waveform-time-indicator">
+                <span class="time">00:00:00</span></div>
+
+        </div>
+
+
+
+        </div>
+
+
+        <div style="text-align:center" class="controls">
+            <button type="button" class="btn btn-info btn-xs audioPlay" style="font-size: 13px;"  onclick="wavesurfer.playPause();">
+                <i class="fa fa-play"></i> /
+                <i class="fa fa-pause"></i>
+            </button>
+
+            <button type="button" style="font-size: 13px;"  class="btn btn-info btn-xs" id="sesAcKapa"
+                    onclick="wavesurfer.toggleMute()">
+                <i id="iconVolume" class="fa fa-volume-up"></i>
+            </button>
+            <button type="button" style="font-size: 13px;"  class="btn btn-purple btn-xs"
+                    onclick="wavesurfer.setPlaybackRate(1);">
+
+                NORMAL
+            </button>
+
+            <button type="button" style="font-size: 13px;"  class="btn btn-danger btn-xs"
+                    onclick="wavesurfer.setPlaybackRate(1.1);">
+
+                HIZLI
+            </button>
+            <button type="button" style="font-size: 13px;" class="btn btn-success btn-xs"
+                    onclick="wavesurfer.setPlaybackRate(1.3);">
+
+                ÇOK HIZLI
+            </button>
+            <br/>
+            <div style="margin-top: 5px;">
+                <button type="button" style="font-size: 13px;"  class="btn btn-warning btn-xs"  onclick="wavesurfer.skipBackward(5)">
+                    <i class="fa fa-step-backward"></i>
+                    Geri Sar
+                </button>
+                <button type="button" style="font-size: 13px;"  class="btn btn-warning btn-xs" onclick="wavesurfer.skipForward(5)">
+                    <i class="fa fa-step-forward"></i>
+                    İleri Sar
+                </button>
+                <input id="volume" type="range" min="0" max="1" value="1" step="0.1">
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

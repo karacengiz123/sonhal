@@ -1,0 +1,7 @@
+sentry:
+#    dsn: 'http://5db1545f890a4949826cc253c03948d2@sentry.tbxdev.ibb.gov.tr/2'
+    dsn: '%env(SENTRY_DSN)%'
+    options:
+      excluded_exceptions:
+        - App\Exception\UserNotFoundException
+        - Symfony\Component\Security\Core\Exception\AccessDeniedException

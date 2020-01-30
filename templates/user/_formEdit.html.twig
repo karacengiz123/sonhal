@@ -1,0 +1,8 @@
+{{ form_start(form,{'action': path('user_update_save'), 'method': 'POST'}) }}
+<div style="display: none">
+    {{ form_widget(form_3) }}
+</div>
+    {{ form_widget(form_2) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success" style="padding: 10px; float: right; margin-right: 10px;" >{{ button_label|default('Kaydet') }}</button>
+{{ form_end(form) }}

@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon.png">
+    <title>BHM  </title>
+    <!-- Custom CSS -->
+    <link href="assets/dist/css/style.min.css" rel="stylesheet">
+    <link href="assets/dist/css/elements/accordion.css" rel="stylesheet">
+    <link href="assets/dist/css/popoutMenu.css" rel="stylesheet">
+
+    <link href="assets/node_modules/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
+    <link href="assets/node_modules/datatables/media/css/dataTables.bootstrap4.css" rel="stylesheet">
+
+
+    <!-- Page plugins css -->
+    <link href="assets/node_modules/clockpicker/dist/jquery-clockpicker.min.css" rel="stylesheet">
+    <!-- Color picker plugins css -->
+    <link href="assets/node_modules/jquery-asColorPicker-master/dist/css/asColorPicker.css" rel="stylesheet">
+    <!-- Date picker plugins css -->
+    <link href="assets/node_modules/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+    <!-- Daterange picker plugins css -->
+    <link href="assets/node_modules/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
+    <link href="assets/node_modules/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <script src="/assets/js/wavesurfer.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="/assets/supervisorAsset/download/ie9/html5shiv.js"></script>
+    <script src="/assets/supervisorAsset/download/ie9/respond.min.js"></script>
+<![endif]-->
+
+<style>
+             .renkli {
+                background-color: #5372c6!important;
+                padding: 6px!important;
+             }
+             .renkliTh{
+                 background-color: #9eccff;
+                 width: 120px;
+             }
+             .card-body{
+               padding:0px!important;
+              border:1px solid #5372c6!important;
+
+             }
+             .border-info {
+              margin-bottom:3px!important;
+
+             }
+             .small-select{
+                height: 25px!important;
+             }
+
+
+             #floating-button{
+                 width: 60px;
+                 height: 60px;
+                 border-radius: 50%;
+                 background: #db4437;
+                 position: fixed;
+                 bottom: 60px;
+                 right: 30px;
+                 cursor: pointer;
+                 box-shadow: 0px 2px 5px #666;
+             }
+
+             .plus{
+                 color: white;
+                 position: absolute;
+                 top: 0;
+                 display: block;
+                 bottom: 0;
+                 left: 0;
+                 right: 0;
+                 text-align: center;
+                 padding: 0;
+                 margin: 0;
+                 line-height: 55px;
+                 font-size: 38px;
+                 font-family: 'Roboto';
+                 font-weight: 300;
+                 animation: plus-out 0.3s;
+                 transition: all 0.3s;
+             }
+
+             #container-floating{
+                 position: fixed;
+                 width: 70px;
+                 height: 70px;
+                 bottom: 30px;
+                 right: 30px;
+                 z-index: 50px;
+             }
+
+             #container-floating:hover{
+                 height: 400px;
+                 width: 90px;
+                 padding: 30px;
+             }
+
+             #container-floating:hover .plus{
+                 animation: plus-in 0.15s linear;
+                 animation-fill-mode: forwards;
+             }
+
+             .edit{
+                 position: absolute;
+                 top: 0;
+                 display: block;
+                 bottom: 0;
+                 left: 0;
+                 display: block;
+                 right: 0;
+                 padding: 0;
+                 opacity: 0;
+                 margin: auto;
+                 line-height: 65px;
+                 transform: rotateZ(-70deg);
+                 transition: all 0.3s;
+                 animation: edit-out 0.3s;
+             }
+
+             #container-floating:hover .edit{
+                 animation: edit-in 0.2s;
+                 animation-delay: 0.1s;
+                 animation-fill-mode: forwards;
+             }
+
+             @keyframes edit-in{
+                 from {opacity: 0; transform: rotateZ(-70deg);}
+                 to {opacity: 1; transform: rotateZ(0deg);}
+             }
+
+             @keyframes edit-out{
+                 from {opacity: 1; transform: rotateZ(0deg);}
+                 to {opacity: 0; transform: rotateZ(-70deg);}
+             }
+
+             @keyframes plus-in{
+                 from {opacity: 1; transform: rotateZ(0deg);}
+                 to {opacity: 0; transform: rotateZ(180deg);}
+             }
+
+             @keyframes plus-out{
+                 from {opacity: 0; transform: rotateZ(180deg);}
+                 to {opacity: 1; transform: rotateZ(0deg);}
+             }
+
+             .nds{
+                 width: 55px;
+                 height: 55px;
+                 border-radius: 50%;
+                 position: fixed;
+                 z-index: 300;
+                 transform:  scale(0);
+                 cursor: pointer;
+             }
+
+             .nd1{
+                 background: #d3a411;
+                 right: 33px;
+                 bottom: 120px;
+                 animation-delay: 0.2s;
+                 animation: bounce-out-nds 0.3s linear;
+                 animation-fill-mode:  forwards;
+             }
+
+             .nd3{
+                 background: #3c80f6;
+                 right: 33px;
+                 bottom: 180px;
+                 animation-delay: 0.15s;
+                 animation: bounce-out-nds 0.15s linear;
+                 animation-fill-mode:  forwards;
+             }
+
+             .nd4{
+                 background: #ba68c8;
+                 right: 33px;
+                 bottom: 240px;
+                 animation-delay: 0.1s;
+                 animation: bounce-out-nds 0.1s linear;
+                 animation-fill-mode:  forwards;
+             }
+
+             .nd5{
+                 background-image: url('https://lh3.googleusercontent.com/-X-aQXHatDQY/Uy86XLOyEdI/AAAAAAAAAF0/TBEZvkCnLVE/w140-h140-p/fb3a11ae-1fb4-4c31-b2b9-bf0cfa835c27');
+                 background-size: 100%;
+                 right: 33px;
+                 bottom: 300px;
+                 animation-delay: 0.08s;
+                 animation: bounce-out-nds 0.1s linear;
+                 animation-fill-mode:  forwards;
+             }
+
+             @keyframes bounce-nds{
+                 from {opacity: 0;}
+                 to {opacity: 1; transform: scale(1);}
+             }
+
+             @keyframes bounce-out-nds{
+                 from {opacity: 1; transform: scale(1);}
+                 to {opacity: 0; transform: scale(0);}
+             }
+
+             #container-floating:hover .nds{
+
+                 animation: bounce-nds 0.1s linear;
+                 animation-fill-mode:  forwards;
+             }
+
+             #container-floating:hover .nd3{
+                 animation-delay: 0.08s;
+             }
+             #container-floating:hover .nd4{
+                 animation-delay: 0.15s;
+             }
+             #container-floating:hover .nd5{
+                 animation-delay: 0.2s;
+             }
+
+             .letter{
+                 font-size: 23px;
+                 font-family: 'Roboto';
+                 color: white;
+                 position: absolute;
+                 left: 0;
+                 right: 0;
+                 margin: 0;
+                 top: 0;
+                 bottom: 0;
+                 text-align: center;
+                 line-height: 40px;
+             }
+
+             .reminder{
+                 position: absolute;
+                 left: 0;
+                 right: 0;
+                 margin: auto;
+                 top: 0;
+                 bottom: 0;
+                 line-height: 40px;
+             }
+
+             .profile{
+                 border-radius: 50%;
+                 width: 40px;
+                 position: absolute;
+                 top: 0;
+                 bottom: 0;
+                 margin: auto;
+                 right: 20px;
+             }
+
+
+</style>
+</head>
+
+<body style="zoom:86%" class="horizontal-nav skin-default fixed-layout">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">BHM Teknoloji</p>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <header class="topbar">
+            <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+                <!-- ============================================================== -->
+                <!-- Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-header" style="width:75px">
+                    <a class="navbar-brand" href="index.html"></a>
+                     <img src="../assets/images/logo.png" width="60px" alt=""> 
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-collapse">
+                    <!-- ============================================================== -->
+                    <!-- toggle and nav items -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav mr-auto">
+                        <!-- This is  -->
+                        <li class="nav-item"> <a class="nav-link nav-toggler d-block d-md-none waves-effect waves-dark" href="javascript:void(0)"><i class="ti-menu"></i></a> </li>
+                        <li class="nav-item"> <a class="nav-link sidebartoggler d-none waves-effect waves-dark" href="javascript:void(0)"><i class="icon-menu"></i></a> </li>
+                        <!-- ============================================================== -->
+                        <!-- Search -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item">
+                            <form class="app-search d-none d-md-block d-lg-block">
+                                <input type="text" class="form-control" placeholder="Ara..">
+                            </form>
+                        </li>
+                        <li class="nav-item dropdown u-pro">
+                                <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-flag "></i> <span class="hidden-md-down">Dil &nbsp;<i class="fa fa-angle-down"></i></span> </a>
+                                <div class="dropdown-menu dropdown-menu-right  flipInY">
+                                    <!-- text-->
+                                    <a href="javascript:void(0)" class="dropdown-item"><i class="fa fa-globe"></i>English-UK</a>
+                                    <!-- text-->
+                                    <div class="dropdown-divider"></div>
+                                    <a href="javascript:void(0)" class="dropdown-item"><i class="fa fa-globe"></i>Türkçe-TR </a>
+                                    
+                                    <!-- text-->
+                                </div>
+                            </li>
+                    </ul>
+                    <!-- ============================================================== -->
+                    <!-- User profile and search -->
+                    <!-- ============================================================== -->
+                    <ul class="navbar-nav my-lg-0">
+                        <!-- ============================================================== -->
+                        <!-- Comment -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-light profile-pic" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-home"></i> <span class="hidden-md-down">Ana Sayfa &nbsp;</span> </a>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- End Comment -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- Messages -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-rocket "></i> <span class="hidden-md-down">Uygulamalar &nbsp;<i class="fa fa-angle-down"></i></span> </a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <!-- text-->
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ti-star"></i> Uygulama 1...</a>
+                                <!-- text-->
+                                <div class="dropdown-divider"></div>
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ti-star"></i> Uygulama 2...</a>
+                                
+                                <!-- text-->
+                            </div>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- End Messages -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- mega menu -->
+                        <!-- ============================================================== -->
+                       
+                        <!-- ============================================================== -->
+                        <!-- End mega menu -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- User Profile -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i style="color:green" class="fa fa-user "></i> <span class="hidden-md-down">Ali Faruk AYDINHAN &nbsp;<i class="fa fa-angle-down"></i></span> </a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <!-- text-->
+                                <a href="javascript:void(0)" class="dropdown-item"><i class="ti-key"></i> Şifre Yönetim</a>
+                                <!-- text-->
+                                <div class="dropdown-divider"></div>
+                                <!-- text-->
+                                <a href="#" class="dropdown-item"><i class="fa fa-power-off"></i> Oturumu Kapat</a>
+                                <!-- text-->
+                            </div>
+                        </li>
+                        <!-- ============================================================== -->
+                        <!-- End User Profile -->
+                        <!-- ============================================================== -->
+                        <li class="nav-item right-side-toggle"> <a class="nav-link  waves-effect waves-light" href="javascript:void(0)"><i class="ti-settings"></i></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-3">
+                            <div class="card border-info ">
+                                    <div class="card-header bg-info renkli">
+                                        <h6 class="m-b-0 text-white">Değerlendiren Bilgileri</h6></div>
+                                    <div class="card-body" >
+                                            <table style="width:100%" class="table-bordered table-stripped">
+                                                    <tr >
+                                                      <th class="renkliTh">Adı</th>
+                                                      <td>Test Supervisor</td>
+                                                    </tr>
+
+                                                  </table>
+                                    </div>
+                                </div>
+                                <div class="card border-info ">
+                                        <div class="card-header bg-info renkli">
+                                            <h6 class="m-b-0 text-white">Konu: TEST AGENT</h6></div>
+                                        <div class="card-body" style="padding:2px!important">
+                                                <table style="width:100%" class="table-bordered table-stripped">
+                                                        <tr >
+                                                          <th class="renkliTh">Operatör</th>
+                                                          <td>TEST AGENT</td>
+                                                        </tr>
+                                                      </table>
+                                        </div>
+                                </div>
+                                <div class="card border-info ">
+                                        <div class="card-header bg-info renkli">
+                                            <h6 class="m-b-0 text-white">Ses Kaydı 01234 (TEST AGENT- 0123456) 01-01-2018 00:12:00 GMT +3</h6></div>
+                                        <div class="card-body" style="padding:2px!important">
+                                                <table style="width:100%" class="table-bordered table-stripped">
+                                                        <tr >
+                                                          <th class="renkliTh">Çağrı Kayıtları</th>
+                                                          <td><select name="" class="form-control form-control-sm small-select" id="">
+                                                              <option value="" disabled selected>Seçim Yapılmadı</option>
+                                                          </select></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="renkliTh">Çağrı Kaydı <i style="color:green" class="fa fa-volume-up"></i></th>
+                                                            <td>Ses Kaydı 01234 (TEST AGENT- 0123456) 01-01-2018 00:12:00 GMT +3</td>
+                                                        </tr>
+                                                      </table>
+
+                                                      <div id="waveform" style="text-align:center">
+                                                            <strong class="1">0:00</strong> / <strong class="2"></strong>
+
+                                                      </div>
+                                                    <div style="text-align:center">
+                                                        <button class="btn btn-info btn-xs" onclick="wavesurfer.playPause()">
+                                                        <i class="fa fa-play"></i> /
+                                                        <i class="fa fa-pause"></i>
+                                                        </button>
+                                                        <button class="btn btn-info btn-xs" id="sesAcKapa" onclick="wavesurfer.toggleMute()">
+                                                                <i id="iconVolume" class="fa fa-volume-up"></i>
+                                                        </button>
+                                                    </div>
+                                            </div> 
+                                </div>
+                                <div class="card border-info ">
+                                        <div class="card-header bg-info renkli">
+                                            <h6 class="m-b-0 text-white">Değerlendiren Görüşü</h6></div>
+                                        <div class="card-body" style="padding:2px!important">
+                                            <textarea name="" class="form-control"  placeholder="Görüş Bildirin..." rows="4"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="height:auto;border:1px solid #bebebe;margin-left:40px"  class="col-lg-8">
+
+                                    <div class="container">
+                                        <div class="panel-group" style="margin-top: 5px;">
+                                            <div class="panel panel-primary">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" href="#collapse1"> -> Form - 1 : Inbound Değerlendirme Formu 01012018</a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse1" class="panel-collapse collapse">
+                                                    <div class="panel-body">
+                                                        <div class="panel-group">
+                                                            <div class="panel panel-primary">
+                                                                <div class="panel-heading">Inbound Değerlendirme Formu - 309903</div>
+                                                                <div class="panel-body">
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                                                             aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">
+                                                                            40% Complete (success)
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="panel-group">
+                                                            <div class="panel panel-danger">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#genel"><button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>Header : Genel</a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="genel" class="panel-collapse collapse">
+                                                                    <div class="panel-body">Panel Body</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="panel panel-success">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#karsilasma"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> Bölüm - 1 : Karşılama
+                                                                            <span style="float: right;" ng-if="!config.badge.hidden" class="badge"><input type="button" style="color: white;  background-color: #3c763d; border: 0px solid; "  id="partTotal1" value="0"/></span></a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="karsilasma" class="panel-collapse collapse">
+                                                                    <div class="panel-body" style="background-color: #dff0d8;">
+                                                                        <div class="progress">
+                                                                            <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar"
+                                                                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                                                                                50% Complete (info)
+                                                                            </div>
+                                                                        </div>
+                                                                        <hr>
+
+                                                                        <div class="panel panel-warning">
+                                                                            <div class="panel-heading">
+                                                                                <h4 class="panel-title">
+                                                                                    <a data-toggle="collapse" href="#selamlama"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> 1
+                                                                                        Kategori - 1 : Etkin Selamlama <span style="float: right;" ng-if="!config.badge.hidden" class="badge"><input type="button" style="color: white; background-color: #8a6d3b; border: 0px solid; " id="category1"  value="0"/></span> </a>
+                                                                                </h4>
+                                                                            </div>
+
+                                                                            <div id="selamlama" class="panel-collapse collapse">
+                                                                                <div class="panel-body"  style="background-color: #fcf8e3;">
+                                                                                    <div class="progress">
+                                                                                        <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar"
+                                                                                             aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                                                                                            50% Complete (info)
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <hr>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                            <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru1"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 1 <span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s1" value="0"/></span></a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru1" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <!--Soru 1-->
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Açılışta Merhaba ifadesi kullanıldı mı? </div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+
+                                                                                                        <form>
+
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="2" id="s1" > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios" value="0" id="s1" > Hayır
+                                                                                                            </label>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                            <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru2"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 2<span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s2" value="0"/></span></a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru2" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Temsilci kendi ismini söyledi mi?</div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+                                                                                                        <form>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel"  class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="100"  id="s2"  > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios"  value="0"  id="s2"  > Hayır
+                                                                                                            </label>
+                                                                                                         </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="panel panel-success">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#agirlama"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> Bölüm - 2 : Ağırlama
+                                                                            <span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #3c763d; border: 0px solid; " id="partTotal2"  value="0"/></span> </a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="agirlama" class="panel-collapse collapse">
+                                                                    <div class="panel-body"  style="background-color: #dff0d8;">
+                                                                        <div class="progress">
+                                                                            <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar"
+                                                                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                                                                                50% Complete (info)
+                                                                            </div>
+                                                                        </div>
+                                                                        <hr>
+                                                                        <div class="panel panel-warning">
+                                                                            <div class="panel-heading">
+                                                                                <h4 class="panel-title">
+                                                                                    <a data-toggle="collapse" href="#aktif"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                        Kategori 2 : Aktif Dinleme ve Görüşme Hakimiyeti <span style="float: right;" ng-if="!config.badge.hidden" class="badge"><input type="button" style="color: white; background-color: #8a6d3b; border: 0px solid; " id="category2"  value="0"/></span> </a>
+                                                                                </h4>
+                                                                            </div>
+                                                                            <div id="aktif" class="panel-collapse collapse">
+                                                                                <div class="panel-body" style="background-color: #fcf8e3;">
+                                                                                    <div class="progress">
+                                                                                        <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar"
+                                                                                             aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                                                                                            50% Complete (info)
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <hr>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                            <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru3"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 1 <span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s3" value="0"/></span> </a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru3" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <!--Soru 1-->
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Açılışta Merhaba ifadesi kullanıldı mı? </div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+                                                                                                        <form>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel"  class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="1"  id="s3"  > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios"  value="0"  id="s3"  > Hayır
+                                                                                                            </label>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                             <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru4"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 2<span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s4" value="0"/></span> </a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru4" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Temsilci kendi ismini söyledi mi?</div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+                                                                                                        <form>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel"  class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="2"  id="s4"  > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios"  value="0"  id="s4"  > Hayır
+                                                                                                            </label>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="panel panel-warning">
+                                                                            <div class="panel-heading">
+
+                                                                                <h4 class="panel-title">
+                                                                                    <a data-toggle="collapse" href="#arayan"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                        Kategori - 2 : Arayanın İsmini Kullanma <span style="float: right;" ng-if="!config.badge.hidden" class="badge"><input type="button" style="color: white; background-color: #8a6d3b; border: 0px solid; " id="category3"  value="0"/></span> </a>
+                                                                                </h4>
+
+
+                                                                            </div>
+                                                                            <div id="arayan" class="panel-collapse collapse">
+                                                                                <div class="panel-body" style="background-color: #fcf8e3;">
+                                                                                    <div class="progress">
+                                                                                        <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar"
+                                                                                             aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%">
+                                                                                            50% Complete (info)
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <hr>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                            <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru5"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 1 <span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s5" value="0"/></span> </a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru5" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <!--Soru 1-->
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Açılışta Merhaba ifadesi kullanıldı mı? </div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+                                                                                                        <form>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel"  class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="2"  id="s5"  > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios"  value="0"  id="s5"  > Hayır
+                                                                                                            </label>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="panel panel-danger">
+                                                                                        <div class="panel-heading">
+                                                                                            <h4 class="panel-title">
+                                                                                                <a data-toggle="collapse" href="#soru6"> <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button>
+                                                                                                    Soru 2  <span style="float: right;" ng-if="!config.badge.hidden"  class="badge"><input type="button" style="color: white; background-color: #a94442; border: 0px solid; " id="s6" value="0"/></span></a>
+                                                                                            </h4>
+                                                                                        </div>
+                                                                                        <div id="soru6" class="panel-collapse collapse">
+                                                                                            <div class="panel-body" style="background-color: #f2dede;">
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom" style="float: left; width:70%; height:50px;">Temsilci kendi ismini söyledi mi?</div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"  style="float: right; width:30%;">
+                                                                                                        <form>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel"  class="btn btn-secondary ">
+                                                                                                                <input type="radio" name="myRadios" value="2"  id="s6"  > Evet
+                                                                                                            </label>
+                                                                                                            <label style="width: 100px; height: 30px; font-size: 14px;" name="myLabel" class="btn btn-secondary">
+                                                                                                                <input type="radio" name="myRadios"  value="0"  id="s6"  > Hayır
+                                                                                                            </label>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="panel panel-success">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#ugurlama"><button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> Bölüm - 3 : Uğurlama <span style="float: right;" ng-if="!config.badge.hidden" class="badge">3</span> </a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="ugurlama" class="panel-collapse collapse">
+                                                                    <div class="panel-body">Panel Body</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="panel panel-success">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#bilgi"><button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> Bölüm - 4 : Bilgi Kısmı</a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="bilgi" class="panel-collapse collapse">
+                                                                    <div class="panel-body">Panel Body</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="panel panel-danger">
+                                                                <div class="panel-heading">
+                                                                    <h4 class="panel-title">
+                                                                        <a data-toggle="collapse" href="#footer"><button class="success-bordered-table" style="border: none; width: 25px; height: 25px; " >></button> Footer : Sonuc</a>
+                                                                    </h4>
+                                                                </div>
+                                                                <div id="footer" class="panel-collapse collapse">
+                                                                    <div class="panel-body">Panel Body</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    </div>
+                                                    <!--<div class="panel-footer">Panel Footer</div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="container-floating" style="margin-top: -10px;">
+
+                        <div class="nd5 nds" data-toggle="tooltip" data-placement="left" data-original-title="Simone"></div>
+                        <div class="nd4 nds" data-toggle="tooltip" data-placement="left" data-original-title="contract@gmail.com"><img class="reminder">
+                            <p class="letter">C</p>
+                        </div>
+                        <div class="nd3 nds" data-toggle="tooltip" data-placement="left" data-original-title="Reminder"><img class="reminder" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/ic_reminders_speeddial_white_24dp.png" /></div>
+                        <div class="nd1 nds" data-toggle="tooltip" data-placement="left" data-original-title="Edoardo@live.it"><img class="reminder">
+                            <p class="letter">E</p>
+                        </div>
+
+                        <div id="floating-button" data-toggle="tooltip" data-placement="left" data-original-title="Create" onclick="newmail()">
+                            <p class="plus"><span style=""><span style="font-size: 25px;" id="total"></span> </p>
+                            <img class="edit" src="https://ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/bt_compose2_1x.png">
+                        </div>
+
+                    </div>
+
+
+
+    <!-- ============================================================== -->
+        <!--  Footer -->
+        <footer style="position:absolute;bottom:0" class="footer ">
+            © 2019 BHM Teknoloji Kalite Yönetim Sistemi 
+        </footer>
+        <!-- ============================================================== -->
+        <!-- End footer -->
+        <!-- ============================================================== -->
+
+        
+
+    <!-- ============================================================== -->
+    <!-- End Wrapper -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+
+
+
+
+
+
+
+    <script src="assets/node_modules/jquery/jquery-3.2.1.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="assets/node_modules/popper/popper.min.js"></script>
+    <script src="assets/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="assets/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!--Wave Effects -->
+    <script src="assets/dist/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="assets/dist/js/sidebarmenu.js"></script>
+    <!--stickey kit -->
+    <script src="assets/node_modules/sticky-kit-master/dist/sticky-kit.min.js"></script>
+    <script src="assets/node_modules/sparkline/jquery.sparkline.min.js"></script>
+
+
+    <!--Custom JavaScript -->
+    <script src="assets/dist/js/custom.min.js"></script>
+    <!-- Plugin JavaScript -->
+    <script src="assets/node_modules/moment/moment.js"></script>
+    <script src="assets/node_modules/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+    <!-- Clock Plugin JavaScript -->
+    <script src="assets/node_modules/clockpicker/dist/jquery-clockpicker.min.js"></script>
+    <!-- Color Picker Plugin JavaScript -->
+    <script src="assets/node_modules/jquery-asColor/dist/jquery-asColor.js"></script>
+    <script src="assets/node_modules/jquery-asGradient/dist/jquery-asGradient.js"></script>
+    <script src="assets/node_modules/jquery-asColorPicker-master/dist/jquery-asColorPicker.min.js"></script>
+    <!-- Date Picker Plugin JavaScript -->
+    <script src="assets/node_modules/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <!-- Date range Plugin JavaScript -->
+    <script src="assets/node_modules/timepicker/bootstrap-timepicker.min.js"></script>
+    <script src="assets/node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="assets/node_modules/datatables/datatables.min.js"></script>
+    <!-- start - This is for export functionality only -->
+    <script src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+    <script src="dist/js/player.js"></script>
+
+    <script>
+    // MAterial Date picker    
+    $('#mdate').bootstrapMaterialDatePicker({ weekStart: 0, time: false });
+    $('#timepicker').bootstrapMaterialDatePicker({ format: 'HH:mm', time: true, date: false });
+    $('#date-format').bootstrapMaterialDatePicker({ format: 'dddd DD MMMM YYYY - HH:mm' });
+
+    $('#min-date').bootstrapMaterialDatePicker({ format: 'DD/MM/YYYY HH:mm', minDate: new Date() });
+    // Clock pickers
+    $('#single-input').clockpicker({
+        placement: 'bottom',
+        align: 'left',
+        autoclose: true,
+        'default': 'now'
+    });
+    $('.clockpicker').clockpicker({
+        donetext: 'Done',
+    }).find('input').change(function() {
+        console.log(this.value);
+    });
+    $('#check-minutes').click(function(e) {
+        // Have to stop propagation here
+        e.stopPropagation();
+        input.clockpicker('show').clockpicker('toggleView', 'minutes');
+    });
+    if (/mobile/i.test(navigator.userAgent)) {
+        $('input').prop('readOnly', true);
+    }
+    // Colorpicker
+    $(".colorpicker").asColorPicker();
+    $(".complex-colorpicker").asColorPicker({
+        mode: 'complex'
+    });
+    $(".gradient-colorpicker").asColorPicker({
+        mode: 'gradient'
+    });
+    // Date Picker
+    jQuery('.mydatepicker, #datepicker').datepicker();
+    jQuery('#datepicker-autoclose').datepicker({
+        autoclose: true,
+        todayHighlight: true
+    });
+    jQuery('#date-range').datepicker({
+        toggleActive: true
+    });
+    jQuery('#datepicker-inline').datepicker({
+        todayHighlight: true
+    });
+    // Daterange picker
+    $('.input-daterange-datepicker').daterangepicker({
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse'
+    });
+    $('.input-daterange-timepicker').daterangepicker({
+        timePicker: true,
+        format: 'MM/DD/YYYY h:mm A',
+        timePickerIncrement: 30,
+        timePicker12Hour: true,
+        timePickerSeconds: false,
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse'
+    });
+    $('.input-limit-datepicker').daterangepicker({
+        format: 'MM/DD/YYYY',
+        minDate: '06/01/2015',
+        maxDate: '06/30/2015',
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse',
+        dateLimit: {
+            days: 6
+        }
+    });
+    </script>
+
+<script>
+                     var it6 = $('#datatable').DataTable( {
+        dom: 'prti',
+            
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+    it6.on( 'order.dt search.dt', function () {
+        it6.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+        } );
+    } ).draw(); 
+
+                         var temsilci = $('#temsilci').DataTable( {
+        dom: 'prti',
+            
+            "ordering": false,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+    temsilci.on( 'order.dt search.dt', function () {
+        temsilci.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+        } );
+
+    } ).draw();
+        </script>
+
+        <script>
+       function temizle (){
+             /* Single line Reset function executes on click of Reset Button */
+             $("#temsilciFiltre")[0].reset();
+            }
+
+            $(document).ready(function(){
+                var metin='<small class="uyari">*Seçtiğiniz kriterlere uygun son 500 çağrı listelenmektedir</small>'
+                 
+                 $('.page-link').addClass('btn btn-xs btn-default');
+                 $('[rel="tooltip"]').tooltip({trigger: "hover"});
+            })
+
+            $(document).ready(function () {
+    $('.material-button-toggle').click(function () {
+        $(this).toggleClass('open');
+        $('.option').toggleClass('scale-on');
+    });
+});
+
+
+        </script>
+    <script>
+
+        $('input[type="radio"]').on('click', function(e) {
+            document.getElementById(e.currentTarget.id).value=e.currentTarget.value;
+
+            category1();
+            category2();
+            category3();
+        });
+
+         function category1() {
+
+             var s1=document.getElementById("s1").value;
+             var s2=document.getElementById("s2").value;
+             document.getElementById("category1").value=parseInt(s1)+parseInt(s2);
+             document.getElementById("partTotal1").value=document.getElementById("category1").value;
+
+        }
+        function category2() {
+            var s3=document.getElementById("s3").value;
+            var s4=document.getElementById("s4").value;
+            document.getElementById("category2").value=parseInt(s3)+parseInt(s4);
+            partTotal();
+        }
+
+        function category3() {
+            var s5=document.getElementById("s5").value;
+            var s6=document.getElementById("s6").value;
+            document.getElementById("category3").value=parseInt(s5)+parseInt(s6);
+            partTotal();
+        }
+        function partTotal() {
+            document.getElementById("partTotal2").value=parseInt(document.getElementById("category3").value)+parseInt(document.getElementById("category2").value);
+            total();
+        }
+        function total() {
+            var getTotal=parseInt(document.getElementById("partTotal1").value)+parseInt(document.getElementById("partTotal2").value);
+            $("#total").html(getTotal);
+
+        }
+
+
+
+    </script>
+
+
+</body>
+</html>

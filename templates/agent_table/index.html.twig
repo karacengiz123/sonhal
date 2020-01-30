@@ -1,0 +1,164 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Temsilci Tablosu{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#agentListTableDiv").css("display", "none");
+                $('#agentListTable').dataTable().fnDestroy();
+                $('#agentListTable').html("");
+                tableFilling = false;
+            }
+
+        }
+
+        function displayBlockTableDiv() {
+            $("#agentListTableDiv").css("display", "block");
+        }
+
+        function modalStart(modalText = null) {
+            $("#loadAgent").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadAgentText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadAgentText").html(modalText);
+            }
+        }
+
+        function modalFinish() {
+            $("#loadAgent").modal('hide');
+            $("#loadAgentText").html("");
+        }
+
+        function agentTableValidateForm() {
+            modalStart();
+            $.ajax({
+                type: 'POST',
+                url: '/agenttablereport',
+                data: $('#formAgentIdSelect').serialize(),
+                success: function (data) {
+                    console.log(data);
+                    obj=JSON.parse(JSON.stringify(data));
+                    var colums = obj.column;
+                    var datas = obj.row;
+                    if ($.isArray(datas) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#agentListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: colums,
+                            order: [],
+                            data: datas
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            },1000);
+                        tableFilling = true;
+                    } else {
+                        modalStart(datas);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error:function (datas) {
+                    var errSms = "Beklenmedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Temsilci Tablosu Detayları</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formAgentIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="agentTableValidateForm();" class="btn" value="Listele"
+               style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="agentListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="agentListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table ">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadAgent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadAgentText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

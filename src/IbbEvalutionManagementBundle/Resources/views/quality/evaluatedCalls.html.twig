@@ -1,0 +1,685 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block customCSS %}
+
+{% endblock %}
+
+{% block customJS %}
+    <script>
+        // MAterial Date picker
+        $('#mdate').bootstrapMaterialDatePicker({ weekStart: 0, time: false });
+        $('#timepicker').bootstrapMaterialDatePicker({ format: 'HH:mm', time: true, date: false });
+        $('#date-format').bootstrapMaterialDatePicker({ format: 'dddd DD MMMM YYYY - HH:mm' });
+
+        $('#min-date').bootstrapMaterialDatePicker({ format: 'DD/MM/YYYY HH:mm', minDate: new Date() });
+        // Clock pickers
+        $('#single-input').clockpicker({
+            placement: 'bottom',
+            align: 'left',
+            autoclose: true,
+            'default': 'now'
+        });
+        $('.clockpicker').clockpicker({
+            donetext: 'Done',
+        }).find('input').change(function() {
+            console.log(this.value);
+        });
+        $('#check-minutes').click(function(e) {
+            // Have to stop propagation here
+            e.stopPropagation();
+            input.clockpicker('show').clockpicker('toggleView', 'minutes');
+        });
+        if (/mobile/i.test(navigator.userAgent)) {
+            $('input').prop('readOnly', true);
+        }
+        // Colorpicker
+        $(".colorpicker").asColorPicker();
+        $(".complex-colorpicker").asColorPicker({
+            mode: 'complex'
+        });
+        $(".gradient-colorpicker").asColorPicker({
+            mode: 'gradient'
+        });
+        // Date Picker
+        jQuery('.mydatepicker, #datepicker').datepicker();
+        jQuery('#datepicker-autoclose').datepicker({
+            autoclose: true,
+            todayHighlight: true
+        });
+        jQuery('#date-range').datepicker({
+            toggleActive: true
+        });
+        jQuery('#datepicker-inline').datepicker({
+            todayHighlight: true
+        });
+        // Daterange picker
+        $('.input-daterange-datepicker').daterangepicker({
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse'
+        });
+        $('.input-daterange-timepicker').daterangepicker({
+            timePicker: true,
+            format: 'MM/DD/YYYY h:mm A',
+            timePickerIncrement: 30,
+            timePicker12Hour: true,
+            timePickerSeconds: false,
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse'
+        });
+        $('.input-limit-datepicker').daterangepicker({
+            format: 'MM/DD/YYYY',
+            minDate: '06/01/2015',
+            maxDate: '06/30/2015',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse',
+            dateLimit: {
+                days: 6
+            }
+        });
+    </script>
+
+    <script>
+        var it6 = $('#datatable').DataTable( {
+            dom: 'prti',
+
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+        it6.on( 'order.dt search.dt', function () {
+            it6.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            } );
+        } ).draw();
+
+        var temsilci = $('#temsilci').DataTable( {
+            dom: 'prti',
+
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+        temsilci.on( 'order.dt search.dt', function () {
+            temsilci.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            } );
+
+        } ).draw();
+    </script>
+
+    <script>
+        function temizle (){
+            /* Single line Reset function executes on click of Reset Button */
+            $("#temsilciFiltre")[0].reset();
+        }
+
+        $(document).ready(function(){
+            var metin='<small class="uyari">*Seçtiğiniz kriterlere uygun son 500 çağrı listelenmektedir</small>'
+
+            $('.page-link').addClass('btn btn-sm btn-default');
+            $('[rel="tooltip"]').tooltip({trigger: "hover"});
+        })
+
+        $('tr#deneme').click(function(){
+            alert('bu kolona tıklandı')
+        })
+
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <h2 >Değerlendirme İzleme</h2>
+
+                    <div class="tc-accordion tc-accordion-style3" id="accordion3">
+                        <div class="panel">
+                            <h4 class="acdn-title">
+                                <a data-toggle="collapse" data-parent="#accordion3" href="#collapse10" class="collapsed" aria-expanded="false">Süreç Seçimi</a>
+                            </h4>
+                            <div id="collapse10" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                <div class="acdn-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hovered">
+                                            <thead>
+                                            <tr class="table-danger ">
+                                                <th > <strong> Süreç Adı</strong></th>
+                                                <th>Açıklama</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Inbound Değerlendirme Süreci</td>
+                                                <td>Gelen Çağrıları Değerlendirin</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <h4 class="acdn-title">
+                                <a data-toggle="collapse" data-parent="#accordion3" href="#collapse14" class="collapsed" aria-expanded="false">Konu Seçimi</a>
+                            </h4>
+                            <div id="collapse14" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                <div class="acdn-body">
+                                    <h5 class="text-center">
+                                        <div class="input-group">
+                                            <div class="input-group-btn search-panel">
+                                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="fa fa-filter"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-primary btn-xs " data-toggle="">
+                                                    <strong>TÜMÜ</strong>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li><a class="dark-link" href="">TEST_GRUP</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP1</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP2</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP3</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP4</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP5</a></li>
+                                                    <li><a class="dark-link" href="">TEST_GRUP6</a></li>
+                                                </ul>
+                                            </div>
+                                            <input type="hidden" name="search_param" value="all" id="search_param">
+                                            <input type="text" class="form-control  form-control-sm small-input" name="x" placeholder="Ara...">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-xs" type="button"><span class="fa fa-search"></span></button>
+                                            </span>
+                                        </div>
+                                    </h5>
+                                    <table style="width:100%" class="display table-bordered table-hovered  danger-bordered-table" id="temsilci">
+                                        <thead id="tblHead" style="background-color:#f7c8c8!important">
+                                        <tr>
+                                            <th>No </th>
+                                            <th>TCNo </th>
+                                            <th>Adı </th>
+                                            <th>Soyadı</th>
+                                            <th>Dahili No</th>
+                                            <th>Grup</th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">A</span></th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">Ö</span></th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">D</span></th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">Y</span></th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">T</span></th>
+                                            <th class="text-center genislik"><span class="btn btn-warning btn-sm">B</span></th>
+                                            <th class="text-right genislik"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>test.agent</td>
+                                            <td>12345678900</td>
+                                            <td>Test</td>
+                                            <td>Agent</td>
+                                            <td>123456</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-center">
+                                                <a class="btn btn-success  btn-sm" title="Detayları Gör" data-backdrop="static" data-keyboard="false" data-target="#degerlendirme"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        <tr  >
+                                            <td>test.agent</td>
+                                            <td>12345678900</td>
+                                            <td>Test</td>
+                                            <td>Agent</td>
+                                            <td>123456</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-center">
+                                                <a class="btn btn-success  btn-sm" title="Detayları Gör" data-backdrop="static" data-keyboard="false" data-target="#degerlendirme"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Kaynak seçimi için GEREKSİZ GÖRDÜĞÜMDEN KAPADIM  -->
+                    <!-- <div class="panel">
+                        <h4 class="acdn-title">
+                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapse11" class="collapsed" aria-expanded="false">Kaynak Seçimi</a>
+                        </h4>
+                        <div id="collapse11" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                            <div class="acdn-body">
+                                    <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="card">
+                                                    <div class="card-body" style="border-bottom:1px solid #ebebeb ">
+                                                        <h4 class="card-title d-inline" >Sorgulama Kriterleri</h4>
+                                                        <a class="btn btn-success float-right btn-sm" title="Temsilci Bul" data-backdrop="static" data-keyboard="false" data-target="#temsilciSec"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-users"></i></a>
+                                                        <form class="form" id="temsilciFiltre" action="#" method="post">
+                                                            <div class="form-group m-t-40 row">
+                                                                <label for="example-text-input" class="col-2 col-form-label">Temsilci</label>
+                                                                <div class="col-10">
+                                                                    <input class="form-control form-control-sm" type="text" disabled value="" id="example-text-input">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">ID</label>
+                                                                    <div class="col-10">
+                                                                        <input class="form-control form-control-sm" type="number"  value="" id="example-text-input">
+                                                                    </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Başlangıç-Bitiş Zamanı</label>
+                                                                    <div class="col-10">
+                                                                    <div class="input-daterange input-group " id="date-range">
+                                                                            <input type="text" class="form-control form-control-sm" name="start">
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text bg-info b-0 text-white"><i class="fa fa-calendar"></i></span>
+                                                                            </div>
+                                                                            <input type="text" class="form-control form-control-sm" name="end">
+                                                                    </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Arayan No</label>
+                                                                    <div class="col-10">
+                                                                        <input class="form-control form-control-sm" type="number"  value="" id="example-text-input">
+                                                                    </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Aranan No</label>
+                                                                    <div class="col-10">
+                                                                        <input class="form-control form-control-sm" type="number"  value="" id="example-text-input">
+                                                                    </div>
+                                                            </div>
+
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Çağrı Tipi</label>
+                                                                    <div class="col-10">
+                                                                            <select class=" form-control form-control-sm" id="intType1" data-placeholder="Çağrı Tipi" name="intType1">
+                                                                        <option value="0" disabled selected>Seçim Yapılmadı</option>
+                                                                                    <option value="0">Inbound</option>
+                                                                                    <option value="1">Outbound</option>
+                                                                                </select>
+                                                            </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Süre</label>
+                                                                    <div class="col-10">
+                                                                    <div class="input-daterange input-group" id="">
+                                                                            <input type="number" class="form-control form-control-sm" name="start">
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text bg-info b-0 text-white"><i class="fa fa-clock"></i></span>
+                                                                            </div>
+                                                                            <input type="number" class="form-control form-control-sm" name="end">
+                                                                    </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Skill</label>
+                                                                    <div class="col-10">
+                                                                    <select class=" form-control form-control-sm" id="intType1" data-placeholder="Çağrı Tipi" name="intType1">
+                                                                        <option value="0" disabled selected>Seçim Yapılmadı</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Dış Arama Kampanyası</label>
+                                                                    <div class="col-10">
+                                                                        <input class="form-control form-control-sm" type="number"  value="" id="example-text-input">
+                                                                    </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Kapatan</label>
+                                                                    <div class="col-10">
+                                                                    <select class=" form-control form-control-sm" id="intType1" data-placeholder="Çağrı Tipi" name="intType1">
+                                                                            <option value="0" disabled selected>Seçim Yapılmadı</option>
+                                                                            <option value="">Seçenekler</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                    <label for="example-text-input" class="col-2 col-form-label">Connection ID</label>
+                                                                    <div class="col-10">
+                                                                        <input class="form-control form-control-sm" type="number"  value="" id="example-text-input">
+                                                                    </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <div class="col-lg-2 ">
+                                                              <button type="submit" class="btn btn-success btn-block btn-sm"><i class="fa fa-search"></i></button>      </div>
+                                                              <div class="col-lg-2 ">
+
+                                                              <button type="button" onclick="temizle();" data-toggle="tooltip" data-original-title="Formu Temizle" title="Formu Temizle" class="btn btn-danger btn-block btn-sm"><i class="fa fa-eraser"></i></button>
+
+                                                            </div>
+                                                             </div>
+
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                  <div class="table-responsive" >
+                                        <table id="datatable" class="table color-bordered-table info-bordered-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Başlangıç Zamanı</th>
+                                                    <th>Temsilci</th>
+                                                    <th>Arayan No</th>
+                                                    <th>Aranan No</th>
+                                                    <th>Çağrı Tipi</th>
+                                                    <th>Süre (sn)</th>
+                                                    <th>Skill</th>
+                                                    <th>Dış Arama Kampanyası</th>
+                                                    <th>Kapatan</th>
+                                                    <th>Connection ID</th>
+                                                    <th>#</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                               <tr>
+                                                   <td>123456</td>
+                                                   <td>01-01-2018 22:00</td>
+                                                   <td>Agent User</td>
+                                                   <td>012345678</td>
+                                                   <td></td>
+                                                   <td>Inbound</td>
+                                                   <td>221</td>
+                                                   <td></td>
+                                                   <td></td>
+                                                   <td>User</td>
+                                                   <td>33445533</td>
+                                                   <td><button class="btn btn-success btn-xs" title="Değerlendir" data-toggle="tooltip"><i class="fa fa-arrow-right"></i></button></td>
+                                               </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                      </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-lg" id="degerlendirme" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"  style="padding:5px!important">
+                    <h4 class="modal-title" id="myLargeModalLabel">Bilgilendirme</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="tblGroup">
+                        <table style="width:100%" class="display table-bordered table-hovered " id="temsilci">
+                            <h6 class="badge badge-primary">Değerlendirme Süreçleri</h6>
+                            <thead id="tblHead" style="background-color:#f7c8c8!important">
+                            <tr>
+                                <th></th>
+                                <th class="text-center">
+                                    <select name="" class="form-control greenSelect form-control-sm small-input" id="">
+                                        <option value="">Tamamı</option>
+                                        <option value="">Bana Ait</option>
+                                        <option value="">Diğer</option>
+
+                                    </select>
+                                </th>
+                                <th class="text-center">
+                                    <select name="" class="form-control blueSelect  form-control-sm small-input" id="">
+                                        <option value="">Aralık 2018</option>
+                                    </select>
+                                </th>
+                                <th class="text-center">
+                                    <select  name="" class="form-control darkSelect  form-control-sm small-input" id="">
+                                        <option value="">Hepsi</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+
+                            </tr>
+                            <tr>
+                                <th style="width:200px!important;">Konu </th>
+                                <th>Filtre </th>
+                                <th>Değerlendirme Tarihi </th>
+                                <th>Durum</th>
+                                <th>Toplam</th>
+                                <th>En Az</th>
+                                <th>En Fazla</th>
+                                <th>Ortalama</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>001- TEST_GRUP</td>
+                                <td>Tümü</td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tblGroup">
+                        <table style="width:100%" class="display table-bordered table-hovered " id="temsilci">
+                            <h6 class="badge badge-primary">Değerlendiren</h6>
+                            <thead id="tblHead" style="background-color:#f7c8c8!important">
+                            <tr>
+                                <th></th>
+                                <th class="text-center">
+                                    <select name="" class="form-control greenSelect form-control-sm small-input" id="">
+                                        <option value="">Tamamı</option>
+                                        <option value="">Bana Ait</option>
+                                        <option value="">Diğer</option>
+                                    </select>
+                                </th>
+                                <th class="text-center">
+                                    <select name="" class="form-control blueSelect  form-control-sm small-input" id="">
+                                        <option value="">Aralık 2018</option>
+                                    </select>
+                                </th>
+                                <th class="text-center">
+                                    <select  name="" class="form-control darkSelect  form-control-sm small-input" id="">
+                                        <option value="">Hepsi</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+
+                            </tr>
+                            <tr>
+                                <th style="width:200px!important;">Konu </th>
+                                <th>Filtre </th>
+                                <th>Değerlendirme Tarihi </th>
+                                <th>Durum</th>
+                                <th>Toplam</th>
+                                <th>En Az</th>
+                                <th>En Fazla</th>
+                                <th>Ortalama</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Test Agent</td>
+                                <td>Tümü</td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            <tr>
+                                <td>Test Agent</td>
+                                <td>Tümü</td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            <tr>
+                                <td>Test Agent</td>
+                                <td>Tümü</td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            <tr>
+                                <td>Test Agent</td>
+                                <td>Tümü</td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tblGroup">
+                        <table style="width:100%" class="display table-bordered table-hovered " id="temsilci">
+                            <h6 class="badge badge-primary">Değerlendirme Formları</h6>
+                            <thead id="tblHead" style="background-color:#f7c8c8!important">
+
+                            <tr>
+                                <th style="width:248px!important;">Kaynak </th>
+                                <th> </th>
+                                <th>Değerlendirme Tarihi </th>
+                                <th>Durum</th>
+                                <th>Toplam</th>
+                                <th>En Az</th>
+                                <th>En Fazla</th>
+                                <th>Ortalama</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>001- TEST_FORM 128274</td>
+                                <td><button class="btn btn-danger btn-sm"><i class="fa fa-play"></i></button></td>
+                                <td class="text-center"><span class="badge badge-dark">> 01-01-2016</span></td>
+                                <td>Hepsi</td>
+                                <td>20</td>
+                                <td>30</td>
+                                <td>25</td>
+                                <td>27</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success waves-effect text-left btn-sm" data-dismiss="modal"><i class="fa fa-check"></i>Pencereyi Kapat</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="temsilciSec">
+        <div class="modal-dialog ayarla">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:5px!important">
+                    <h6>Temsilci Seç</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body bordered">
+                    <h5 class="text-center">
+                        <div class="input-group">
+                            <div class="input-group-btn search-panel">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-filter"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-xs " data-toggle="">
+                                    <strong>TÜMÜ</strong>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a class="dark-link" href="">TEST_GRUP</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP1</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP2</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP3</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP4</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP5</a></li>
+                                    <li><a class="dark-link" href="">TEST_GRUP6</a></li>
+                                </ul>
+                            </div>
+                            <input type="hidden" name="search_param" value="all" id="search_param">
+                            <input type="text" class="form-control  form-control-sm small-input" name="x" placeholder="Ara...">
+                            <span class="input-group-btn">
+                                    <button class="btn btn-default btn-xs" type="button"><span class="fa fa-search"></span></button>
+                                </span>
+                        </div>
+                    </h5>
+                    <table style="width:100%" class="display table-bordered table-hovered color-bordered-table warning-bordered-table" id="temsilci">
+                        <thead id="tblHead">
+                        <tr>
+                            <th>No </th>
+                            <th>TCNo </th>
+                            <th>Adı </th>
+                            <th>Soyadı</th>
+                            <th>Dahili No</th>
+                            <th>Grup</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>test.agent</td>
+                            <td>12345678900</td>
+                            <td>Test</td>
+                            <td>Agent</td>
+                            <td>123456</td>
+                            <td>TEST_GRUP</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default " data-dismiss="modal">Vazgeç</button>
+                    <button type="button" class="btn btn-success">Seç</button>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+{% endblock %}

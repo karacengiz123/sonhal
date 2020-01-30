@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormQuestionOption index{% endblock %}
+
+{% block body %}
+    <h1>FormQuestionOption index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Score</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_question_option in form_question_options %}
+            <tr>
+                <td>{{ form_question_option.id }}</td>
+                <td>{{ form_question_option.title }}</td>
+                <td>{{ form_question_option.score }}</td>
+                <td>
+                    <a href="{{ path('form_question_option_show', {'id': form_question_option.id}) }}">show</a>
+                    <a href="{{ path('form_question_option_edit', {'id': form_question_option.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('form_question_option_new') }}">Create new</a>
+{% endblock %}

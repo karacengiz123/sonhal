@@ -1,0 +1,374 @@
+<header class="topbar">
+    <nav class="navbar top-navbar navbar-expand-md navbar-dark">
+        <div class="navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <div class="navbar-header" style="background-color: #03a9f3!important;">
+                    <a class="navbar-brand" href="/">
+                        <!-- Logo icon --><b>
+                            <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                            <!-- Dark Logo icon -->
+                            <img src="/assets/images/tbxProLogoIconW.png" alt="homepage" class="dark-logo"
+                                 style="width: 50px!important;">
+                            <!-- Light Logo icon -->
+                            <img src="/assets/images/tbxProLogoIconW.png" alt="homepage" class="light-logo"
+                                 style="width: 50px!important;">
+                        </b>
+                        <!--End Logo icon -->
+                        <!-- Logo text --><span class="hidden-sm-down">
+                         <!-- dark Logo text -->
+                         <img src="/assets/images/tbxProLogoTextW.png" alt="homepage" class="dark-logo"
+                              style="width: 150px!important;">
+                            <!-- Light Logo text -->
+                         <img src="/assets/images/tbxProLogoTextW.png" class="light-logo" alt="homepage"
+                              style="width: 150px!important;">
+                        </span>
+                    </a>
+                </div>
+
+                <ul class="navbar-nav mr-auto">
+                    <!-- This is  -->
+                    <li class="nav-item"><a class="nav-link nav-toggler d-block d-md-none waves-effect waves-dark"
+                                            href="javascript:void(0)"><i class="ti-close ti-menu"></i></a></li>
+                    <li class="nav-item"><a class="nav-link sidebartoggler d-none waves-effect waves-dark"
+                                            href="javascript:void(0)"><i class="icon-menu ti-menu"></i></a></li>
+                </ul>
+            </ul>
+            <ul class="navbar-nav my-lg-0">
+                <li class="nav-item dropdown u-pro">
+                    <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic" href=""
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
+                                src="/assets/images/tbxProLogoIconW.png" alt="user" class=""> <span
+                                class="hidden-md-down">{{ app.session.get('_security.last_username') }}<i
+                                    class="fa fa-angle-down" style="margin-left: 5px!important;"></i></span> </a>
+                    <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                        <a href="javascript:void(0)" class="dropdown-item"><i class="ti-user"
+                                                                              style="margin-right: 5px!important;"></i>Profilim</a>
+                        {#<a href="javascript:void(0)" class="dropdown-item"><i class="ti-wallet"></i> My Balance</a>#}
+                        {#<a href="javascript:void(0)" class="dropdown-item"><i class="ti-email"></i> Inbox</a>#}
+                        {#<div class="dropdown-divider"></div>#}
+                        {#<a href="javascript:void(0)" class="dropdown-item"><i class="ti-settings"></i> Account Setting</a>#}
+                        <div class="dropdown-divider"></div>
+                        <a href="/logout" class="dropdown-item"><i class="fa fa-power-off"
+                                                                   style="margin-right: 5px!important;"></i>Çıkış</a>
+                    </div>
+                </li>
+                <!-- ============================================================== -->
+                <!-- End User Profile -->
+                <!-- ============================================================== -->
+            </ul>
+        </div>
+    </nav>
+</header>
+
+
+<aside class="left-sidebar">
+    <div class="scroll-sidebar">
+        <nav class="sidebar-nav">
+            <script type="text/javascript">
+                var serverIpAdressShow = false;
+                if (serverIpAdressShow == false) {
+                    serverIpAdressHideFunction();
+                } else {
+                    if (serverIpAdressShow == true) {
+                        serverIpAdressShowFunction()
+                    }
+                }
+
+                function serverIpAdressShowFunction() {
+                    $("#serverIpAdress").css("display", "block")
+                }
+
+                function serverIpAdressHideFunction() {
+                    $("#serverIpAdress").css("display", "none")
+                }
+            </script>
+            <span style="float: right!important; display: none;" id="serverIpAdress">{{ serverIpAdress }}</span>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light"
+                 style="background-color: white!important; padding: 0px!important;">
+                <ul id="sidebarnav">
+                    <li class="user-pro">
+                        <a class="waves-effect waves-dark" href="/" aria-expanded="false">
+                            <img src="/assets/images/tbxProLogo.png" alt="Bhm Teknoloji"
+                                 style="padding: 0px!important; margin-bottom: 20px!important;">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/">Anasayfa</a>
+                    </li>
+                    <li>
+                        <a href="/softphone" class="softphone" id="softphone">Arama</a>
+                        <script>
+                            $(document).ready(function () {
+                                $("#softphone").click(function (e) {
+                                    e.preventDefault(); // this will prevent the browser to redirect to the href
+                                    // if js is disabled nothing should change and the link will work normally
+                                    var url = $(this).attr('href');
+                                    var windowName = $(this).attr('id');
+
+                                    try {
+                                        viewer = window.open("", windowName);
+                                        /*'checkpage' is a method in "mv" page, it
+                                        ensures this is still the correct page and goes into
+                                        the catch block if it is not*/
+                                        viewer.checkPage();
+
+                                    } catch (error) {
+                                        viewer = window.open(url, windowName, "wheight=100%,width=100%");
+                                    }
+
+
+                                });
+                            });
+                        </script>
+                    </li>
+                    {% if is_granted('ROLE_INDEX_HARDPHONE') %}
+                        <li>
+                            <a href="/hardphone" class="softphone" id="hardphone">Hard Phone</a>
+                            <script>
+                                $(document).ready(function () {
+                                    $("#hardphone").click(function (e) {
+                                        e.preventDefault(); // this will prevent the browser to redirect to the href
+                                        // if js is disabled nothing should change and the link will work normally
+                                        var url = $(this).attr('href');
+                                        var windowName = $(this).attr('id');
+
+                                        try {
+                                            viewer = window.open("", windowName);
+                                            /*'checkpage' is a method in "mv" page, it
+                                            ensures this is still the correct page and goes into
+                                            the catch block if it is not*/
+                                            viewer.checkPage();
+
+                                        } catch (error) {
+                                            viewer = window.open(url, windowName, "wheight=100%,width=100%");
+                                        }
+                                    });
+                                });
+                            </script>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_CHAT') %}
+                        <li>
+                            <a href="{{ path('agent_chat') }}" class="chatAction" id="chatAction">Chat</a>
+                            <script>
+                                $(document).ready(function () {
+                                    $("#chatAction").click(function (e) {
+                                        e.preventDefault(); // this will prevent the browser to redirect to the href
+                                        // if js is disabled nothing should change and the link will work normally
+                                        var url = $(this).attr('href');
+                                        var windowName = $(this).attr('id');
+
+                                        try {
+                                            viewer = window.open("", windowName);
+                                            /*'checkpage' is a method in "mv" page, it
+                                            ensures this is still the correct page and goes into
+                                            the catch block if it is not*/
+                                            viewer.checkPage();
+
+                                        } catch (error) {
+                                            viewer = window.open(url, windowName, "wheight=100%,width=100%");
+                                        }
+
+
+                                    });
+                                });
+
+                            </script>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_INDEX_SUPERVISOR') %}
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic dropdown_a" href=""
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                               style="color: #8d97ad!important;">Personel</a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <a href="{{ path('skill_management') }}" target="_blank">Skill Yönetimi</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('queue_skill_managament') }}" target="_blank">Kuyruk Yönetimi</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('agent_management') }}" target="_blank">Agent Yönetimi</a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('team_index') }}" target="_blank">Takımlar</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('user_index') }}" target="_blank">Kullanıcılar</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('group_index') }}" target="_blank">Kullanıcı Yetkileri</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('acw_type_index') }}" target="_blank">İşlem Tipleri</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('break_type_index') }}" target="_blank">Mola Tipleri</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{{ path('break_group_index') }}" target="_blank">Mola Grupları</a>
+                                {% endif %}
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic dropdown_a" href=""
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                               style="color: #8d97ad!important;">Anlık İzleme</a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <a href="{{ path('cc_pulse') }}" target="_blank">Inbound</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('outbound_cc_pulse') }}" target="_blank">Outbound</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('chat_cc_pulse') }}" target="_blank">Chat</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic dropdown_a" href=""
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                               style="color: #8d97ad!important;">Rehber</a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <a href="{{ path('guide_index') }}" target="_blank">Rehber</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('guide_group_index') }}" target="_blank">Rehber Grupları</a>
+                            </div>
+                        </li>
+                    {% elseif is_granted('ROLE_SUPERVISOR') %}
+                        <li class="nav-item dropdown u-pro">
+                            <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic dropdown_a" href=""
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                               style="color: #8d97ad!important;">Rehber</a>
+                            <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                                <a href="{{ path('guide_index') }}" target="_blank">Rehber</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown u-pro">
+                        <a class="nav-link dropdown-toggle waves-effect waves-dark profile-pic dropdown_a" href=""
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                           style="color: #8d97ad!important;">Kalite</a>
+
+                        <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                            {% if is_granted('ROLE_EVALUATED_CALLS') %}
+                                <a href="{{ path('quality_inbound') }}" target="_blank">Çağrı Değerlendir</a>
+                                {#                                <a href="{{ path('quality_outbound') }}" target="_blank">Outbound Değerlendir</a>#}
+                                <div class="dropdown-divider"></div>
+                            {% endif %}
+                            {% if is_granted('ROLE_QUALITY_NEW') %}
+                                <a href="{{ path('quality_new') }}" target="_blank">Çözüm Değerlendirme </a>
+                            {% endif %}
+                            {% if is_granted('ROLE_EVALUATION_LIST') %}
+                                <a href="{{ path('evaluation_list') }}" target="_blank">Değerlendirme Listesi</a>
+                            {% endif %}
+                            {% if is_granted('ROLE_TAKIM_LIDERI') or is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_SUPERVISOR') %}
+                                <a href="{{ path('listen_calls') }}" target="_blank">Dinle</a>
+                            {% endif %}
+                            {% if is_granted('ROLE_REPORTER') %}
+                            <div class="dropdown-divider"></div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a class="has-arrow waves-effect waves-dark" href="javascript:void(0)"
+                           aria-expanded="false"><i class="ti-align-left"></i><span
+                                    class="hide-menu">Rapor</span></a>
+                        <ul aria-expanded="false" class="collapse">
+
+                            <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">Santral R.</a>
+                                <ul aria-expanded="false" class="collapse">
+                                    <li><a href="{{ path('central_index')}}" target="_blank">Santral Raporları</a></li>
+                                    <li><a href="{{ path('card_close') }}" target="_blank">Kart Kapatma IVR</a></li>
+                                    <li><a href="{{ path('station') }}" target="_blank">Durak IVR</a></li>
+                                    <li><a href="{{ path('igdas_ivr') }}" target="_blank">İgdaş IVR</a></li>
+                                    <li><a href="{{ path('igdas_details_new') }}" target="_blank">İgdaş IVR Detay</a>
+                                    </li>
+                                    <li><a href="{{ path('log_report_detail') }}" target="_blank">Login LogOut Detay</a>
+                                    </li>
+                                    <li><a href="{{ path('log_report_detail_firstLast') }}" target="_blank">Login İlk Giriş Son Çıkış Detay</a>
+                                    </li>
+                                    <li><a href="{{ path('form_acht_details') }}" target="_blank">ACHT Detay</a></li>
+                                </ul>
+
+                            </li>
+
+                            <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">Temsilci R.</a>
+                                <ul aria-expanded="false" class="collapse">
+                                    <li><a href="{{ path('agent_detailed_table_report') }}" target="_blank">Temsilci Tablosu
+                                            Raporları</a></li>
+                                    <li><a href="{{ path('call_detail') }}" target="_blank">Arama Detay</a></li>
+                                    {#                                        <li><a href="javascript:void(0)" target="_blank">Bilgiver Otomatik</a></li>#}
+                                    <li><a href="{{ path('seven_second_new') }}" target="_blank">0-7 SN Raporu</a>
+                                    </li>
+                                    {#                                        <li><a href="javascript:void(0)" target="_blank">ACHT Detay</a></li>#}
+                                    {#                                        <li><a href="{{ path('agent_detail') }}" target="_blank">Saat Bazlı Acht</a></li>#}
+                                    <li><a href="{{ path('agent_based_expertise') }}" target="_blank">Temsilci Bazlı
+                                            Uzmanlık</a></li>
+                                    <li><a href="{{ path('agent_detail') }}" target="_blank">Temsilci Detay</a></li>
+                                    <li><a href="{{ path('abandon_from_details') }}" target="_blank">Kaçan Çağrı
+                                            Listesi</a></li>
+                                </ul>
+
+                            </li>
+                            <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">Kalite R.</a>
+                                <ul aria-expanded="false" class="collapse">
+                                    <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">Değerlendirme</a>
+                                        <ul aria-expanded="false" class="collapse">
+
+                                            <li><a href="{{ path('evaluator_reports') }}" target="_blank">Değerlendirilen
+                                                    Kısmından Çekilen Rapor</a></li>
+
+                                            <li><a href="{{ path('external_company_reports') }}" target="_blank">Dış
+                                                    Firma
+                                                    Kısmından Çekilen Rapor</a></li>
+                                            <li><a href="{{ path('evaluator-external-count-report-form') }}"
+                                                   target="_blank">Değerlendiren + Dış Firma Süreci Tablosu</a></li>
+                                            <li><a href="{{ path('evaluator-count-report-form') }}" target="_blank">Değerlendiren Tablosu</a></li>
+
+                                        </ul>
+                                    <li><a class="has-arrow" href="javascript:void(0)" aria-expanded="false">TL</a>
+
+                                        <ul aria-expanded="false" class="collapse">
+                                            <li><a href="{{ path('team_leader_category') }}" target="_blank">Takım
+                                                    Lideri
+                                                    Kategori Bazlı Karne</a></li>
+                                            <li><a href="{{ path('team-leader-question') }}" target="_blank">Takım
+                                                    Lideri
+                                                    Soru Bazlı Karne</a></li>
+                                            <li><a href="{{ path('team-leader-eva-count') }}" target="_blank">Takım
+                                                    Lideri Temsilci
+                                                    Toplam Değerlendirme Tablosu</a></li>
+
+                                           <li><a href="{{ path('team-leader-eva-total-count') }}" target="_blank">Takım
+                                                    Lideri
+                                                    Toplam Değerlendirme Tablosu</a></li>
+
+                                            <li><a href="{{ path('team-leader-protest-count') }}" target="_blank">Takım
+                                                    Lideri İtiraz Raporu</a></li>
+
+                                        </ul>
+                                    <li><a href="{{ path('agent-detail-reports-qualty-form') }}" target="_blank">Agent
+                                            Detay Süreci Raporu</a></li>
+                                    <li><a href="{{ path('agent-protest-count') }}" target="_blank">Kalite
+                                            İtiraz Tablosu</a></li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    {% if is_granted("ROLE_ADMIN") %}
+                        <li id="wallMessagesLi">
+                            <style>
+                                #wallMessages:hover, #wallMessagesLi:hover {
+                                    cursor: pointer !important;
+                                }
+                            </style>
+                            <a onclick="wallModalStart()">Dashboard Mesajı</a>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_CHAT') %}
+                        <li class="nav-item">
+                            <a class="nav-link  waves-effect waves-light" href="{{ path('chat_list') }}" target="_blank">
+                                <i class="ti-settings" style="color: black!important;"> Sohbet Geçmişi</i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </nav>
+    </div>
+</aside>

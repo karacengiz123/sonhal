@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New HoldLog{% endblock %}
+
+{% block body %}
+    <h1>Create new HoldLog</h1>
+
+    {{ include('hold_log/_form.html.twig') }}
+
+    <a href="{{ path('hold_log_index') }}">back to list</a>
+{% endblock %}

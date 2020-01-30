@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RegisterLog index{% endblock %}
+
+{% block body %}
+    <h1>RegisterLog index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>StartTime</th>
+                <th>EndTime</th>
+                <th>LastRegister</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for register_log in register_logs %}
+            <tr>
+                <td>{{ register_log.id }}</td>
+                <td>{{ register_log.StartTime ? register_log.StartTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ register_log.EndTime ? register_log.EndTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ register_log.LastRegister ? register_log.LastRegister|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('register_log_show', {'id': register_log.id}) }}">show</a>
+                    <a href="{{ path('register_log_edit', {'id': register_log.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('register_log_new') }}">Create new</a>
+{% endblock %}

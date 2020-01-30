@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New RealtimeQueues{% endblock %}
+
+{% block body %}
+    <h1>Create new RealtimeQueues</h1>
+
+    {{ include('realtime_queues/_form.html.twig') }}
+
+    <a href="{{ path('realtime_queues_index') }}">back to list</a>
+{% endblock %}

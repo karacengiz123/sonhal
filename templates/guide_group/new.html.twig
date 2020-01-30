@@ -1,0 +1,28 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}New GuideGroup{% endblock %}
+
+{% block body %}
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".successBtn form button").attr('class', 'btn btn-success');
+        });
+    </script>
+    <h1 style="padding: 20px">Yeni Rehber Grubu Oluştur</h1>
+<div class="col-lg-12 aaa" style="padding: 20px; background-color: white">
+
+    <a class="btn btn-info" style="margin-bottom: 20px; float:right;margin-top: 10px" href="{{ path('guide_group_index') }}">Listeye Geri Dön</a>
+
+<div class="successBtn" >
+    {{ include('guide_group/_form.html.twig') }}
+</div>
+    <br/>
+    <br/>
+</div>
+{% endblock %}

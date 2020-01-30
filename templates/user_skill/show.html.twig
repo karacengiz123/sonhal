@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserSkill{% endblock %}
+
+{% block body %}
+    <h1>UserSkill</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user_skill.id }}</td>
+            </tr>
+            <tr>
+                <th>Queue</th>
+                <td>{{ user_skill.queue }}</td>
+            </tr>
+            <tr>
+                <th>Member</th>
+                <td>{{ user_skill.member }}</td>
+            </tr>
+            <tr>
+                <th>Penalty</th>
+                <td>{{ user_skill.penalty }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('user_skill_index') }}">back to list</a>
+
+    <a href="{{ path('user_skill_edit', {'id': user_skill.id}) }}">edit</a>
+
+    {{ include('user_skill/_delete_form.html.twig') }}
+{% endblock %}

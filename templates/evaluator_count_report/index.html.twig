@@ -1,0 +1,166 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Değerlendiren Tablosu{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#evaluatorCountListTableDiv").css("display","none");
+                $('#evaluatorCountListTable').dataTable().fnDestroy();
+                $('#evaluatorCountListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#evaluatorCountListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#evaluatorCountDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#evaluatorCountDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#evaluatorCountDetailText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#evaluatorCountDetail").modal('hide');
+            $("#evaluatorCountDetailText").html("");
+        }
+        function evaluatorCountReportDetailValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/evaluatorCountReportTime',
+                data:$('#formcallDetailIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#evaluatorCountListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "24/15 dklık<br/>veya Saatlik"},
+                                { data: "Degerlendiren" , name: "Degerlendiren" , title: "Degerlendiren"},
+                                { data: "evaCount" , name: "evaCount" , title: "Değerlendirme Sayısı"},
+                                { data: "AVGScore" , name: "AVGScore" , title: "Ortalama Puan"},
+                                { data: "SumDuration" , name: "SumDuration" , title: "Toplam Dinleme Süresi DK"},
+                                { data: "AvgDuration" , name: "AvgDuration" , title: "Ortalma Çağrı Süresi DK"},
+                                { data: "MinScore" , name: "MinScore" , title: "Min Puan"},
+                                { data: "MaxScore" , name: "MaxScore" , title: "Max Puan"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Değerlendiren Tablosu</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formcallDetailIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="evaluatorCountReportDetailValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="evaluatorCountListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="evaluatorCountListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="evaluatorCountDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="evaluatorCountDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

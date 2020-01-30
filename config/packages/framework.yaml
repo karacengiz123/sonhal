@@ -1,0 +1,44 @@
+framework:
+    translator: ~
+    secret: '%env(APP_SECRET)%'
+    default_locale: "%locale%"
+    csrf_protection: true
+    #http_method_override: true
+    ide: 'phpstorm://open?url=file://%%f&line=%%l'
+    # Enables session support. Note that the session will ONLY be started if you read or write from it.
+    # Remove or comment this section to explicitly disable session support.
+    session:
+   #     handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        cookie_lifetime: 31536000
+        gc_maxlifetime:  31536000
+    templating: { engines: ['twig'] }
+    #esi: ~
+    #fragments: ~
+    php_errors:
+        log: true
+
+    cache: ~
+
+fos_user:
+  db_driver: orm # other valid values are 'mongodb' and 'couchdb'
+  firewall_name: main
+  user_class: App\Entity\User
+  from_email:
+    address: "nobody"
+    sender_name: "nobody"
+
+ldap_tools:
+
+  domains:
+    ibb:
+      # The LDAP FQDN is required
+      domain_name: '%env(LDAP_HOST)%'
+#      domain_name: fake.domain
+      # The base DN for LDAP searches (queried from the RootDSE if not provided)
+      base_dn: "CN=LDAP Test 2,OU=SERVICE ACCOUNTS,OU=Bilgi Islem,OU=SARACHANE BINASI,OU=BIRIMLER,OU=BILGI ISLEM DOMAIN YONETIMI,DC=ibb,DC=gov,DC=tr"
+      # The LDAP servers to use for the connection (Queried from DNS if not provided)
+      servers: ["ldap.ibb.gov.tr"]
+      use_ssl: true
+      port: 636
+

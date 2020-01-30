@@ -1,0 +1,11 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}New FormCategory{% endblock %}
+
+{% block body %}
+    <h1>Create new FormCategory</h1>
+
+    {{ include('form_category/_form.html.twig') }}
+
+    <a href="{{ path('form_category_index') }}">back to list</a>
+{% endblock %}

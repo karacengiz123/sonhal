@@ -1,0 +1,182 @@
+{% extends 'layout/base.html.twig' %}
+{% block customCss %}
+    {#<link rel="stylesheet" href="/assets/css/jquery.dataTables.min.css">#}
+    <style>
+        .dt-buttons{
+            margin-left: 30px!important;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    {#<script src="/assets/js/jquery.dataTables.min.js"></script>#}
+    <script src="/assets/js/ccPulseFunction.js"></script>
+    <script type="text/javascript">
+        // KUYRUK BAZLI PERSONEL BAŞLANGIÇ
+        $("#btnQueuesAsUser").click(function () {
+            $("#tableTitle").html("KUYRUK BAZLI PERSONEL");
+            displayNoneTableDiv();
+            loadedModalStart();
+            var placeholderSelect = "Kuyruk Seçiniz..";
+            var allSelect = "Tüm Kuyruklar";
+            var listSelectDatalink = "/ccPulse/queue-select";
+            listTableDatalink = "/ccPulse/queue-get-select-all";
+            listSelectData(placeholderSelect,allSelect,listSelectDatalink);
+            displayBlockSelect();
+        });
+        // KUYRUK BAZLI PERSONEL BİTİŞ
+
+        // TAKIM BAZLI PERSONEL BAŞLANGIÇ
+        $("#btnTeamAsUser").click(function () {
+            $("#tableTitle").html("TAKIM BAZLI PERSONEL");
+            displayNoneTableDiv();
+            loadedModalStart();
+            var placeholderSelect = "Takım Seçiniz..";
+            var allSelect = "Tüm Takımlar";
+            var listSelectDatalink = "/ccPulse/team-select";
+            listTableDatalink = "/ccPulse/team-get-select-all";
+            listSelectData(placeholderSelect,allSelect,listSelectDatalink);
+            displayBlockSelect();
+        });
+        // TAKIM BAZLI PERSONEL BİTİŞ
+
+        // AGENT BAZLI KUYRUK BAŞLANGIÇ
+        $("#btnUserAsQueues").click(function () {
+            $("#tableTitle").html("AGENT BAZLI KUYRUK");
+            loadedModalStart();
+            displayNoneSelect();
+            displayNoneTableDiv();
+            var listTableDatalink = "/ccPulse/agent-as-queue-get-select-all";
+            agentAsQueueGetSelectAll(listTableDatalink);
+            displayBlockTableDiv();
+        });
+        // AGENT BAZLI KUYRUK BİTİŞ
+
+        // ÇAĞRI BAZLI KUYRUK BAŞLANGIÇ
+        $("#btnCallAsQueues").click(function () {
+            $("#tableTitle").html("ÇAĞRI BAZLI KUYRUK");
+            loadedModalStart();
+            displayNoneSelect();
+            displayNoneTableDiv();
+            var listTableDatalink = "/ccPulse/call-as-queue-get-select-all";
+            callAsQueueGetSelectAll(listTableDatalink);
+            displayBlockTableDiv();
+        });
+        // ÇAĞRI BAZLI KUYRUK BİTİŞ
+
+        // ÖZET BAŞLANGIÇ
+        $("#btnSummary").click(function () {
+            $("#tableTitle").html("ÖZET");
+            loadedModalStart();
+            displayNoneSelect();
+            displayNoneTableDiv();
+            var listTableDatalink = "/ccPulse/summary";
+            console.log();
+            summaryAll(listTableDatalink);
+            displayBlockTableDiv();
+        });
+        // ÖZET BİTİŞ
+    </script>
+{% endblock %}
+{% block title %}Anlık İzleme{% endblock %}
+{% block body %}
+
+<div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+        <h4 class="text-themecolor">Anlık İzleme</h4>
+    </div>
+    <div class="col-md-7 align-self-center text-right">
+        <div class="d-flex justify-content-end align-items-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Anasayfa</a></li>
+                <li class="breadcrumb-item active">Anlık İzleme</li>
+            </ol>
+            {#<button type="button" class="btn btn-info  d-lg-block m-l-15"><i class="far fa-save"></i> Kaydet</button>#}
+        </div>
+    </div>
+</div>
+<!-- ============================================================== -->
+<!-- End Bread crumb and right sidebar toggle -->
+<!-- ============================================================== -->
+<!-- ============================================================== -->
+<!-- Start Page Content -->
+<!-- ============================================================== -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- SELECT BUTTONS START -->
+                <div class="cc_pulse_btn_div">
+                    <button type="button" class="btn btn-primary d-lg-block m-l-15 cc_pulse_btn" id="btnUserAsQueues">
+                        AGENT BAZLI KUYRUK
+                    </button>
+                    <button type="button" class="btn btn-primary d-lg-block m-l-15 cc_pulse_btn" id="btnCallAsQueues">
+                        ÇAĞRI BAZLI KUYRUK
+                    </button>
+                    <button type="button" class="btn btn-primary d-lg-block m-l-15 cc_pulse_btn" id="btnQueuesAsUser">
+                        KUYRUK BAZLI PERSONEL
+                    </button>
+                    <button type="button" class="btn btn-primary d-lg-block m-l-15 cc_pulse_btn" id="btnTeamAsUser">
+                        TAKIM BAZLI PERSONEL
+                    </button>
+                    <button type="button" class="btn btn-primary d-lg-block m-l-15 cc_pulse_btn" id="btnSummary">
+                        ÖZET
+                    </button>
+                </div>
+                <!-- SELECT BUTTONS FINISH -->
+
+                <div class="col-lg-12">
+                    <button type="button" class="btn btn-warning" id="btnRefreshTable" onclick="tenSecondLoadTable(datatableupdatelink,tableParam);" style="float: right!important;">
+                        YENİLE
+                    </button>
+                    <h1 id="tableTitle"></h1>
+                </div>
+
+
+                <!-- TABLE & SELECT START -->
+                <select class="form-control" id="listSelect" style="display: none">
+                </select>
+
+                <div id="listTableDiv" class="tabcontent">
+                    <div class="table-responsive m-t-40">
+                        <table id="listTable"
+                               class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                        </table>
+                    </div>
+                </div>
+                <!-- TABLE & SELECT FINISH -->
+
+
+
+                <!-- MODAL START -->
+                <div class="modal fade" id="loadCCPulse" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                        <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                            <div class="modal-body">
+                                <h1 id="LoadCCPulseText"></h1>
+                                <div class="outer" id="loadModalAnimation">
+                                    <div class="inner">
+                                        <div class="small"></div>
+                                        <div class="small"></div>
+                                        <div class="small"></div>
+                                        <div class="small"></div>
+                                    </div>
+                                    <div class="big">
+                                        <div class="small"></div>
+                                    </div>
+                                    <div class="big">
+                                        <div class="small"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- MODAL FINISH -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

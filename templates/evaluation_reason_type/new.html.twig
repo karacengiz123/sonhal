@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New EvaluationReasonType{% endblock %}
+
+{% block body %}
+    <h1>Create new EvaluationReasonType</h1>
+
+    {{ include('evaluation_reason_type/_form.html.twig') }}
+
+    <a href="{{ path('evaluation_reason_type_index') }}">back to list</a>
+{% endblock %}

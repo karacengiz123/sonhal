@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EvaluationSource index{% endblock %}
+
+{% block body %}
+    <h1>EvaluationSource index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation_source in evaluation_sources %}
+            <tr>
+                <td>{{ evaluation_source.id }}</td>
+                <td>{{ evaluation_source.name }}</td>
+                <td>
+                    <a href="{{ path('evaluation_source_show', {'id': evaluation_source.id}) }}">show</a>
+                    <a href="{{ path('evaluation_source_edit', {'id': evaluation_source.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('evaluation_source_new') }}">Create new</a>
+{% endblock %}

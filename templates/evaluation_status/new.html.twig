@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New EvaluationStatus{% endblock %}
+
+{% block body %}
+    <h1>Create new EvaluationStatus</h1>
+
+    {{ include('evaluation_status/_form.html.twig') }}
+
+    <a href="{{ path('evaluation_status_index') }}">back to list</a>
+{% endblock %}

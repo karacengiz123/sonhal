@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EvaluationStatus index{% endblock %}
+
+{% block body %}
+    <h1>EvaluationStatus index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>StatusCode</th>
+                <th>Name</th>
+                <th>IsActive</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation_status in evaluation_statuses %}
+            <tr>
+                <td>{{ evaluation_status.id }}</td>
+                <td>{{ evaluation_status.statusCode }}</td>
+                <td>{{ evaluation_status.name }}</td>
+                <td>{{ evaluation_status.isActive ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('evaluation_status_show', {'id': evaluation_status.id}) }}">show</a>
+                    <a href="{{ path('evaluation_status_edit', {'id': evaluation_status.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('evaluation_status_new') }}">Create new</a>
+{% endblock %}

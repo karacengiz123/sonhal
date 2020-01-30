@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IvrServiceLog index{% endblock %}
+
+{% block body %}
+    <h1>IvrServiceLog index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CallId</th>
+                <th>Alias</th>
+                <th>Input</th>
+                <th>Request</th>
+                <th>Response</th>
+                <th>CreatesAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ivr_service_log in ivr_service_logs %}
+            <tr>
+                <td>{{ ivr_service_log.id }}</td>
+                <td>{{ ivr_service_log.callId }}</td>
+                <td>{{ ivr_service_log.alias }}</td>
+                <td>{{ ivr_service_log.input }}</td>
+                <td>{{ ivr_service_log.request }}</td>
+                <td>{{ ivr_service_log.response }}</td>
+                <td>{{ ivr_service_log.createsAt ? ivr_service_log.createsAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('ivr_service_log_show', {'id': ivr_service_log.id}) }}">show</a>
+                    <a href="{{ path('ivr_service_log_edit', {'id': ivr_service_log.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ivr_service_log_new') }}">Create new</a>
+{% endblock %}

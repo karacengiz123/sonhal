@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormQuestionOption{% endblock %}
+
+{% block body %}
+    <h1>FormQuestionOption</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ form_question_option.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ form_question_option.title }}</td>
+            </tr>
+            <tr>
+                <th>Score</th>
+                <td>{{ form_question_option.score }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('form_question_option_index') }}">back to list</a>
+
+    <a href="{{ path('form_question_option_edit', {'id': form_question_option.id}) }}">edit</a>
+
+    {{ include('form_question_option/_delete_form.html.twig') }}
+{% endblock %}

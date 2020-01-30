@@ -1,0 +1,208 @@
+// Settings
+$c-w: 300px;   //container width
+$crcl-w: 12px; //circle width
+$time: 4s;     //animation time
+$delta: 5px;   //up-down movement
+
+//Colors
+$bg: rgb(79, 60, 53);         //background
+$color_1: rgb(239, 194, 71);  //yellow
+$color_2: rgb(135, 219, 150); //green
+$color_3: rgb(202, 79, 79);   //red
+// ********
+
+$c-h: .4*$c-w;
+$inner-count: 4;
+$inner-color: ($color_2, $color_3, $color_3, $color_2);
+
+@mixin animation($name) {
+  @-webkit-keyframes #{$name} {@content;}
+  @-moz-keyframes #{$name} {@content;}
+  @-o-keyframes #{$name} {@content;}
+  @keyframes #{$name} {@content;}
+}
+
+@mixin animation-use($name) {
+  -webkit-animation: $name $time infinite linear;
+  -moz-animation: $name $time infinite linear;
+  -o-animation: $name $time infinite linear;
+  animation: $name $time infinite linear;
+}
+
+@mixin transform($x, $y, $a) {
+  -webkit-transform: translate($x, $y) rotate($a);
+  -ms-transform: translate($x, $y) rotate($a);
+  transform: translate($x, $y) rotate($a);
+}
+
+@mixin spin-animation($sgn) {
+  20%       { @include transform(0, 0, -.5turn); }
+  20.00001% { @include transform($sgn*$c-h, 0, 0); }
+  40%       { @include transform($sgn*$c-h, 0, .5turn); }
+  40.00001% { @include transform($sgn*2*$c-h, 0, 0); }
+  60%       { @include transform($sgn*2*$c-h, 0, -1turn); }
+  60.00001% { @include transform($sgn*$c-h, 0, -.5turn); }
+  80%       { @include transform($sgn*$c-h, 0, 0); }
+  80.00001% { @include transform(0, 0, .5turn); }
+  100%      { @include transform(0, 0, 0); }
+}
+
+@mixin color-animation_1_4($sgn) {
+  0%, 39% {
+    background: $color_2;
+    @include transform(0, 0, 0);
+  }
+  40% {
+    background: $color_3;
+    @include transform(0, $sgn*$delta, 0);
+  }
+  45%, 59% {
+    background: $color_3;
+    @include transform(0, 0, 0);
+  }
+  60% {
+    background: $color_2;
+    @include transform(0, $sgn*$delta, 0);
+  }
+  65% {
+    background: $color_2;
+    @include transform(0, 0, 0);
+  }
+}
+
+@mixin color-animation_2_3($sgn) {
+  0%, 19% {
+    background: $color_3;
+    @include transform(0, 0, 0);
+  }
+  20% {
+    background: $color_1;
+    @include transform(0, $sgn*$delta, 0);
+  }
+  25%, 79% {
+    background: $color_1;
+    @include transform(0, 0, 0);
+  }
+  80% {
+    background: $color_3;
+    @include transform(0, $sgn*$delta, 0);
+  }
+  85% {
+    background: $color_3;
+    @include transform(0, 0, 0);
+  }
+}
+
+@include animation(left) {
+  @include spin-animation(1);
+}
+
+@include animation(right) {
+  @include spin-animation(-1);
+}
+
+@include animation(first) {
+  @include color-animation_1_4(-1);
+}
+
+@include animation(fourth) {
+  @include color-animation_1_4(1);
+}
+
+@include animation(second) {
+  @include color-animation_2_3(-1);
+}
+
+@include animation(third) {
+  @include color-animation_2_3(1);
+}
+
+@include animation(main) {
+  0%, 19%  { background: $color_1; }
+  20%, 39% { background: $color_3; }
+  40%, 59% { background: $color_2; }
+  60%, 79% { background: $color_3; }
+  80%      { background: $color_1; }
+}
+
+body {
+  margin: 0;
+  background: $bg;
+  overflow: hidden;
+
+  .outer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $c-w;
+    height: $c-h;
+    margin: -$c-h/2 0 -$c-w/2;
+
+    .small {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: $crcl-w;
+      height: $crcl-w;
+      margin: -$crcl-w/2 0 -$crcl-w/2;
+      border-radius: 50%;
+      background: $color_1;
+      box-shadow: 0 0 2px #000;
+    }
+
+    .big {
+      position: absolute;
+      width: $c-h;
+      height: $c-h;
+      border-radius: 50%;
+      @include animation-use(left);
+
+      .small {
+        @include animation-use(main);
+      }
+
+      &:last-child {
+        right: 0;
+        @include animation-use(right);
+
+        & .small {
+          left: 100%;
+        }
+      }
+    }
+
+    .inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: .6*$c-w;
+      height: .2*$c-w;
+      margin: -.1*$c-w 0 - .3*$c-w;
+
+      .small {
+        @for $i from 0 to $inner-count {
+          &:nth-child(#{$i + 1}) {
+            left: percentage(($i*100/($inner-count - 1))/100);
+            background: nth($inner-color, $i + 1);
+          }
+        }
+
+        &:nth-child(1) {
+          @include animation-use(first);
+        }
+
+        &:nth-child(2){
+          @include animation-use(second);
+        }
+
+        &:nth-child(3){
+          @include animation-use(third);
+        }
+
+        &:nth-child(4) {
+          @include animation-use(fourth);
+        }
+      }
+    }
+  }
+}

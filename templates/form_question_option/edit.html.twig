@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit FormQuestionOption{% endblock %}
+
+{% block body %}
+    <h1>Edit FormQuestionOption</h1>
+
+    {{ include('form_question_option/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('form_question_option_index') }}">back to list</a>
+
+    {{ include('form_question_option/_delete_form.html.twig') }}
+{% endblock %}

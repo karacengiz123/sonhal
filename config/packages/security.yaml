@@ -1,0 +1,66 @@
+security:
+  encoders:
+    FOS\UserBundle\Model\UserInterface: bcrypt
+
+  providers:
+    fos_userbundle:
+      id: fos_user.user_provider.username_email
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    chat:
+      host: ^tbxdevchat.ibb.gov.tr$
+      security: false
+
+    api:
+      pattern:   ^/api
+      stateless: true
+      anonymous: false
+      json_login:
+        check_path: /api/login_check
+        username_path: _username
+        password_path: _password
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+      guard:
+        entry_point: app.ldapwithjwt.guard
+        authenticators:
+          - app.ldapwithjwt.guard
+          - lexik_jwt_authentication.jwt_token_authenticator
+
+    main:
+      pattern: ^/
+      user_checker: security.user_checker
+      form_login:
+        provider: fos_userbundle
+        csrf_token_generator: security.csrf.token_manager
+      logout:       true
+      anonymous:    true
+      guard:
+        authenticators:
+        - app.ldap.guard
+
+  access_control:
+  - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%' }
+  - { path: ^/TestTwig, role: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%' }
+  - { path: ^/login_check, role: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/admin/, role: ROLE_ADMIN , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+
+  - { path: ^/siebelCrm/createPollActivity,     roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/ibb-staff/agent-information,      roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/last-online-control-cron,      roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/last-register-control-cron,      roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/wallboard,      roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/chat-create-activity-cron,      roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+
+  - { path: ^/api/login,       roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/q2r,             roles: IS_AUTHENTICATED_ANONYMOUSLY}
+  - { path: ^/api/login_check, roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/api,             roles: IS_AUTHENTICATED_FULLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/ivr,             roles: IS_AUTHENTICATED_ANONYMOUSLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+  - { path: ^/,                roles: IS_AUTHENTICATED_FULLY , requires_channel: '%env(REQUIRES_CHANNEL)%'}
+

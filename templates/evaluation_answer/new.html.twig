@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New EvaluationAnswer{% endblock %}
+
+{% block body %}
+    <h1>Create new EvaluationAnswer</h1>
+
+    {{ include('evaluation_answer/_form.html.twig') }}
+
+    <a href="{{ path('evaluation_answer_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,388 @@
+{% extends 'layout/base.html.twig' %}
+{% block customCss %}
+{#    <link rel="stylesheet" href="/assets/node_modules/sweetalert/sweetalert.css">#}
+
+    <style>
+
+        .detailBtn
+        {
+            font-size: 17px!important;
+        }
+        body
+        {
+            zoom: 100%!important;
+            font-weight: bold;
+        }
+        th
+        {
+            font-weight: bold!important;
+            font-size: 13px!important;
+        }
+        tr{
+            font-size: 11px!important;
+
+        }
+        .dataTables_filter
+        {
+            background-color: white!important;
+        }
+
+    </style>
+{% endblock %}
+{% block customScript %}
+<script>
+
+    function recordModalClose() {
+        $('#agentCard').DataTable().destroy();
+    }
+
+    function cleanAgentFilter(){
+        window.localStorage.removeItem("DataTables_sg-datatables-evalist_datatable_/quality/EvaluationList","");
+        location.reload();
+    }
+    function cleanSummaryFilter() {
+        window.localStorage.removeItem("DataTables_sg-datatables-evaluation_summary_datatable_/quality/", "");
+        location.reload();
+    }
+
+    function evaCheck(id) {
+
+        $('#agentCard').empty();
+        $('#evaWhoModal').attr('display',true);
+        // var historyId='historyPro'+id;
+        // var name = document.getElementById(historyId);
+        // var agentId = name.getAttribute('data-id');
+        $.ajax({
+            url:"/quality/whoEvaluated/"+id,
+            dataType: 'json',
+            success: function (data) {
+
+
+                $('#agentCard').DataTable({
+                    dom:'lBfrtip',
+                    "language":{
+                        url:'/assets/Turkish.json'
+                    },
+                    columns: [
+                        { data: "evaluative" , name: "evaluative" , title: "Değerlendiren"},
+                        { data: "status" , name: "status" , title: "Durum"},
+                        { data: "createdAt" , name: "createdAt" , title: "Değerlendirme Tarihi"},
+                        { data: "count" , name: "count" , title: "Değerlendirme Sayısı"},
+                        { data: "score" , name: "score" , title: "Skor"},
+                        { data: null,title:"İşlemler",
+                            render: function ( data, type, row ) {
+                                return '<button onclick="whoMuchEvaluatedCheck('+data.userId+','+ data.evaluativeId+')"  class="btn btn-success">Göster</button>';
+                            }},
+
+                    ],
+                    order:[],
+                    data:data
+                });
+
+                {#var historyJson = JSON.parse(JSON.stringify(data));#}
+                {#var i;#}
+                {#for (i=0;i<historyJson.length;i++)#}
+                {#{#}
+                {#    var evaluativeName="****** ******";#}
+                {#    {% if is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_KALITE_ADMIN') %}#}
+                {#    evaluativeName=historyJson[i].evaluative;#}
+                {#    {% endif %}#}
+
+                {#     $('#agentCard').append('<tr>' +#}
+                {#         '<td>' + evaluativeName+ '</td>' +#}
+                {#         '<td>' + historyJson[i].status + '</td>' +#}
+                {#         '<td>' + historyJson[i].createdAt + '</td>' +#}
+                {#         '<td>' + historyJson[i].count + '</td>' +#}
+                {#         '<td>' + historyJson[i].score + '</td>' +#}
+                {#         '<td><button onclick="whoMuchEvaluatedCheck('+historyJson[i].userId +','+ historyJson[i].evaluativeId +')"  class="btn btn-success" >Göster</button></td>' +#}
+                {#         '</tr>')#}
+                {#}#}
+            }});
+    }
+
+    function whoMuchEvaluatedCheck(muchUserId,muchEvaluativeId) {
+
+        $('#evaluatedCard').empty();
+        $('#collapseOne').attr('class','collapse');
+        $('#collapseTwo').attr('class','collapse show');
+
+        $.ajax({
+            url:"/quality/whoMuchEvaluated/"+muchUserId+"/"+muchEvaluativeId+"",
+            dataType: 'json',
+            success: function (data) {
+                var historyJson = JSON.parse(JSON.stringify(data));
+                var i;
+                for (i=0;i<historyJson.length;i++)
+                {
+                    $('#evaluatedCard').append('<tr>' +
+                        '<td>' + historyJson[i].source+ '</td>' +
+                        '<td>' + historyJson[i].createdAt + '</td>' +
+                        '<td>' + historyJson[i].status + '</td>' +
+                        '<td>1</td>' +
+                        '<td>' + historyJson[i].score + '</td>' +
+                        '<td><a href="/quality/evaluation/' + historyJson[i].evaluationId + '" class="btn btn-success" >Git</a></td>' +
+                        '</tr>')
+                }
+
+            }});
+    }
+    // $("[aria-labelledby='select2-sg-datatables-evalist_datatable-head-filter-5-container']").attr('display','none');
+
+    var loginUser={{ memberLogin }};
+
+    function historyCheck(id) {
+
+        $('#agentHistoryCard').empty();
+        var historyId='historyPro'+id;
+        var name = document.getElementById(historyId);
+        var agentId = name.getAttribute('data-id');
+        $.ajax({
+            url:"/quality/history/"+id,
+            // data: { field: 'field' },
+            dataType: 'json',
+            success: function (data) {
+                var historyJson = JSON.parse(JSON.stringify(data));
+                historyJson.forEach(function (historyJson) {
+                        if(agentId==loginUser) var userName='******* *****';
+                        else userName=historyJson.username;
+
+                            {% if is_granted('ROLE_KALITE_AGENT')%}
+                            userName=historyJson.username;
+                            {% endif %}
+                        $('#agentHistoryCard').append('<tr>' +
+                            '<td>' + userName+ '</td>' +
+                            '<td>' + historyJson.fieldHumanRead + '</td>' +
+                            '<td>' + historyJson.data+ '</td>' +
+                            '<td>' + historyJson.loggedAt + '</td>' +
+                            // '<td>' + historyJson.data + '</td>' +
+                            '</tr>')
+                });
+            }});
+    }
+
+    function changeAgentfilter(id) {
+        $('#sg-datatables-evalist_datatable-head-filter-6').val(id).change();
+    }
+
+    $("#select2-sg-datatables-evalist_datatable-head-filter-5-container").val(null);
+
+
+
+</script>
+{% endblock %}
+
+{% block body %}
+
+
+    {% if is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_KALITE_ADMIN')%}
+    <h1 style="text-align: left;padding: 20px">{{ "Özet" | trans }}</h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px;">
+
+        <div class="successBtn ">
+            <div class="summaryTable">
+                {{ sg_datatables_render(datatable2) }}
+            </div>
+        </div>
+        <button type="button" class="btn btn-info btn-xs " onclick="cleanSummaryFilter()"
+                style="margin-bottom: 10px; font-size: 19px;">Filtreyi Temizle
+        </button>
+    </div>
+{% endif %}
+    <h1 style="text-align: left; padding: 20px">Değerlendirme Listesi </h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px;">
+
+
+        <div class="successBtn" >
+            {{ sg_datatables_render(datatable) }}
+
+        </div>
+        <button type="button" class="btn btn-info btn-xs " onclick="cleanAgentFilter()"
+                style="margin-bottom: 10px; font-size: 19px;">Filtreyi Temizle
+        </button>
+    </div>
+    <div class="modal" id="historyModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Temsilci Değerlendirme Geçmişi</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <table class="table table-striped table-active">
+                        <thead>
+                            <tr>
+                                <th>Değiştiren Kişi</th>
+                                <th>Alan Adı</th>
+                                <th>Alan Verisi</th>
+                                <th>Kayıt Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agentHistoryCard">
+
+                        </tbody>
+
+                    </table>
+{#                    Değerlendirilen Kişi : <span style="font-size: 16px; color: Red"></span><br/>#}
+{#                    Değerlendiren Kişinin Kullanıcı Adı :  <span id="username" style="font-size: 16px; color: Red"></span><br/>#}
+{#                    Alan Adı : <span id="fieldHumanRead" style="font-size: 16px; color: Red"></span><br/>#}
+{#                    Skor : <span id="data" style="font-size: 16px; color: Red"></span><br/>#}
+{#                    Kayıt Tarihi : <span id="loggedAt" style="font-size: 16px; color: Red"></span>#}
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="evaCheckModal"  data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #d8d9da">
+                    <h4 class="modal-title">Temsilci Değerlendirme Geçmişi</h4>
+                    <button type="button" class="close" data-dismiss="modal" onclick="recordModalClose()">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne"  style="background-color: #ffb762;border-radius: 10px 10px 0px 0px;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;font-size: 17px;color: white;">
+                                        Değerlendirme İzleme
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body" style="background-color: bisque ;border-radius: 0px 0px 10px 10px;">
+                                    <table class="table table-striped table-active" id="agentCard">
+{#                                        <thead>#}
+{#                                        <tr>#}
+{#                                            <th></th>#}
+{#                                            <th></th>#}
+{#                                            <th><select>#}
+{#                                                    <option value="1">Ocak</option>#}
+{#                                                    <option value="2">Şubat</option>#}
+{#                                                    <option value="3">Mart</option>#}
+{#                                                    <option value="4">Nisan</option>#}
+{#                                                    <option value="5">Mayıs</option>#}
+{#                                                    <option value="6">Haziran</option>#}
+{#                                                    <option value="7">Temmuz</option>#}
+{#                                                    <option value="8">Ağustos</option>#}
+{#                                                    <option value="9">Eylül</option>#}
+{#                                                    <option value="10">Ekim</option>#}
+{#                                                    <option value="11">Kasım</option>#}
+{#                                                    <option value="12">Aralık</option>#}
+{#                                                </select></th>#}
+{#                                            <th></th>#}
+{#                                            <th></th>#}
+{#                                        </tr>#}
+{#                                        <tr>#}
+{#                                            <th>Değiştiren Kişi</th>#}
+{#                                            <th>Durumu</th>#}
+{#                                            <th>Değerlendirme Tarihi </th>#}
+{#                                            <th>Değerlendirme Sayısı</th>#}
+{#                                            <th>Skoru</th>#}
+{#                                        </tr>#}
+{#                                        </thead>#}
+{#                                        <tbody id="agentCard">#}
+
+{#                                        </tbody>#}
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="card">
+                            <div class="card-header" id="headingTwo" style="background-color:#e8a23b;border-radius: 10px 10px 0px 0px;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="font-weight: bold;font-size: 17px;color: white;">
+                                        Değerlendirme Formları
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div class="card-body" style="background-color: bisque;">
+                                    <table class="table table-striped table-active">
+                                        <thead>
+                                        <tr>
+                                            <th>Kaynak</th>
+                                            <th>Değerlendirme Tarihi</th>
+                                            <th>Durumu</th>
+                                            <th>Değerlendirme Sayısı</th>
+                                            <th>Skoru</th>
+                                            <th>Git</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="evaluatedCard">
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+            var filter=JSON.parse(window.localStorage.getItem("DataTables_sg-datatables-evalist_datatable_/quality/EvaluationList"));
+            var summaryfilter=JSON.parse(window.localStorage.getItem("DataTables_sg-datatables-evaluation_summary_datatable_/quality/"));
+
+             if(summaryfilter.columns[0].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-0').val(summaryfilter.columns[0].search.search).change();
+             if(summaryfilter.columns[1].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-1').val(summaryfilter.columns[1].search.search).change();
+             if(summaryfilter.columns[2].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-2').val(summaryfilter.columns[2].search.search).change();
+             if(summaryfilter.columns[3].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-3').val(summaryfilter.columns[3].search.search).change();
+             if(summaryfilter.columns[4].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-4').val(summaryfilter.columns[4].search.search).change();
+             if(summaryfilter.columns[5].search.search)$('#sg-datatables-evaluation_summary_datatable-head-filter-5').val(summaryfilter.columns[5].search.search).change();
+
+
+            {% if is_granted('ROLE_TAKIM_LIDERI')%}
+            $('#sg-datatables-evalist_datatable-head-filter-5').val(loginUser).change();
+            {% endif %}
+            {% if is_granted('ROLE_KALITE_AGENT')%}
+            $('#sg-datatables-evalist_datatable-head-filter-5').val(loginUser).change();
+            {% endif %}
+            {% if is_granted('ROLE_SUPERVISOR')%}
+            $('#sg-datatables-evalist_datatable-head-filter-5').val(loginUser).change();
+            {% endif %}
+
+             if(filter.columns[3].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-3').val(filter.columns[3].search.search!="").change();
+             if(filter.columns[4].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-4').val(filter.columns[4].search.search!="").change();
+             if(filter.columns[5].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-5').val(filter.columns[5].search.search!="").change();
+             if(filter.columns[6].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-6').val(filter.columns[6].search.search!="").change();
+             if(filter.columns[7].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-7').val(filter.columns[7].search.search!="").change();
+             if(filter.columns[8].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-8').val(filter.columns[8].search.search!="").change();
+             if(filter.columns[9].search.search!="") $('#sg-datatables-evalist_datatable-head-filter-9').val(filter.columns[9].search.search!="").change();
+            if(filter.columns[10].search.search!="")$('#sg-datatables-evalist_datatable-head-filter-10').val(filter.columns[10].search.search!="").change();
+            if(filter.columns[11].search.search!="")$('#sg-datatables-evalist_datatable-head-filter-11').val(filter.columns[11].search.search!="").change();
+            if(filter.columns[12].search.search!="")$('#sg-datatables-evalist_datatable-head-filter-12').val(filter.columns[12].search.search!="").change();
+            if(filter.columns[13].search.search!="")$('#sg-datatables-evalist_datatable-head-filter-13').val(filter.columns[13].search.search!="").change();
+
+        });
+
+        // console.log(filter.columns);
+
+    </script>
+{% endblock %}
+

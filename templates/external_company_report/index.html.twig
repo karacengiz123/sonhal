@@ -1,0 +1,219 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Dış Firma Kısmından Çekilen Rapor{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+
+        #form_time {
+            width: 400px;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+        // jQuery(document).ready(function () {
+        //     $('.js-datepicker').datepicker({
+        //         format: 'dd/mm/yyyy',
+        //         autoclose:true,
+        //         language: 'tr',
+        //         // autocomplete: off(),
+        //     });
+        // });
+        // $.fn.datepicker.dates['tr'] = {
+        //     days: ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"],
+        //     daysShort: ["Pz", "Pzt", "Sal", "Çrş", "Prş", "Cu", "Cts", "Pz"],
+        //     daysMin: ["Pz", "Pzt", "Sa", "Çr", "Pr", "Cu", "Ct", "Pz"],
+        //     months: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+        //     monthsShort: ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"]
+        // };
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#externalCompanyReportListTableDiv").css("display", "none");
+                $('#externalCompanyReportListTable').dataTable().fnDestroy();
+                $('#externalCompanyReportListTable').html("");
+                tableFilling = false;
+            }
+        }
+
+        function displayBlockTableDiv() {
+            $("#externalCompanyReportListTableDiv").css("display", "block");
+        }
+
+        function modalStart(modalText = null) {
+            $("#loadexternalCompanyReport").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadexternalCompanyReportText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadexternalCompanyReportText").html(modalText);
+            }
+        }
+
+        function modalFinish() {
+            $("#loadexternalCompanyReport").modal('hide');
+            $("#loadexternalCompanyReportText").html("");
+        }
+
+        function externalCompanyReportValidateForm() {
+            modalStart();
+            $.ajax({
+                type: 'POST',
+                url: '/externalCompanyReportsTime',
+                data: $('#formexternalCompanyReportIdSelect').serialize(),
+                success: function (data) {
+                    console.log(data);
+                    if ($.isArray(data) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#externalCompanyReportListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: [
+                                {data: "dateRange", name: "dateRange", title: "Tarih"},
+                                // {data: "dateRangeTime", name: "dateRange", title: "24/15 dklık<br/>veya Saatlik"},
+                                {data: "formTemplate", name: "formTemplate", title: "Form"},
+                                {data: "externalType", name: "externalType", title: "Süreç"},
+                                {data: "evaluationSource", name: "evaluationSource", title: "Tipi"},
+
+                                {data: "updateDate", name: "updateDate", title: "Güncelleme Tarihi"},
+                                {data: "createdDate", name: "createdDate", title: "İlk Değerlendirme Tarihi"},
+                                {data: "evaluative", name: "evaluative", title: "Değerlendiren"},
+                                {data: "agent", name: "agent", title: "Temsilci"},
+                                {data: "team", name: "team", title: "Takım Lideri"},
+                                {data: "phoneNumber", name: "phoneNumber", title: "Telefon Numarası"},
+                                {data: "callDate", name: "callDate", title: "Çağrı Tarihi"},
+                                // {data: "evaResult", name: "evaResult", title: "Sonuç"},
+                                {data: "duration", name: "duration", title: "Toplam Dinleme Süresi Sn"},
+                                {data: "score", name: "score", title: "Puan"},
+                                {data: "note", name: "note", title: "NOT"},
+                                {data: "evaMaxResult", name: "evaMaxResult", title: "Sonuç"},
+                            ],
+                            order: [],
+                            data: data
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            }, 1000);
+                        tableFilling = true;
+                    } else {
+                        modalStart(data);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <div class="card" style="padding: 20px; background-color: #edf1f5">
+            <h3>Dış Firma Kısmından Çekilen Rapor</h3>
+            <br>
+            {{ form_start(form, {'attr': {'id': 'formexternalCompanyReportIdSelect'}}) }}
+            <div class="row">
+                <div style="margin-left: 20px;"><h3>İlk Tarih</h3>
+                    {{ form_widget(form.firstDate) }}
+                </div>
+                <div><h3>Son Tarih</h3>
+                    {{ form_widget(form.lastDate) }}
+                </div>
+
+            </div>
+            <br>
+            <div style="width: 180px">
+{#                <h3>Saat Aralıkları</h3>#}
+                {{ form_widget(form.time) }}
+                {{ form_end(form) }}
+                <br>
+                <br>
+                <input type="button" onclick="externalCompanyReportValidateForm()" class="btn" value="Listele"
+                       style="background-color: limegreen">
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="externalCompanyReportListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="externalCompanyReportListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadexternalCompanyReport" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadexternalCompanyReportText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

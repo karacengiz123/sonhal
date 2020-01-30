@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit RealtimeQueues{% endblock %}
+
+{% block body %}
+    <h1>Edit RealtimeQueues</h1>
+
+    {{ include('realtime_queues/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('realtime_queues_index') }}">back to list</a>
+
+    {{ include('realtime_queues/_delete_form.html.twig') }}
+{% endblock %}

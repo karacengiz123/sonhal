@@ -1,0 +1,136 @@
+{% extends "layout/base.html.twig" %}
+{% block title %}Temsilci Tablosu Detayları{% endblock %}
+{% block customCss %}
+    <style>
+
+    div.scrollmenu {
+    overflow: auto;
+    white-space: nowrap;
+    }
+
+    div.scrollmenu a {
+    display: inline-block;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+    }
+
+    div.scrollmenu a:hover {
+    background-color: #777;
+    }
+    </style>
+
+{% endblock %}
+{% block customScript %}
+    <script type="text/javascript">
+
+            $("#selectCategoryTable").DataTable({
+                dom:'lBfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ],
+                order:[],
+                "language":{
+                    url:'/assets/Turkish.json'
+                }
+            });
+            $('#selectCategoryTable').animate({
+            });
+    </script>
+{% endblock %}
+{% block body %}
+    <script type="text/javascript">
+        var createTableCount = 0;
+    </script>
+    <style>
+        .dataTables_length{
+            margin-right: 30px!important;
+        }
+    </style>
+
+    <div class="form-group col-md-4">
+        <h1>Temsilci Tablosu Detayları</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
+
+    <div class="col-sm-12" style="padding: 10px!important;">
+        {% set tableCount = 0 %}
+        {% set tableName = "selectCategoryTable_" %}
+        <div class="col-sm-12">
+            &nbsp;
+        </div>
+
+            {% set tableCount = tableCount + 1 %}
+            <script type="text/javascript">
+                createTableCount = {{ tableCount }};
+            </script>
+        <div class="scrollmenu">
+            <table id="selectCategoryTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table" style="width: 100%!important; min-width: 100%!important; max-width: 100%!important;">
+
+                <thead>
+                <tr>
+                 <th>TARİH</th>
+{#                 <th>24/15 <br>DAKIKALIK <br>VEYA <br>SAATLİK</th>#}
+                 <th>TC</th>
+                 <th>Personel</th>
+                 <th>YEMEK</th>
+                 <th>IHTIYAC</th>
+                 <th>Toplam<br> Mola <br>Süresi</th>
+                 <th>HAZIR</th>
+                 <th>ACW</th>
+                 <th>SORU</th>
+                 <th>DisArama</th>
+                 <th>TOPLANTI</th>
+                 <th>SINAV</th>
+                 <th>EGITIM</th>
+                 <th>Geri Bildirim</th>
+                 <th>TOPLAM <br>İŞLEM SÜRESİ</th>
+                 <th>LOGİN <br>İLK GİRİŞ <br>SON ÇIKIŞ <br>TOPLAM SÜRE</th>
+                 <th>Toplam<br> Login Süresi</th>
+                 <th>Toplam <br>Gelen Çağrı <br>Sayısı</th>
+                 <th>Toplam <br>Konuşma Süresi</th>
+                 <th>Hold</th>
+                 <th>acht</th>
+                </tr>
+                </thead>
+                <tbody>
+    {% for keyDivName,divNameVal in  datatable %}
+                <tr>
+                    <td>{{ divNameVal.dateRangeTime| raw  }} </td>
+{#                    <td>{{ divNameVal.dateRangeTime2| raw  }} </td>#}
+                    <td>{{divNameVal.TC}}</td>
+                    <td>{{ divNameVal.Personel }}</td>
+                    <td>{{ divNameVal.YEMEK }}</td>
+                    <td>{{ divNameVal.IHTIYAC }}</td>
+                    <td>{{ divNameVal.ToplamMolaSuresi }}</td>
+                    <td>{{ divNameVal.stateOneTotal }}</td>
+                    <td>{{ divNameVal.ACW }}</td>
+                    <td>{{ divNameVal.SORU }}</td>
+                    <td>{{ divNameVal.DisArama }}</td>
+                    <td>{{ divNameVal.TOPLANTI }}</td>
+                    <td>{{ divNameVal.SINAV }}</td>
+                    <td>{{ divNameVal.EGITIM }}</td>
+                    <td>{{ divNameVal.GeriBildirim }}</td>
+                    <td>{{ divNameVal.ToplamIslemSuresi }}</td>
+                    <td>{{ divNameVal.LoginFirstLoginLast }}</td>
+                    <td>{{ divNameVal.ToplamLoginSuresi }}</td>
+                    <td>{{ divNameVal.ToplamGelenCagriSayisi }}</td>
+                    <td>{{ divNameVal.ToplamKonusmaSuresi }}</td>
+                    <td>{{ divNameVal.Hold }}</td>
+                    <td>{{ divNameVal.acht }}</td>
+                </tr>
+    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+{#        {% endfor %}#}
+
+{#        {% endfor %}#}
+
+
+    </div>
+{% endblock %}

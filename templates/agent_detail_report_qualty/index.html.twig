@@ -1,0 +1,204 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Agent Detay Kısmından Çekilen Rapor{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+
+        #form_time {
+            width: 400px;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#agentDetailQualtyReportListTableDiv").css("display", "none");
+                $('#agentDetailReportQualtyListTable').dataTable().fnDestroy();
+                $('#agentDetailReportQualtyListTable').html("");
+                tableFilling = false;
+            }
+        }
+
+        function displayBlockTableDiv() {
+            $("#agentDetailQualtyReportListTableDiv").css("display", "block");
+        }
+
+        function modalStart(modalText = null) {
+            $("#loadagentDetailReport").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadagentDetailReportText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadagentDetailReportText").html(modalText);
+            }
+        }
+
+        function modalFinish() {
+            $("#loadagentDetailReport").modal('hide');
+            $("#loadagentDetailReportText").html("");
+        }
+
+        function agentDetailReportValidateForm() {
+            modalStart();
+            $.ajax({
+                type: 'POST',
+                url: '/agentDetailReportsQualtyTime',
+                data: $('#formagentDetailReportIdSelect').serialize(),
+                success: function (data) {
+                    console.log(data);
+                    if ($.isArray(data) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#agentDetailReportQualtyListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: [
+                                {data: "dateRange", name: "dateRange", title: "Tarih"},
+                                {data: "dateRangeTime", name: "dateRange", title: "24<br/>Saatlik"},
+                                {data: "formTemplate", name: "formTemplate", title: "Süreç"},
+                                // { data: "userFullName" , name: "userFullName" , title: "Aranan"},
+                                {data: "evaluationSource", name: "evaluationSource", title: "Kaynak"},
+                                {data: "citizenId", name: "citizenId", title: "Vatandaş ID"},
+                                {data: "createdDate", name: "createdDate", title: "İlk Değerlendirme Tarihi"},
+                                {data: "updateDate", name: "updateDate", title: "Güncelleme Tarihi"},
+                                {data: "degerlendiren", name: "degerlendiren", title: "Değerlendiren"},
+                                {data: "phoneNumber", name: "phoneNumber", title: "Telefon Numarası"},
+                                {data: "callDate", name: "callDate", title: "Çağrı Tarihi"},
+                                {data: "team", name: "team", title: "Takım Lideri"},
+                                {data: "agent", name: "agent", title: "Temsilci"},
+                                {data: "score", name: "score", title: "Puan"},
+                                {data: "duration", name: "duration", title: "Toplam Dinleme Süresi Sn"},
+                                {data: "status", name: "status", title: "Status"},
+                                {data: "note", name: "note", title: "NOT"},
+                                {data: "evaluationReasonType", name: "evaluationReasonType", title: "Tipi"},
+                                {data: "evaMaxResult", name: "evaMaxResult", title: "Sonuç"},
+                            ],
+                            order: [],
+                            data: data
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            }, 1000);
+                        tableFilling = true;
+                    } else {
+                        modalStart(data);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <div class="card" style="padding: 20px; background-color: #edf1f5">
+            <h3>Agent Detay Kısmından Çekilen Rapor</h3>
+            <br>
+            {{ form_start(form, {'attr': {'id': 'formagentDetailReportIdSelect'}}) }}
+            <div class="row">
+                <div style="margin-left: 20px;"><h3>İlk Tarih</h3>
+                    {{ form_widget(form.firstDate) }}
+                </div>
+                <div><h3>Son Tarih</h3>
+                    {{ form_widget(form.lastDate) }}
+                </div>
+
+            </div>
+            <br>
+            <div style="width: 180px"><h3>Saat Aralıkları</h3>
+                {{ form_widget(form.time) }}
+                {{ form_end(form) }}
+                <br>
+                <br>
+                <input type="button" onclick="agentDetailReportValidateForm()" class="btn" value="Listele"
+                       style="background-color: limegreen">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="agentDetailQualtyReportListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="agentDetailReportQualtyListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadagentDetailReport" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadagentDetailReportText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{
+  "name": "softphone",
+  "version": "0.0.1",
+  "description": "IBB SoftPhone",
+  "main": "main.js",
+  "scripts": {
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/tfontelekom/softphone.git"
+  },
+  "keywords": [
+    "IBB",
+    "Softphone"
+  ],
+  "author": "Sarp Doruk ASLAN <sarpdorukaslan@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/tfontelekom/softphone/issues"
+  },
+  "homepage": "https://gitlab.com/tfontelekom/softphone#README",
+  "devDependencies": {
+    "electron": "^3.0.7",
+    "electron-builder": "^20.29.0"
+  }
+}

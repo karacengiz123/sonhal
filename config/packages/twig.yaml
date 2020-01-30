@@ -1,0 +1,16 @@
+twig:
+  form_themes: ['bootstrap_4_layout.html.twig']
+  globals:
+    listenerExten: '%listenerExten%'
+    siebeliFrameLink: '%siebeliFrameLink%'
+    tbxSipServer: '%tbxSipServer%'
+    appServerLink: '%appServerLink%'
+    tkmApiLink: '%tkmApiLink%'
+    tkmAvayaApiLink: '%tkmAvayaApiLink%'
+    busStopApiLink: '%busStopApiLink%'
+    busStopSMSLink: '%busStopSMSLink%'
+    cardControllerApiLink: '%cardControllerApiLink%'
+    igdasApiLink: '%igdasApiLink%'
+    siebelCreateActivityLink: '%siebelCreateActivityLink%'
+    createPollActivityLink: '%createPollActivityLink%'
+    serverIpAdress: '%serverIpAdress%'

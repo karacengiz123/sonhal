@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New RecordListenLog{% endblock %}
+
+{% block body %}
+    <h1>Create new RecordListenLog</h1>
+
+    {{ include('record_listen_log/_form.html.twig') }}
+
+    <a href="{{ path('record_listen_log_index') }}">back to list</a>
+{% endblock %}

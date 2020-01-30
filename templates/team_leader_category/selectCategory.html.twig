@@ -1,0 +1,105 @@
+{% extends "layout/base.html.twig" %}
+{% block title %} Takım Lideri Kategori Bazlı Karne{% endblock %}
+
+{% block customScript %}
+    <script type="text/javascript">
+        for (i = 0; i <= createTableCount; i++) {
+            $("#selectCategoryTable_"+i).DataTable({
+                dom:'lBfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ],
+                order:[],
+                "language":{
+                    url:'/assets/Turkish.json'
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <script type="text/javascript">
+        var createTableCount = 0;
+    </script>
+    <style>
+        .dataTables_length{
+            margin-right: 30px!important;
+        }
+    </style>
+
+    <div class="form-group col-md-4">
+        <h1>Takım Lideri Kategori Bazlı Karne</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
+
+    <div class="col-sm-12" style="padding: 20px!important;">
+
+        {% set tableCount = 0 %}
+        {% set tableName = "selectCategoryTable_" %}
+
+        {% for keyDivName,divNameVal in  datatable %}
+
+            <div class="col-sm-12">
+                &nbsp;
+            </div>
+
+            <div class="col-sm-12">
+                <h1>{{ keyDivName }}</h1>
+            </div>
+
+                {% for keyDivForm,divFormVal in divNameVal %}
+                    <div class="col-sm-12">
+                        &nbsp;
+                    </div>
+
+                    <div class="col-sm-10" style="float: left;">
+                        <h1>{{ keyDivForm }}</h1>
+                    </div>
+
+                    {% for keyDivCount,divCountVal in divFormVal %}
+
+                        <div class="col-sm-2" style="float: right">
+                            <h1 style="float: right">{{ keyDivCount }}</h1>
+                        </div>
+
+                        <div class="col-sm-12">
+                            &nbsp;
+                        </div>
+                        {% set tableCount = tableCount + 1 %}
+                        <script type="text/javascript">
+                            createTableCount = {{ tableCount }};
+                        </script>
+                        <table id="{{ tableName }}{{ tableCount }}" class="table table-bordered table-striped full-color-table full-primary-table hover-table" style="width: 100%!important; min-width: 100%!important; max-width: 100%!important;">
+
+                            <thead>
+                                <tr>
+                                    <th>Soru</th>
+                                    <th>Puan</th>
+                                    <th>Max Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for keyDivTable,divTableVal in divCountVal %}
+                                <tr>
+                                    <td>{{ divTableVal.question }}</td>
+                                    <td>{{ divTableVal.sort }}</td>
+                                    <td>{{ divTableVal.maxScore }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+
+                        </table>
+
+                    {% endfor %}
+
+                {% endfor %}
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

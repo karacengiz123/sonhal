@@ -1,0 +1,253 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Santral Detay{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+        #form_formTemplateId  {
+            color: #f00 !important;
+        }
+
+        /*.select2-container--default .select2-selection--multiple .select2-selection__choice{*/
+        /*    background-color: #03a9f3;*/
+        /*    border: 1px solid #aaa;*/
+        /*    border-radius: 4px;*/
+        /*    cursor: default;*/
+        /*    float: left;*/
+        /*    margin-right: 10px;*/
+        /*    margin-top: 10px;*/
+        /*    padding: 0 5px;*/
+        /*}*/
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#centralListTableDiv").css("display", "none");
+                $('#centralListTable').dataTable().fnDestroy();
+                $('#centralListTable').html("");
+                tableFilling = false;
+            }
+
+        }
+
+        function displayBlockTableDiv() {
+            $("#centralListTableDiv").css("display", "block");
+        }
+
+        function modalStart(modalText = null) {
+            $("#loadCentral").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadCentralText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadCentralText").html(modalText);
+            }
+        }
+
+        function modalFinish() {
+            $("#loadCentral").modal('hide');
+            $("#loadCentralText").html("");
+        }
+
+        function centralValidateForm() {
+            modalStart();
+            $.ajax({
+                type: 'POST',
+                url: '{{ path('central_detail') }}',
+                data: $('#formCentralIdSelect').serialize(),
+                success: function (data) {
+                    obj = JSON.parse(JSON.stringify(data));
+                    var colums = obj.column;
+                    var datas = obj.row;
+                    if ($.isArray(datas) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#centralListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange", name: "dateRange", title: "Tarih"},
+                                { data: "dateRangeTime" , name: "dateRange" , title: "24/15 dklık<br/>veya Saatlik"},
+                                { data: "kuyruk" , name: "kuyruk" , title: "Kuyruk"},
+                                { data: "totalCallEnterqueue" , name: "totalCallEnterqueue" , title: "Toplam Gelen Çağrı Sayısı"},
+                                { data: "totalCallConnect" , name: "totalCallConnect" , title: "Toplam Cevaplanan Çağrı Sayısı"},
+                                { data: "totalCallAbandon" , name: "totalCallAbandon" , title: "Toplam Kaçan Çağrı Sayısı"},
+                                { data: "callConnectIn10" , name: "callConnectIn10" , title: "10sn içinde Cevaplanan Çağrı Sayısı"},
+                                { data: "callConnectIn20" , name: "callConnectIn20" , title: "20sn içinde Cevaplanan Çağrı Sayısı"},
+                                // { data: "callConnectInc20v30" , name: "callConnectInc20v30" , title: "20sn ile 30 içinde Cevaplanan Çağrı Sayısı"},
+                                { data: "totalCallAbandon10" , name: "totalCallAbandon10" , title: "10sn içinde Toplam Kaçan Çağrı Sayısı"},
+                                // { data: "totalCallAbandon10v20" , name: "totalCallAbandon10v20" , title: "10sn ile 20sn  içinde Toplam Kaçan Çağrı Sayısı"},
+                                { data: "avgAgentDelegationTime" , name: "avgAgentDelegationTime" , title: "Temsilciye Aktarılana Kadarki Ort. Bekleme Sürsi Sn"},
+                                { data: "missedCallToQueue" , name: "missedCallToQueue" , title: "Kuyrukta Beklerken Kapanan Çağrı   Ort. Bekleme Süresi Sn"},
+                                { data: "maxStandbyTimeQueue" , name: "maxStandbyTimeQueue" , title: "Kuyrukta Bekleyen  Çağrının  Max Bekleme Süresi Sn"},
+                                { data: "serviceLevel2" , name: "serviceLevel2" , title: "SERVİS SEVİYESİ 2"},
+                                { data: "accessibility" , name: "accessibility" , title: "ULAŞILABİLİRLİK ORANI (AR)"},
+
+                            ],
+                            order: [],
+                            data: datas
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            }, 1000);
+                        tableFilling = true;
+                    } else {
+                        modalStart(datas);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error: function (datas) {
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+        // $(document).ready(function () {
+        //     $("#form_formTemplateId").select2({
+        //
+        //         width: 1000,
+        //     });
+        //
+        // })
+        $(document).ready(function () {
+            $.ajax({
+                method: "POST",
+                url: "{{ path('central_data_select') }}",
+                success: function (data) {
+                    obj = JSON.parse(JSON.stringify(data));
+                    var queues = obj.queues;
+                    var timeRange = obj.timeRange;
+
+                    $('#form_queue').select2({
+                        data: queues
+                    });
+                    $('#form_time').select2({
+                        data: timeRange
+                    });
+                }
+            });
+        });
+
+        $('#form_queue').on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+
+            $.ajax({
+                method: "POST",
+                url: "{{ path('central_data_select') }}",
+                data: "queue=" + id,
+                success: function (data) {
+                    obj = JSON.parse(JSON.stringify(data));
+                    var timeRange = obj.timeRange;
+
+                    clearSelect();
+                    addSelectData(timeRange);
+                }
+            });
+
+        });
+
+        function clearSelect() {
+            $("#form_time").select2();
+            $("#form_time").select2("destroy");
+            $("#form_time").html("");
+            $("#form_time").select2();
+        }
+
+        function addSelectData(data) {
+            $("#form_time").select2({
+                data: data
+            });
+        }
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+
+        <h1>Santral Raporları</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formCentralIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="centralValidateForm()" class="btn" value="Listele"
+               style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="centralListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="centralListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadCentral" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadCentralText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

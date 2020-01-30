@@ -1,0 +1,1667 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block customCSS %}
+{#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">#}
+    <link rel="stylesheet" href="/assets/node_modules/sweetalert/sweetalert.css">
+
+    <style>
+
+        body
+        {
+            zoom: 100%!important;
+        }
+        .renkli {
+            background-color: #5372c6 !important;
+            padding: 6px !important;
+        }
+        .renkliTh {
+            background-color: #9eccff;
+            width: 120px;
+        }
+        .card-body {
+            padding: 0.25rem 1rem!important;
+            border: 1px solid #5372c6 !important;
+            margin-bottom: 0px!important;
+
+        }
+        .border-info {
+            margin-bottom: 3px !important;
+
+        }
+        #waveform-time-indicator {
+            text-align: center;
+        }
+        #waveform-time-indicator .time {
+            background: #f5f5f5;
+            padding:5px;
+
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -60px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+
+       /*textarea{*/
+       /*    resize: both!important;*/
+       /*}*/
+
+    </style>
+
+
+{% endblock %}
+{% block customScript %}
+    <script src="/assets/node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
+{#    <script src="/assets/js/wavesurfer.js"></script>#}
+{#    <script src="/assets/js/wavesurfer.min.js"></script>#}
+    <script src="/assets/dist/js/wavesurfer-2.1.3/wavesurfer.js"></script>
+{#    <script src="/assets/js/wavesurfer.min.js" ></script>#}
+
+
+    <script src="/assets/node_modules/sweetalert/sweetalert.min.js"></script>
+    <script src="/assets/node_modules/sweetalert/sweetalert2@8.js"></script>
+    <script src="/assets/node_modules/sweetalert/sweetalert2.all.min.js"></script>
+
+    <script type="text/javascript">
+        var sourceID={{ source.id }};
+
+        var audio = $('#audio_hidden');
+        var durationWave = Math.round(audio[0].duration);
+        var wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            waveColor: 'violet',
+            progressColor: 'purple',
+            barWidth: "3",
+            barHeight: "3",
+            barGap: "0",
+            cursorWidth: "4",
+            duration: durationWave,
+
+        });
+        // wavesurfer.on('ready', function () {
+        //     var timeline = Object.create(WaveSurfer.Timeline);
+        //
+        //     timeline.init({
+        //         wavesurfer: wavesurfer,
+        //         container: '#waveform-timeline'
+        //     });
+        // });
+
+        wavesurfer.setVolume(0.4);
+        document.querySelector('#volume').value = wavesurfer.backend.getVolume();
+        var volumeInput = document.querySelector('#volume');
+        var onChangeVolume = function (e) {
+            wavesurfer.setVolume(e.target.value);
+            console.log(e.target.value);
+        };
+        volumeInput.addEventListener('input', onChangeVolume);
+        volumeInput.addEventListener('change', onChangeVolume);
+
+        if (sourceID==1)
+        {
+            wavesurfer.load("{{ absolute_url(audioUrl) }}");
+        }
+
+        wavesurfer.on('ready', function() {
+            $('#play-pause').click(function() {
+                wavesurfer.playPause();
+            });
+        });
+
+        wavesurfer.on('ready', updateTimer);
+        wavesurfer.on('audioprocess', updateTimer);
+        wavesurfer.on('seek', updateTimer);
+
+        function updateTimer() {
+            var formattedTime = secondsToTimestamp(wavesurfer.getCurrentTime());
+            $('#waveform-time-indicator .time').text(formattedTime);
+        }
+
+        function secondsToTimestamp(seconds) {
+            seconds = Math.floor(seconds);
+            var h = Math.floor(seconds / 3600);
+            var m = Math.floor((seconds - (h * 3600)) / 60);
+            var s = seconds - (h * 3600) - (m * 60);
+
+            h = h < 10 ? '0' + h : h;
+            m = m < 10 ? '0' + m : m;
+            s = s < 10 ? '0' + s : s;
+            return h + ':' + m + ':' + s;
+        }
+
+        var user={{ userID }};
+        var memberLogin={{ memberLogin }}
+        var evaluativeID={{ evaluativeID }};
+        var evaluation={{ evaluation.id }};
+        var statusID={{ statusID }};
+        var formtemplate={{ formTemplate.id }};
+        var optionScore;
+        var questionID;
+
+        getExtraSource();
+        if({{ evaluativeID }}=={{ memberLogin }})
+        {
+            $('.evaluativeName').html("{{ evaluative }}");
+        }
+
+        else
+        {
+            $('.evaluativeName').html("****** ******");
+        }
+
+
+        if(formtemplate==233 || formtemplate==234|| formtemplate==246 || formtemplate==247 || formtemplate==249 || formtemplate==255 || formtemplate==258 || formtemplate==259)
+        {
+        $("#evaluation_form_resetReason").hide();
+        $(".saveAndPublishDrop").hide();
+        }
+        $("#evaluation_form_rejectComment").attr("readonly", true);
+        $("#evaluation_form_duration").prop('readonly', true);
+        $("#rejectComment").show();
+        $("#evaluation_form_resetReason").hide();
+        $("#evaluation_form_rejectCloseComment").attr('readonly','readonly');
+        $("#extraDestRemoveButton").show();
+        $("#extraDestAdd").show();
+        $(".callDateHidden").hide();
+        $(".createDateHidden").hide();
+        $(".reasonTypeHiddens").hide();
+
+        if(formtemplate==242 || formtemplate==259|| formtemplate==264)
+        {
+            $("#evaluation_form_duration").prop('readonly', false);
+        }
+        if(sourceID!=1)
+            $('.callPlayer').hide();
+
+
+        if(user==memberLogin){
+            $(document).ready(function () {
+                $(".answer").attr("disabled",true);
+                $("#evaluation_form_evaluationReasonType").prop('readonly', true);
+                $("#evaluation_form_evaluatorComment").prop('readonly', true);
+                $("#evaluation_form_duration").prop('readonly', true);
+                $('.evaluationCard').collapse();
+                $('.save').hide();
+                $('.saveAndPublish').hide();
+                $('.saveAndPublishDrop').hide();
+                $("#evaluation_form_resetReason").hide();
+                $('#evaluation_form_comment').prop('readonly', true);
+                $('#evaluation_form_evaluativeComment').attr('readonly',false);
+
+                    $('.callPlayer').attr('display','none');
+
+                    if (!$.trim($("#evaluation_form_evaluativeComment").val())) {
+                        $(".reject").hide();
+                        $("#rejectSpan").show();
+                    }
+                    $('#evaluation_form_evaluativeComment').bind('input propertychange', function() {
+                        if (!$.trim($("#evaluation_form_evaluativeComment").val())) {
+                            $(".reject").hide();
+                            $("#rejectSpan").show();
+                        }
+                        if(this.value.length){
+                            $(".reject").show();
+                            $("#rejectSpan").hide();
+                        }
+                    });
+            }) }
+
+
+
+
+        {% if is_granted('ROLE_QUALITY_REJECT_ADMIN') %}
+        $("#evaluation_form_rejectCloseComment").attr("readonly", false);
+        {% endif %}
+
+        {% if is_granted('ROLE_QUALITY_REJECT_TEAM') %}
+        $("#evaluation_form_rejectComment").attr("readonly", false);
+        {% endif %}
+
+        {% if is_granted('ROLE_QUALITY_CREATEAT_DATE')%}
+        $("#createdAt").show();
+        {% endif %}
+
+        {% if is_granted('ROLE_QUALITY_CALLDATE')%}
+        $(".callDate").show();
+        {% endif %}
+
+        {% if is_granted('ROLE_KALITE_AGENT')%}
+        $('.evaluativeName').html("{{ evaluative }}");
+        $('#evaluation_form_evaluativeComment').attr('readonly',true);
+
+        {% endif %}
+        {% if is_granted('ROLE_TAKIM_LIDERI') %}
+        $('#evaluation_form_evaluativeComment').attr('readonly',true);
+
+        $("#rejectSpan").hide();
+
+        if(statusID==3)
+        {
+            $('#evaluation_form_evaluativeComment').attr('readonly',true);
+            if (!$.trim($("#evaluation_form_rejectComment").val())) {
+                $(".rejectAccept").hide();
+                $(".rejectDeny").hide();
+                $("#rejectSpan").show();
+            }
+            $('#evaluation_form_rejectComment').bind('input propertychange', function() {
+                if (!$.trim($("#evaluation_form_rejectComment").val())) {
+                    $(".rejectAccept").hide();
+                    $(".rejectDeny").hide();
+                    $("#rejectSpan").show();
+                }
+                if(this.value.length){
+                    $(".rejectAccept").show();
+                    $(".rejectDeny").show();
+                    $("#rejectSpan").hide();
+                    $("#evaluation_form_comment").attr('readonly',true);
+                }
+            });
+
+        }
+        if (statusID==5)
+        {
+            $("#evaluation_form_resetReason").hide();
+            $(".reasonTypes").show();
+            $(".reasonTypeHiddens").hide();
+
+        }
+        {% endif %}
+
+        $('.extraSourceClass').hide();
+
+        if(sourceID==4)
+        {
+            $('.extraSourceClass').show();
+        }
+        $('.evaluationType').hide();
+        $('.evaluationTypeHidden').hide();
+        if(formtemplate==235)
+        {
+            $('.evaluationType').show();
+            $('.callPlayer').hide();
+        }
+
+        if (statusID > 1 && statusID < 10)
+        {
+            $(".callDate").hide();
+            $(".callDateHidden").show();
+            $(".createDate").hide();
+            $(".createDateHidden").show();
+            $(".reasonTypes").hide();
+            $(".reasonTypeHiddens").show();
+            $("#extraDestRemoveButton").hide();
+            $("#extraDestAdd").hide();
+            $("#evaluation_form_duration").prop('readonly', true);
+            $('.evaluationType').hide();
+
+            if(formtemplate==235)
+            {
+                $('.evaluationTypeHidden').show();
+            }
+        }
+        if(statusID==2)
+        {
+            $(".answer").attr("disabled",true);
+            $("#evaluation_form_evaluatorComment").prop('readonly', true);
+            $('.evaluationCard').collapse();
+            $('#evaluation_form_comment').prop('readonly', true);
+            $('#evaluation_form_rejectCloseComment').prop('readonly', true);
+        }
+
+
+        if (statusID == 3 || statusID == 4) {
+            $("#evaluation_form_callDate").readOnly();
+            $("#evaluation_form_comment").prop('readonly', true);
+            $('.evaluationCard').collapse();
+            $('.rejectCard').collapse();
+            $(".answer").attr("disabled",true);
+
+        }
+
+         else if ( statusID == 7 || statusID == 8 ) {
+            $("#rejectCloseComment").show();
+            $('.evaluationCard').collapse();
+            $('.rejectCard').collapse();
+            $('.rejectCloseCard').collapse();
+            $(".answer").attr("disabled",true);
+            $('#evaluation_form_comment').prop('readonly', true);
+        }
+        if(statusID == 1 || statusID == 10)
+        {
+            $("#evaluation_form_resetReason").show();
+        }
+        {% if is_granted('ROLE_KALITE_AGENT')%}
+        if(statusID == 6)
+        {
+            $("#evaluation_form_resetReason").show();
+        }
+        {% endif %}
+
+
+
+      $(function () {
+        $("#evaluation_form_resetReason").click(function () {
+          if (parseInt($(this).val()) > 0) {
+            resetTotal();
+          }
+        });
+        $("#evaluation_form_evaluationExtraSources").select2({
+          tags: true,
+        });
+      });
+
+      // MAterial Date picker
+      $('#mdate').bootstrapMaterialDatePicker({weekStart: 0, time: false});
+      $('#timepicker').bootstrapMaterialDatePicker({format: 'HH:mm', time: true, date: false});
+      $('#date-format').bootstrapMaterialDatePicker({format: 'dddd DD MMMM YYYY - HH:mm'});
+
+      $('#min-date').bootstrapMaterialDatePicker({format: 'DD/MM/YYYY HH:mm', minDate: new Date()});
+      // Clock pickers
+      $('#single-input').clockpicker({
+        placement: 'bottom',
+        align: 'left',
+        autoclose: true,
+        'default': 'now'
+      });
+      $('.clockpicker').clockpicker({
+        donetext: 'Done',
+      }).find('input').change(function () {
+        console.log(this.value);
+      });
+      $('#check-minutes').click(function (e) {
+        // Have to stop propagation here
+        e.stopPropagation();
+        input.clockpicker('show').clockpicker('toggleView', 'minutes');
+      });
+      if (/mobile/i.test(navigator.userAgent)) {
+        $('input').prop('readOnly', true);
+      }
+      // Colorpicker
+      $(".colorpicker").asColorPicker();
+      $(".complex-colorpicker").asColorPicker({
+        mode: 'complex'
+      });
+      $(".gradient-colorpicker").asColorPicker({
+        mode: 'gradient'
+      });
+      // Date Picker
+      jQuery('.mydatepicker, #datepicker').datepicker();
+      jQuery('#datepicker-autoclose').datepicker({
+        autoclose: true,
+        todayHighlight: true
+      });
+      jQuery('#date-range').datepicker({
+        toggleActive: true
+      });
+      jQuery('#datepicker-inline').datepicker({
+        todayHighlight: true
+      });
+      // Daterange picker
+      $('.input-daterange-datepicker').daterangepicker({
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse'
+      });
+      $('.input-daterange-timepicker').daterangepicker({
+        timePicker: true,
+        format: 'MM/DD/YYYY h:mm A',
+        timePickerIncrement: 30,
+        timePicker12Hour: true,
+        timePickerSeconds: false,
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse'
+      });
+      $('.input-limit-datepicker').daterangepicker({
+        format: 'MM/DD/YYYY',
+        minDate: '06/01/2015',
+        maxDate: '06/30/2015',
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-danger',
+        cancelClass: 'btn-inverse',
+        dateLimit: {
+          days: 6
+        }
+      });
+    </script>
+
+    <script>
+
+      $(function () {
+        calculateTotal();
+      });
+      /**
+       * @todo max-score değerleri kontrol edilecek.
+       */
+      $('.answer').click(function () {
+        calculateTotal();
+      });
+      var gTotal;
+      function calculateTotal() {
+        var total = 100;
+        $(".section").each(function (key, section) {
+          total -= calculateSection(section)
+        });
+        if (total < 0) {
+          total = 0;
+        } else if (total > 100) {
+          total = 100;
+        }
+        gTotal = total;
+        document.getElementById("grandTotal").setAttribute("style", "width:" + gTotal + "%");
+        $("#gTotal").html(gTotal);
+
+        $("#totall").html(gTotal);
+        $("#totalScore").val(gTotal);
+
+        return total;
+      }
+
+      function calculateSection(section) {
+        var total = 0;
+        $(section).find('.category').each(function (key, category) {
+          total += calculateCategory(category)
+        });
+        var sid = $(section).data('sid');
+        $("#section-score-" + sid).val(total);
+        return total;
+      }
+
+
+      function calculateCategory(category) {
+        var total = 0;
+        $(category).find('.question').each(function (key, question) {
+          total += calculateQuestion(question);
+        });
+        var cid = $(category).data('cid');
+        $("#category-score-" + cid).val(total);
+        return total;
+      }
+
+      function calculateQuestion(question) {
+        var total = 0;
+        var scoreId;
+        $(question).find(':checked').each(function (key, radio) {
+          total += $(radio).data('score');
+          scoreId = $(radio).data('qid');
+        });
+
+        $("#question-score-" + scoreId).val(total);
+
+        return total;
+      }
+      function maxTotal() {
+          var $prevScore;
+          $(".question-container").each(function (k, v) {
+              prevScore = 1;
+              $(this).find('.answer').each(function () {
+                  if ($(this).data('score') < prevScore) {
+                      $(this).prop('checked', true);
+                      prevScore = $(this).data('score');
+                  }
+              })
+          });
+          calculateTotal();
+      }
+
+      function submitEvaForm(status) {
+        if(status) {
+          $("#evaluation_form_status").val(status);
+        }
+        $("#eva_form").submit();
+
+
+      }
+      var resetReason="{{ evaluation.resetReason }}";
+      var tScore="{{ evaluation.score }}";
+      if(resetReason=="" && tScore==0)
+      {
+          maxTotal();
+      }
+
+      var lastScore=$("#gTotal").val();
+
+      function repoAlert(dataAlert,evaluation) {
+
+          switch (dataAlert) {
+              case 'maxTotal':
+                  $repoTitle="Maksimum Puan Verilecek ";
+                  break;
+              case 'save':
+                  $repoTitle="Kayıt Edilecek ";
+                  break;
+              case 'saveAndPublish':
+                  $repoTitle="Kayıt Edilecek ve Yayınlayacak ";
+                  break;
+              case 'reject':
+                  $repoTitle="İtiraz Edilecek ";
+                  break;
+              case 'rejectDeny':
+                  $repoTitle="İtiraz Reddedilecek ";
+                  break;
+              case 'rejectAccept':
+                  $repoTitle="İtiraz Kabul Edilecek ";
+                  break;
+              case 'reEvaluate':
+                  $repoTitle="Yeniden Değerlendirme Kabul Edilecek";
+                  break;
+              case 'secondReject':
+                  $repoTitle="2. Kez İtiraz Edilecek ";
+                  break;
+              case 'secondReEvaluate':
+                  $repoTitle="Yeniden Değerlendirme Red Edilecek ";
+                  break;
+              case 'unPublish':
+                  $repoTitle="Yayından Kaldırılacak ";
+                  break;
+              case 'remove':
+                  $repoTitle="Form Silinecek ";
+                  break;
+              case 'mailThanks':
+                  $repoTitle="Tebrikler Maili Gönderilicek ";
+                  break;
+              case 'mailReport':
+                  $repoTitle="Geri Bildirim Maili Gönderilicek ";
+                  break;
+              case 'upgrade':
+                  $repoTitle="Güncellenecek ";
+                  break;
+            }
+
+          Swal.fire({
+              title: $repoTitle+' Emin Misiniz ?',
+              text: "Form Kaydedilecek !",
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Kaydet!',
+              cancelButtonText: 'Vazgeç',
+          }).then((result) => {
+              if (result.value) {
+                  switch (dataAlert) {
+                      case 'maxTotal':
+                          maxTotal();
+                          if (gTotal  > 0) {
+                              $("#evaluation_form_resetReason").val(0);
+                          }
+                          break;
+                      case 'save':
+                          if (gTotal > 0) {
+                              $("#evaluation_form_resetReason").val(0);
+                          }
+                          if($("#gTotal").text()==0 && $("#evaluation_form_resetReason").val()==null)
+                          {
+                              Swal.fire('Değerlendirme skoru sıfırlama sebebi olmadan 0 verilemez !');
+                              maxTotal();
+                          }
+                          else
+                          {
+                              submitEvaForm(10);
+                              Swal.fire(
+                                  'Kaydedildi!',
+                                  'Form Başarıyla Kaydedildi!.',
+                                  'success'
+                              );
+                          }
+                          break;
+                      case 'saveAndPublish':
+                          if (gTotal > 0) {
+                              $("#evaluation_form_resetReason").val(0);
+                              submitEvaForm(2);
+                              Swal.fire(
+                                  'Kaydedildi!',
+                                  'Form Başarıyla Yayınlandı ve Kaydedildi!.',
+                                  'success'
+                              );
+                          }
+                          else {
+                              submitEvaForm(2);
+                              Swal.fire(
+                                  'Kaydedildi!',
+                                  'Form Başarıyla Yayınlandı ve Kaydedildi!.',
+                                  'success'
+                              );
+                          }
+
+                          break;
+                      case 'reject':
+                          submitEvaForm(3);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'İtiraz Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'rejectDeny':
+                          submitEvaForm(4);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'İtiraz Red Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'rejectAccept':
+                          submitEvaForm(5);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'İtiraz Kabul Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'reEvaluate':
+                          submitEvaForm(6);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'Yeniden Değerlendirme Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'secondReject':
+                          submitEvaForm(5);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              '2.İtiraz Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'secondReEvaluate':
+                          submitEvaForm(7);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'Form Başarıyla Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                      case 'unPublish':
+                          submitEvaForm(1);
+                          Swal.fire(
+                              'Kaydedildi!',
+                              'Form Başarıyla Kaydedildi!.',
+                              'success'
+                          );
+                          break;
+                          case 'upgrade':
+                          submitEvaForm(9);
+                          Swal.fire(
+                              'Güncellendi!',
+                              'Form Başarıyla Güncellendi!.',
+                              'success'
+                          );
+                          break;
+                      case 'remove':
+                          $.ajax({
+                              url: '{{ path('evaluation_delete',{'id':evaluation.id}) }}'
+                          });
+                          Swal.fire(
+                              'Silindi!',
+                              'Form Başarıyla Silindi!.',
+                              'success'
+                          );
+                          window.location="/quality/EvaluationList";
+                          break;
+
+                      case 'mailThanks':
+                          $.ajax({
+                              url: '{{ path('quality_evalutation_congr_mail',{'evaluation':evaluation.id}) }}',
+                              success: function (data) {
+                                  $("#evaluation_form_resetReason").val(0);
+                                  submitEvaForm(2);
+                                  Swal.fire(
+                                      'Gönderildi!',
+                                      'Başarılı Bir Şekilde Gönderildi!.',
+                                      'success'
+                                  )
+                              }
+                          });
+                          break;
+                      case 'mailReport':
+                          $.ajax({
+                              url: '{{ path('quality_evaluation_feedback_mail',{'evaluation':evaluation.id}) }}',
+                              success: function (data) {
+                                  resetTotal();
+                                  if($("#evaluation_form_resetReason").val()=="")
+                                  {
+                                      $("#evaluation_form_resetReason").val(94);
+                                  }
+                                  submitEvaForm(2);
+                                  Swal.fire(
+                                      'Gönderildi!',
+                                      'Başarılı Bir Şekilde Gönderildi!.',
+                                      'success'
+                                  )
+                              }
+                          });
+                          break;
+                      }
+                  }
+              });
+      }
+      function resetTotal() {
+          $(".question-container").each(function (k, v) {
+              $(this).find('.answer').each(function () {
+                  if (parseInt($(this).data('score')) > 0) {
+                      $(this).prop('checked', true);
+                  }
+              })
+          });
+          calculateTotal();
+      }
+    </script>
+    <script type="text/javascript">
+{##}
+        var selected;
+        $(document).ready(function(){
+            $("#evaluation_form_resetReason").change(function(){
+                selected = $("#evaluation_form_resetReason").children("option:selected").text();
+                Swal.fire({
+                    title: selected+ ' Sebebi ile Sıfırlanarak Kayıt Edilecektir Emin Misiniz ?',
+                    text: "Form Kaydedilecek !",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Kaydet!',
+                    cancelButtonText: 'Vazgeç',
+                }).then((result) => {
+                    if (result.value) {
+                        if($("#evaluation_form_resetReason").val()==0)
+                        {
+                            Swal.fire('Boş sebep gönderilemez!',)
+                        }
+                        else
+                        {
+                            resetTotal();
+                            submitEvaForm(10);
+                            Swal.fire(
+                                'Kaydedildi!',
+                                'Form Başarııyla Kaydedildi!.',
+                                'success'
+                            ) }}
+                    else {
+                        $("#evaluation_form_resetReason").val(0);
+                    }
+                })
+            });
+        });
+    </script>
+{% endblock %}
+{% block body %}
+    <style> body  {  zoom: 100%!important; }</style>
+    {{ form_start(form,{'attr':{'id':'eva_form'}}) }}
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card border-info ">
+                <div class="card-header bg-info renkli">
+                    <h6 class="m-b-0 text-white">Değerlendiren Bilgileri </h6></div>
+                <div class="card-body">
+                    <table style="width:100%" class="table-bordered table-stripped">
+                        <tr>
+                            <th class="renkliTh">Adı</th>
+                            <td> <span class="evaluativeName"></span> </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card border-info ">
+                <div class="card-header bg-info renkli">
+                    <h6 class="m-b-0 text-white">Temsilci</h6></div>
+                <div class="card-body" style="padding:2px!important">
+                    <table style="width:100%" class="table-bordered table-stripped">
+                        <tr>
+                            <th class="renkliTh">Operatör </th>
+                            <td>{{ user }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Takım Lideri</th>
+                            <td>{{ teamManagerName }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Durumu</th>
+                            <td id="agentStatus">{{ agentStatus |raw }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">İlk Değerlendirme Tarihi</th>
+                            <td>{{ evaCreateDate|raw }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Güncelleme Tarihi</th>
+                            <td>{{  evaUpdateDate|raw }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Sıfırlama Sebebi</th>
+                            <td>{{ agentResetReason |raw }}</td>
+                        </tr>
+                        <tr style="height: 12px">
+                            <th class="renkliTh">Aktivite ID</th>
+                            <td>{{ sourceID|raw }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Vatandaş ID </th>
+                            <td>{{ citizenID }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Telefon Numarası</th>
+                            <td>{{ phoneNumber|raw }}</td>
+                        </tr>
+                        <tr>
+                            <th class="renkliTh">Toplam Hold Süresi</th>
+                            <td>{% for i, hold in holdDuration %}
+                                    {{ holdDuration[i] }},
+                                {% endfor %}  (Saniye)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card border-info callPlayer">
+                <div class="card-header bg-info renkli">
+                    <h6 class="m-b-0 text-white">{{ source }} {{ user }} {{ callDate|date('d-m-Y H:i:s') }} GMT +3</h6>
+                </div>
+{#                {% if isCall == true %}#}
+                    <div style="display: none">
+                        <audio id="audio_hidden" controls>
+                            <source src="{{ audioUrl }}" type="audio/wav">
+                            {#                            <source src="https://tbxdev.ibb.gov.tr/153.wav" type="audio/wav">#}
+                        </audio>
+                    </div>
+                    <div class="card-body" style="padding:2px!important">
+                        <table style="width:100%" class="table-bordered table-stripped">
+
+                            <tr>
+                                <th class="renkliTh">Çağrı Kaydı <i style="color:green" class="fa fa-volume-up"></i>
+                                </th>
+                                <td>{{ userField }}</td>
+                            </tr>
+                        </table>
+
+                        <div id="waveform" style="text-align:center">
+                              <div id="waveform-time-indicator">
+                                <span class="time">00:00:00</span></div>
+
+                        </div>
+
+
+                        <div id="waveform"></div>
+                        <div id="waveform-timeline">
+                        </div>
+
+
+                        <div style="text-align:center" class="controls">
+                            <button type="button" class="btn btn-info btn-xs audioPlay" style="font-size: 13px;"  onclick="wavesurfer.playPause();">
+                                <i class="fa fa-play"></i> /
+                                <i class="fa fa-pause"></i>
+                            </button>
+
+                            <button type="button" style="font-size: 13px;"  class="btn btn-info btn-xs" id="sesAcKapa"
+                                    onclick="wavesurfer.toggleMute()">
+                                <i id="iconVolume" class="fa fa-volume-up"></i>
+                            </button>
+                            <button type="button" style="font-size: 13px;"  class="btn btn-purple btn-xs"
+                                    onclick="wavesurfer.setPlaybackRate(1);">
+
+                                NORMAL
+                            </button>
+
+                            <button type="button" style="font-size: 13px;"  class="btn btn-danger btn-xs"
+                                    onclick="wavesurfer.setPlaybackRate(1.1);">
+
+                                HIZLI
+                            </button>
+                            <button type="button" style="font-size: 13px;" class="btn btn-success btn-xs"
+                                    onclick="wavesurfer.setPlaybackRate(1.3);">
+
+                                ÇOK HIZLI
+                            </button>
+                            <br/>
+                            <div style="margin-top: 5px;">
+                            <button type="button" style="font-size: 13px;"  class="btn btn-warning btn-xs"  onclick="wavesurfer.skipBackward(5)">
+                                <i class="fa fa-step-backward"></i>
+                                Geri Sar
+                            </button>
+                            <button type="button" style="font-size: 13px;"  class="btn btn-warning btn-xs" onclick="wavesurfer.skipForward(5)">
+                                <i class="fa fa-step-forward"></i>
+                                İleri Sar
+                            </button>
+                                <input id="volume" type="range" min="0" max="1" value="1" step="0.1">
+                            </div>
+                        </div>
+
+                    </div>
+
+{#                {% endif %}#}
+            </div>
+            <div class="card border-info ">
+
+{#                {% if isCall == true %}#}
+                    <div class="card-header bg-info renkli">
+                        <h6 class="m-b-0 text-white">Çağrı Süresi (Saniye)</h6>
+                    </div>
+                    <div class="card-body" style="padding:2px!important">
+                        {{ form_widget(form.duration) }}
+                    </div>
+{#                {% endif %}#}
+                <div class="card border-info extraSourceClass">
+                    <div class="card-header bg-info renkli">
+                        <h6 class="m-b-0 text-white">Extra Kaynak</h6></div>
+                    <div class="card-body" style="padding:2px!important; background-color: #e2e2e2;">
+
+                        <div class="input-group" style="border: groove; padding: 5px; border-radius: 15px;" id="extraAdd">
+                        <input type="text" class="form-control"  placeholder="Aktivite Id:"  name="extraSouceId" id="extraSouceId" style="width: 70%!important; ">
+                            <div class="input-group-append">
+                                <a class="btn btn-info "  id="extraDestRemoveButton"  style="color: white" onclick="extraDestRemoveButton()">
+                                    <i class="fa fa-trash" ></i>
+                                </a>
+                            <a class="btn btn-warning" id="extraDestAdd" style="color: white" onclick="extraDestAdd()" ><i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                            <hr>
+
+                             <div style="border: groove; padding: 5px;border-radius: 15px;" id="extraSources">
+
+                               {#              Extra kaynaklar            #}
+
+                            </div>
+                    </div>
+
+                </div>
+
+                <div class="card border-info ">
+                    <div class="card-header bg-info renkli">
+                        <h6 class="m-b-0 text-white">Değerlendiren Görüşü</h6></div>
+                    <div class="card-body" style="padding:2px!important">
+                        {{ form_widget(form.comment) }}
+                    </div>
+                </div>
+                <div class="card border-info callDate">
+                    <div class="card-header bg-info renkli">
+                        <h6 class="m-b-0 text-white">Çağrı / Etkileşim Tarihi </h6></div>
+                    <div class="card-body callDateBody" style="padding:2px!important">
+                        {{ form_widget(form.callDate) }}
+
+                    </div>
+                </div>
+                <div class="card border-info callDateHidden">
+                    <div class="card-header bg-info renkli">
+                        <h6 class="m-b-0 text-white">Çağrı / Etkileşim Tarihi </h6></div>
+                    <div class="card-body " style="padding:2px!important; text-align: center">
+                        <h3 style="font-weight: bold; color: #1B72B8"> {{ callDate }} GMT +3</h3>
+                    </div>
+
+
+                </div>
+
+{#                {% endif %}#}
+            </div>
+        </div>
+        <div style="height:auto;border:1px solid #bebebe; " class="col-lg-8">
+
+            <style>
+                #accordion div div {
+                    border-radius: 10px 10px 0px 0px !important;
+                }
+                #accordion {
+                    padding: 0.45rem;
+                    font-size: 19px;
+                    font-weight: 500;
+                }
+
+            </style>
+            <div id="accordion" style="width: 100%!important; font-size: 16px; color:black!important; ">
+                <div class="card">
+                    <div class="card-header" style=" background-color: #3073ac; font-size: 25px; ">
+                        <a class="card-link" data-toggle="collapse" style=" color: white!important; margin-top: 10px; "
+                           href="#collapseOne">
+                            {{ formTemplate.description }}
+                        </a>
+                        <span style="float: right;" ng-if="!config.badge.hidden"
+                              class="badge" >
+                            {% if is_granted('ROLE_KALITE_AGENT') %}
+                                <a class='btn btn-success btn-xs' id='historyPro$historyId' style='font-size:20px; color: white; font-weight: bold'
+                                   data-toggle="modal" data-target="#historyModal"  onclick='historyCheck()'>Geçmiş</a>
+                            {% endif %}</span>
+
+                    </div>
+                    <div id="collapseOne" class="collapse show" data-parent="#accordion" style=" ">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header" style="background-color: #3073ac; color: white;">
+                                    {{ formTemplate.title }} - {{ sourceID }}
+                                </div>
+                                <div class="card-body" style="background-color: #DBE6EA;">
+                                    <div class="progress" id="progressbar" role="progressbar"
+                                         style=" border-radius: 10px 10px 10px 10px!important;">
+                                        <div id="grandTotal"
+                                             class="progress-bar bg-info wow animated progress-animated"
+                                             role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                                             aria-valuemax="100" style="width:100%;">
+                                            <span id="gTotal" style="font-size: 14px; color:black;"> </span><span
+                                                    style="font-size: 14px; color:black; font-size: 15px;">%100 Soru</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="general">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#generalID">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">
+                                                >
+                                            </button>
+                                            Başlık : Genel
+                                        </a>
+                                    </div>
+                                    <div id="generalID" class="collapse show" data-parent="#general">
+                                        <div class="card-body" style="text-align: center; padding: 0.75rem; background-color: #eed3d3; border-radius: 0px 0px 10px 10px!important;">
+
+                                            <span> Değerlendirme Tipi</span>
+                                            <br>
+                                            <hr>
+                                            <div class="reasonTypes">
+                                                {{ form_widget(form.evaluationReasonType) }}
+                                                      <hr>
+                                            </div>
+                                            <div class="evaluationType">
+                                                {{ form_widget(form.evaluationType) }}
+                                            </div>
+
+                                            <div class="reasonTypeHiddens">
+                                                <h4 style="font-weight: bold; color: #1B72B8"> {{ reasonType }}</h4>
+                                                <hr>
+                                            </div>
+                                            <div class="evaluationTypeHidden" >
+                                                <h4 style="font-weight: bold; color: #901e0d"> {{ evaluationType }}</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="accordionParent">
+
+                            {% for i, section in formTemplate.formSections %}
+                                <div id="section-{{ section.id }}" class="section"  data-sid="{{ section.id }}"
+                                     data-max="{{ section.maxScore }}">
+
+                                    <div class="card" >
+                                        <div class="card-header" style="background-color: #d5ebcc;">
+                                            <a class="card-link" data-toggle="collapse"
+                                               style="color: black!important;"
+                                               href="#section-body-{{ section.id }}">
+                                                <button class="success-bordered-table"
+                                                        style="border: none; width: 25px; height: 25px; background-color: #52ab52; color: white; ">
+                                                    >
+                                                </button>
+                                                Bölüm - {{ i + 1 }} : {{ section.title }}
+                                                <span style="float: right;" ng-if="!config.badge.hidden"
+                                                      class="badge"><input type="button"
+                                                       style="color: white; color: white;  background-color: #52ab52; border: 0px solid; font-size: 15px; "
+                                                       id="section-score-{{ section.id }}"
+                                                       value="{{ section.maxScore }}"/></span>
+                                            </a>
+                                        </div>
+                                        <div id="section-body-{{ section.id }}" class="collapse "
+                                             data-parent="#accordionParent">
+                                            <div class="card-body"
+                                                 style="  border-radius: 0px 0px 10px 10px!important;  background-color: #d5ebcc;">
+                                                {% for j,category in section.formCategories %}
+                                                    <div id="cat{{ category.id }}" class="category"
+                                                         data-cid="{{ category.id }}"
+                                                         data-max="{{ category.maxScore }}">
+                                                        <div class="card">
+                                                            <div class="card-header"
+                                                                 style="background-color: #fbf5d7;">
+                                                                <a class="card-link" data-toggle="collapse"
+                                                                   style="color: black!important;"
+                                                                   href="#category{{ category.id }}ID">
+                                                                    <button class="success-bordered-table" style="border: none; width: 25px; height: 25px; background-color: #efa63f; color: white; ">
+                                                                        >
+                                                                    </button>
+                                                                    Kategori {{ j+1 }} {{ category.title }}
+                                                                    <span style="float: right;"
+                                                                           ng-if="!config.badge.hidden"
+                                                                           class="badge"><input type="button"
+                                                                           style="color: white; background-color: #efa63f; color: white;  border: 0px solid; font-size: 15px; "
+                                                                           id="category-score-{{ category.id }}"
+                                                                           value="{{ category.maxScore }}"
+                                                                           name="{{ category.maxScore }}"/></span>
+                                                                </a>
+                                                            </div>
+                                                            <div id="category{{ category.id }}ID"
+                                                                 class="collapse " data-parent="#section-body-{{ section.id }}">
+                                                                <div class="card-body"
+                                                                     style=" border-radius: 0px 0px 0px 0px!important; background-color: #fbf5d7;">
+                                                                    <div class="card" style="margin-bottom: 0px!important;">
+
+                                                                        {#<div class="progress" id="categoryTotal1" role="progressbarr" style=" border-radius: 10px 10px 10px 10px!important;" >#}
+                                                                        {#<div id="categoryTotal"  class="progress-bar bg-success wow animated progress-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%;">#}
+                                                                        {#<span id="cTotal" style="font-size: 14px;" > </span>/10 Puan#}
+                                                                        {#</div>#}
+                                                                        {#</div>#}
+
+                                                                        {% for k , question in category.formQuestions %}
+                                                                            <div id="question{{ question.id }}"
+                                                                                 class="question">
+                                                                                <div class="card" style="margin-bottom: 0px!important;">
+                                                                                    <div class="card-header"
+                                                                                         style="background-color: #eed3d3;">
+                                                                                        <a class="card-link"
+                                                                                           data-toggle="collapse"
+                                                                                           style="color: black!important;"
+                                                                                           href="#question{{ question.id }}ID">
+                                                                                            <button class="success-bordered-table"
+                                                                                                    style="border: none; width: 25px; height: 25px;background-color: #d04541; color: white; ">
+                                                                                                >
+                                                                                            </button>
+                                                                                            Soru {{ k+1 }}
+                                                                                            <span style="float: right;"
+                                                                                                  ng-if="!config.badge.hidden"
+                                                                                                  class="badge"><input
+                                                                                                        type="button"
+                                                                                                        style="color: white; background-color: #d04541; border: 0px solid; font-size: 15px; "
+                                                                                                        id="question-score-{{ question.id }}"
+                                                                                                        value=""/></span>
+                                                                                        </a>
+                                                                                        <span style="float: right;"
+                                                                                              ng-if="!config.badge.hidden"
+                                                                                              class="badge"><input
+                                                                                                    type="button"
+                                                                                                    style="color: white; background-color: green; border: 0px solid; font-size: 15px; "
+                                                                                                    id="question-totalscore-{{ question.id }}"
+                                                                                                    value=""/></span>
+                                                                                    </div>
+                                                                                    <div id="question{{ question.id }}ID"
+                                                                                         class="collapse show question-container"
+                                                                                         data-parent="question{{ question.id }}">
+                                                                                        <div class="card-body"
+                                                                                             style="background-color: #eed3d3; padding: 0px 15px; border-radius: 0px 0px 0px 0px!important;">
+                                                                                            <div class="card" style="margin-bottom: 5px!important;">
+                                                                                                <div class="row">
+                                                                                                    <div class="alert alert-danger no-margin-bottom"
+                                                                                                         style="background-color: #eed3d3; float: left; width: 60%;   border-radius: 0px 0px 0px 0px!important;  margin-bottom: 0rem!important;   padding: 5px; ">{{ question.title|raw }} </div>
+                                                                                                    <div class="alert alert-danger no-margin-bottom"
+                                                                                                         style=" background-color: #eed3d3; float: right; width: 40%;  border-radius: 0px 0px 0px 0px!important;   margin-bottom: 0rem!important;  padding: 0.75rem 1.25rem;">
+
+                                                                                                        <div style="display: table; margin: auto;">
+                                                                                                            {%for z, option in question.formQuestionOptions %}
+                                                                                                                {% if option.id in answerArray %}
+                                                                                                                    {% set checked = 'checked' %}
+                                                                                                                {% else %}
+                                                                                                                    {% set checked = '' %}
+                                                                                                                {% endif %}
+
+                                                                                                                <label style="width: 100px; height: 30px;  margin-right:5px;font-size: 14px; font-weight: bold;"
+                                                                                                                       class="btn btn-secondary ">
+                                                                                                                    <input {{ checked }}
+                                                                                                                            class="answer"
+                                                                                                                            data-order="asc"
+                                                                                                                            id="option_{{ option.id }}"
+                                                                                                                            type="radio"
+                                                                                                                            name="answer[{{ question.id }}]"
+                                                                                                                            data-score="{{ option.score }}"
+                                                                                                                            value="{{ option.id }}"
+                                                                                                                            data-qid="{{ question.id }}"> {{ option.title }}
+                                                                                                                </label>
+                                                                                                                <script>
+                                                                                                                    optionScore= {{ option.score }};
+                                                                                                                    questionID= {{ question.id }};
+                                                                                                                    $("#question-totalscore-"+questionID).val(optionScore);
+                                                                                                                    // writeQuestionScore(optionScore,questionID);
+                                                                                                                </script>
+                                                                                                                {% if(z==1) %}
+                                                                                                                    {{ loop.break }}
+                                                                                                                {% endif %}
+                                                                                                            {% endfor %}
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+
+                            <div id="footer">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#footerID">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">>
+                                            </button>
+                                            Altbilgi : Sonuc
+                                        </a>
+                                    </div>
+                                    <div id="footerID" class="collapse  " data-parent="#footer">
+                                        <div class="card-body" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important; ">
+                                            {{ form_widget(form.evaluatorComment) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="evaluativeComment">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#evaluativeCommentBody">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">>
+                                            </button>
+                                            Değerlendirilen Görüşü
+                                        </a>
+                                    </div>
+                                    <div id="evaluativeCommentBody" class="collapse evaluationCard" data-parent="#evaluativeComment">
+                                        <div class="card-body" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important;">
+                                            {{ form_widget(form.evaluativeComment) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="rejectComment">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#commentBody">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">>
+                                            </button>
+                                            İtiraz Yorumu
+                                        </a>
+                                    </div>
+                                    <div id="commentBody" class="collapse rejectCard" data-parent="#rejectComment">
+                                        <div class="card-body" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important;">
+                                            {{ form_widget(form.rejectComment) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="rejectCloseComment">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#rejectCommentBody">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">>
+                                            </button>
+                                            İtiraz Kapatma Yorumu
+                                        </a>
+                                    </div>
+                                    <div id="rejectCommentBody" class="collapse rejectCloseCard" data-parent="#rejectCloseComment">
+                                        <div class="card-body" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important;">
+                                            {{ form_widget(form.rejectCloseComment) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr/>
+                            <div id="createdAt">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: #eed3d3;">
+                                        <a class="card-link" data-toggle="collapse" style="color: black!important;"
+                                           href="#createdAtBody">
+                                            <button class="success-bordered-table"
+                                                    style="border: none; width: 25px; height: 25px; background-color: #d04541; color: white; ">>
+                                            </button>
+                                            Değerlendirme Tarihi
+                                        </a>
+                                    </div>
+                                    <div id="createdAtBody" class="collapse evaluationCard" data-parent="#evaluativeComment">
+                                        <div class="card-body createDate" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important;">
+                                            {{ form_widget(form.createdAt) }}
+                                        </div>
+                                        <div class="card-body createDateHidden" style="background-color: #eed3d3; border-radius: 0px 0px 0px 0px!important; text-align: center">
+                                            <h3 style="font-weight: bold; color: #1B72B8">{{ evaCreateDate|date('d-m-Y H:i:s') }} GMT +3</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div style="float: right; margin-bottom: 20px; margin-right: 10px;">
+                            <div class="btn-group">
+                                <div class="input-group mb-3" style="margin-bottom: 0rem!important;">
+                                    <div class="input-group-append">
+                                        <span style="text-align: right; display: none;" id="rejectSpan">Eğer itiraz etmek istiyorsanız lütfen önce itiraz sebebinizi giriniz.</span>
+                                        {% if max == true %}
+                                        <button type="button" class="btn btn-warning maxTotal" onclick="repoAlert('maxTotal','')" style="margin-right: 10px;font-weight: bold;">Max</button>
+                                          {% endif %}
+
+                                        {% if save == true %}
+                                        <button type="button" class="btn btn-cyan save" onclick="repoAlert('save','')" style="margin-right: 10px;font-weight: bold;">
+                                            Kaydet
+                                        </button>
+                                        {% endif %}
+                                        {% if saveAndPublish == true %}
+                                            <div class="btn-group dropup">
+                                                <button type="button" class="btn btn-info saveAndPublish"  onclick="repoAlert('saveAndPublish','')" style="font-weight: bold;">Yayınla</button>
+                                                <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split saveAndPublishDrop"  style="margin-right: 10px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" id="mailThanksID"  onclick="repoAlert('mailThanks',{{ evaluation.id}})">Tebrikler</a>
+                                                    <a class="dropdown-item" id="mailReportID" onclick="repoAlert('mailReport',{{ evaluation.id }})">Geri Bildirim</a>
+                                                </div>
+                                            </div>
+
+                                        {% endif %}
+
+                                        {% if reject == true %}
+                                        <button type="button" class="btn btn-tumblr reject" onclick="repoAlert('reject','')" style="margin-right: 10px;font-weight: bold;">
+                                            İtiraz
+                                        </button>
+                                        {% endif %}
+
+                                        {% if rejectDeny == true %}
+                                        <button type="button" class="btn btn-tumblr rejectDeny" onclick="repoAlert('rejectDeny','')" style="margin-right: 10px;font-weight: bold;">
+                                            İtirazı Reddet
+                                        </button>
+                                        {% endif %}
+
+                                        {% if rejectAccept == true %}
+                                        <button type="button" class="btn btn-flickr rejectAccept" onclick="repoAlert('rejectAccept','')" style="margin-right: 10px;font-weight: bold;">
+                                            İtirazı Kabul Et
+                                        </button>
+                                        {% endif %}
+
+                                        {% if reEvaluate == true %}
+                                            <button type="button" class="btn btn-github" onclick="repoAlert('reEvaluate','')" style="font-weight: bold;margin-right: 10px;">
+                                            Kabul Et
+                                        </button>
+                                        {% endif %}
+
+                                        {% if secondReject == true %}
+                                            <button type="button" class="btn btn-tumblr" onclick="repoAlert('secondReject','')" style="font-weight: bold;margin-right: 10px;">
+                                           Yeniden İtiraz Et
+                                        </button>
+                                        {% endif %}
+
+                                        {% if secondReEvaluate == true %}
+                                            <button type="button" class="btn btn-purple" onclick="repoAlert('secondReEvaluate','')" style="margin-right: 10px;font-weight: bold;">
+                                            Reddet
+                                        </button>
+                                        {% endif %}
+
+                                        {% if unPublish == true %}
+                                            <button type="button" class="btn btn-danger" onclick="repoAlert('unPublish','')" style="margin-right: 10px;font-weight: bold;">
+                                            Yayından Geri Al
+                                        </button>
+                                        {% endif %}
+                                        {% if upgrade == true %}
+                                            <button type="button" class="btn btn-danger" onclick="repoAlert('upgrade','')" style="margin-right: 10px;font-weight: bold;">
+                                            Güncelle
+                                        </button>
+                                        {% endif %}
+
+                                        {% if remove == true %}
+                                        <button type="button" class="btn btn-youtube remove"  onclick="repoAlert('remove','')" style="font-weight: bold;margin-right: 10px; margin-left: 10px;">
+                                            Sil
+                                        </button>
+                                        {% endif %}
+
+{#                                        {%  if resetReason == true %}#}
+                                        {{ form_widget(form.resetReason) }}
+{#                                        {% endif %}#}
+
+                                        {{ form_widget(form.status) }}
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="container-floating">
+            {% if is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_KALITE_ADMIN') or is_granted('ROLE_TAKIM_LIDERI') %}
+            <div class="nd1 nds" data-toggle="tooltip" data-placement="left">
+                <a href="{{ path('quality_inbound') }}">
+                    <img title="Çağrılara Geri Dön" class="reminder" src="/assets/images/icon/back-icon.png">
+                </a>
+            </div>
+            {% endif %}
+            <div class="nd3 nds" data-toggle="tooltip" data-placement="left">
+                <a href="{{ path('evaluation_list') }}">
+                    <img title="Değerlendirmeye Geri Dön" class="reminder" src="/assets/images/icon/expense-w.png">
+                </a>
+            </div>
+            {% if is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_KALITE_ADMIN') or is_granted('ROLE_TAKIM_LIDERI') %}
+            <div class="nd4 nds" data-toggle="tooltip" data-placement="left">
+                <a href="{{ path('quality_new') }}">
+                    <img title="Çözüm'e Geri Dön" class="reminder" src="/assets/images/icon/income-w.png">
+                </a>
+            </div>
+            {% endif %}
+
+            <div id="floating-button" data-toggle="tooltip" data-placement="left"
+                 style="margin-bottom: 10px; font-size: 15px;">
+                <p class="plus" id="totall" style=" font-size: 27px!important; font-family: monospace;"></p>
+                <input type="hidden" name="score" id="totalScore">
+                <img title="Seçenekler" class="edit" src="/assets/images/icon/menu.png">
+            </div>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+        <div class="modal" id="historyModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Temsilci Değerlendirme Geçmişi</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <table class="table table-striped table-active">
+                            <thead>
+                            <tr>
+                                <th>Değiştiren Kişi</th>
+                                <th>Alan Adı</th>
+                                <th>Alan Verisi</th>
+                                <th>Kayıt Tarihi</th>
+                            </tr>
+                            </thead>
+                            <tbody id="agentHistoryCard">
+
+                            </tbody>
+
+                        </table>
+                        {#                    Değerlendirilen Kişi : <span style="font-size: 16px; color: Red"></span><br/>#}
+                        {#                    Değerlendiren Kişinin Kullanıcı Adı :  <span id="username" style="font-size: 16px; color: Red"></span><br/>#}
+                        {#                    Alan Adı : <span id="fieldHumanRead" style="font-size: 16px; color: Red"></span><br/>#}
+                        {#                    Skor : <span id="data" style="font-size: 16px; color: Red"></span><br/>#}
+                        {#                    Kayıt Tarihi : <span id="loggedAt" style="font-size: 16px; color: Red"></span>#}
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+</div>
+    <script>
+        function historyCheck() {
+            {#alert({{evaluation.id}});#}
+            $('#agentHistoryCard').empty();
+            var historyId='historyPro'+{{evaluation.id}};
+            $.ajax({
+                url:"/quality/history/"+{{evaluation.id}},
+                // data: { field: 'field' },
+                dataType: 'json',
+                success: function (data) {
+                    var historyJson = JSON.parse(JSON.stringify(data));
+                    console.log(historyJson);
+                    historyJson.forEach(function (historyJson) {
+                        $('#agentHistoryCard').append('<tr>' +
+                            '<td>' + historyJson.username+ '</td>' +
+                            '<td>' + historyJson.fieldHumanRead + '</td>' +
+                            '<td>' + historyJson.data+ '</td>' +
+                            '<td>' + historyJson.loggedAt + '</td>' +
+                            // '<td>' + historyJson.data + '</td>' +
+                            '</tr>')
+                    });
+                }});
+        }
+
+        function getExtraSource(){
+            $('#extraSources').empty();
+            $.ajax({
+                url:"{{path('extra_source_list',{'evaluation':evaluation.id})}}",
+                dataType: 'json',
+                success: function (data) {
+                    var extraJson = JSON.parse(JSON.stringify(data));
+                    extraJson.forEach(function (extraJson) {
+                        if(extraJson.evaluation==evaluation){
+                            $('#extraSources').append('<div class="input-group bootstrap-touchspin bootstrap-touchspin-injected" style="padding:3px">\n' +
+                                '<span class="input-group-btn input-group-prepend"><button class="btn btn-secondary btn-outline bootstrap-touchspin-down" type="button"><li class="fas fa-history"></li> </button></span>\n' +
+                                '<textarea id="tch3_22" type="text" name="tch3_22" data-bts-button-down-class="btn btn-secondary btn-outline" style="resize: both" readonly="readonly" data-bts-button-up-class="btn btn-secondary btn-outline" class="form-control">\n' +extraJson.source+
+                                '</textarea>\n' +
+                                '<span class="input-group-btn input-group-append extraDestRemove" id="extraDest" style="display: none;">' +
+                                '<a class="btn btn-secondary btn-outline bootstrap-touchspin-up" id="'+extraJson.source+'" onclick="extraDestRemove(this)"><i class="fa fa-trash" style="margin-top: 15px;"></i></a>\n' +
+                                '</span></div>')
+                        }
+
+                    });
+                }});
+        }
+        function  extraDestRemove(elem) {
+            var id = $(elem).attr("id");
+            $.ajax({
+                    url: '/quality/extraSourceRemove/'+id
+                }
+            );
+            Swal.fire(
+                'Silindi!',
+                'Eksta kaynak başarıyla silindi!.',
+                'success'
+            );
+            getExtraSource();
+        }
+        function extraDestRemoveButton()
+        {
+            $('.extraDestRemove').show();
+        }
+
+        function extraDestAdd()
+        {
+            $('#extraSources').empty();
+            if($('#extraSouceId').val()=="")
+            {
+                Swal.fire({
+                    title: '!!! -DİKKAT- !!!',
+                    allowOutsideClick: false,
+                    closeOnClickOutside: false,
+                    html: '' +
+                        '<h3 style="float: left!important; font-weight: bold!important;">Olay Id boş geçilemez !</h3>' +
+                        '',
+                    confirmButtonText: 'Yenile',
+                }).then(function (result) {
+                    if (result.dismiss == Swal.DismissReason.cancel) {
+                    }else if (result.dismiss == Swal.DismissReason.backdrop){
+                    }else if (result.value) {
+
+                    }
+                })
+            }
+            else
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('extra_source_add') }}",
+                    data: {
+                        evaluationId: {{ evaluation.id }},
+                        extraSource: $('#extraSouceId').val(),
+                        description: $('#description').val()
+                    },
+                    success: function (data) {
+                        if(data.success==true)
+                        {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Başarılı !</h3>' +
+                                    '',
+                                confirmButtonText: 'Yenile',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+
+                                }
+                            });
+                            getExtraSource();
+
+                        }
+                        else{
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Bu Aktivite ID zaten var !</h3>' +
+                                    '',
+                                confirmButtonText: 'Yenile',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+
+                                }
+                            })
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert('Error : ' + errorThrown);
+                    }
+
+                });
+            }
+
+             $('#extraSouceId').val("");
+             $('#description').val("");
+        }
+
+    </script>
+{% endblock %}

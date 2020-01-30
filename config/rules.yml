@@ -1,0 +1,3 @@
+ruroles:
+  - kullanıcı_grubları:
+    - RULE_USER_LIST: {'title' : 'Kullanıcı Listesi' }

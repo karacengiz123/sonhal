@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormSection index{% endblock %}
+
+{% block body %}
+    <h1>FormSection index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>MinScore</th>
+                <th>Sort</th>
+                <th>MaxScore</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_section in form_sections %}
+            <tr>
+                <td>{{ form_section.id }}</td>
+                <td>{{ form_section.title }}</td>
+                <td>{{ form_section.minScore }}</td>
+                <td>{{ form_section.sort }}</td>
+                <td>{{ form_section.maxScore }}</td>
+                <td>
+                    <a href="{{ path('form_section_show', {'id': form_section.id}) }}">show</a>
+                    <a href="{{ path('form_section_edit', {'id': form_section.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('form_section_new') }}">Create new</a>
+{% endblock %}

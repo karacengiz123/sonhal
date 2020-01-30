@@ -1,0 +1,608 @@
+{% extends 'layout/base.html.twig' %}
+
+
+
+    {% block customScript %}
+        {##}
+        {#        <script src="/assets/dist/js/wavesurfer-2.1.3/wavesurfer.js" ></script>#}
+        <script src="/assets/js/wavesurfer.min.js"></script>
+
+        <script type="text/javascript">
+
+                $(document).ready(function () {
+                    var filter=JSON.parse(window.localStorage.getItem("DataTables_sg-datatables-calls_datatable_/quality/"));
+                    var summaryfilter=JSON.parse(window.localStorage.getItem("DataTables_sg-datatables-evaluation_summary_datatable_/quality/"));
+                   if(summaryfilter.columns[0].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-0').val(summaryfilter.columns[0].search.search).change();
+                   if(summaryfilter.columns[1].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-1').val(summaryfilter.columns[1].search.search).change();
+                   if(summaryfilter.columns[2].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-2').val(summaryfilter.columns[2].search.search).change();
+                   if(summaryfilter.columns[3].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-3').val(summaryfilter.columns[3].search.search).change();
+                   if(summaryfilter.columns[4].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-4').val(summaryfilter.columns[4].search.search).change();
+                   if(summaryfilter.columns[5].search.search!="")$('#sg-datatables-evaluation_summary_datatable-head-filter-5').val(summaryfilter.columns[5].search.search).change();
+
+                 if(filter.columns[1].search.search!="") $('#sg-datatables-calls_datatable-head-filter-1').val(filter.columns[1].search.search).change();
+                 if(filter.columns[2].search.search!="") $('#sg-datatables-calls_datatable-head-filter-2').val(filter.columns[2].search.search).change();
+                 if(filter.columns[3].search.search!="") $('#sg-datatables-calls_datatable-head-filter-3').val(filter.columns[3].search.search).change();
+                 if(filter.columns[4].search.search!="") $('#sg-datatables-calls_datatable-head-filter-4').val(filter.columns[4].search.search).change();
+                 if(filter.columns[5].search.search!="") $('#sg-datatables-calls_datatable-head-filter-5').val(filter.columns[5].search.search).change();
+                 if(filter.columns[6].search.search!="") $('#sg-datatables-calls_datatable-head-filter-6').val(filter.columns[6].search.search).change();
+                 if(filter.columns[7].search.search!="") $('#sg-datatables-calls_datatable-head-filter-7').val(filter.columns[7].search.search).change();
+                 if(filter.columns[11].search.search!="") $('#sg-datatables-calls_datatable-head-filter-11').val(filter.columns[11].search.search).change();
+                 if(filter.columns[12].search.search!="") $('#sg-datatables-calls_datatable-head-filter-12').val(filter.columns[12].search.search).change();
+
+               });
+
+            function changeAgentfilter(id) {
+                $('#sg-datatables-calls_datatable-head-filter-2').val(id).change();
+            }
+
+            function cleanAgentFilter() {
+                window.localStorage.removeItem("DataTables_sg-datatables-calls_datatable_/quality/", "");
+                // window.localStorage.getItem("DataTables_sg-datatables-calls_datatable_/quality/", "");
+                location.reload();
+            }
+            function cleanSummaryFilter() {
+                window.localStorage.removeItem("DataTables_sg-datatables-evaluation_summary_datatable_/quality/", "");
+                location.reload();
+            }
+
+            function evaCheck(id) {
+
+                $('#agentCard').empty();
+                $('#evaWhoModal').attr('display',true);
+                $.ajax({
+                    url:"/quality/whoEvaluated/"+id,
+                    dataType: 'json',
+                    success: function (data) {
+
+                        $('#agentCard').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "evaluative" , name: "evaluative" , title: "Değerlendiren"},
+                                { data: "status" , name: "status" , title: "Durum"},
+                                { data: "createdAt" , name: "createdAt" , title: "Değerlendirme Tarihi"},
+                                { data: "count" , name: "count" , title: "Değerlendirme Sayısı"},
+                                { data: "score" , name: "score" , title: "Skor"},
+                                { data: null,title:"İşlemler",
+                                    render: function ( data, type, row ) {
+                                        return '<button onclick="whoMuchEvaluatedCheck('+data.userId+','+ data.evaluativeId+')"  class="btn btn-success">Göster</button>';
+                                    }},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        {#var historyJson = JSON.parse(JSON.stringify(data));#}
+                        {#var i;#}
+                        {#for (i=0;i<historyJson.length;i++)#}
+                        {#{#}
+                        {#    var evaluativeName="****** ******";#}
+                        {#    {% if is_granted('ROLE_KALITE_AGENT') or is_granted('ROLE_KALITE_ADMIN')%}#}
+                        {#    evaluativeName=historyJson[i].evaluative;#}
+                        {#    {% endif %}#}
+
+                        {#    $('#agentCard').append('<tr>' +#}
+                        {#        '<td>' + evaluativeName+ '</td>' +#}
+                        {#        '<td>' + historyJson[i].status + '</td>' +#}
+                        {#        '<td>' + historyJson[i].createdAt + '</td>' +#}
+                        {#        '<td>' + historyJson[i].count + '</td>' +#}
+                        {#        '<td>' + historyJson[i].score + '</td>' +#}
+                        {#        '<td><button onclick="whoMuchEvaluatedCheck('+historyJson[i].userId +','+ historyJson[i].evaluativeId +')"  class="btn btn-success" >Göster</button></td>' +#}
+                        {#        '</tr>')#}
+                        {#}#}
+                    }});
+            }
+
+            function whoMuchEvaluatedCheck(muchUserId,muchEvaluativeId) {
+
+                $('#evaluatedCard').empty();
+                $('#collapseOne').attr('class','collapse');
+                $('#collapseTwo').attr('class','collapse show');
+
+                $.ajax({
+                    url:"/quality/whoMuchEvaluated/"+muchUserId+"/"+muchEvaluativeId+"",
+                    dataType: 'json',
+                    success: function (data) {
+                        var historyJson = JSON.parse(JSON.stringify(data));
+                        var i;
+                        for (i=0;i<historyJson.length;i++)
+                        {
+                            $('#evaluatedCard').append('<tr>' +
+                                '<td>' + historyJson[i].source+ '</td>' +
+                                '<td>' + historyJson[i].createdAt + '</td>' +
+                                '<td>' + historyJson[i].status + '</td>' +
+                                '<td>' + historyJson[i].formName + '</td>' +
+                                '<td>' + historyJson[i].score + '</td>' +
+                                '<td><a href="/quality/evaluation/' + historyJson[i].evaluationId + '" class="btn btn-success" >Git</a></td>' +
+                                '</tr>')
+                        }
+
+                    }});
+            }
+
+
+
+            var audio = $('#audio_hidden');
+            var durationWave = Math.round(audio[0].duration);
+            var wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'violet',
+                progressColor: 'purple',
+                barWidth: "3",
+                barHeight: "3",
+                barGap: "0",
+                cursorWidth: "4",
+                duration: durationWave
+            });
+
+            // wavesurfer.load('https://tbxdev.ibb.gov.tr/153.wav');
+
+            wavesurfer.on('ready', function () {
+                $('#play-pause').click(function () {
+                    wavesurfer.playPause();
+                });
+            });
+
+            wavesurfer.on('ready', updateTimer);
+            wavesurfer.on('audioprocess', updateTimer);
+            wavesurfer.on('seek', updateTimer);
+
+            function updateTimer() {
+                var formattedTime = secondsToTimestamp(wavesurfer.getCurrentTime());
+                $('#waveform-time-indicator .time').text(formattedTime);
+            }
+
+            function secondsToTimestamp(seconds) {
+                seconds = Math.floor(seconds);
+                var h = Math.floor(seconds / 3600);
+                var m = Math.floor((seconds - (h * 3600)) / 60);
+                var s = seconds - (h * 3600) - (m * 60);
+
+                h = h < 10 ? '0' + h : h;
+                m = m < 10 ? '0' + m : m;
+                s = s < 10 ? '0' + s : s;
+                return h + ':' + m + ':' + s;
+            }
+
+
+                function recordModalClose() {
+                    $('#agentCard').DataTable().destroy();
+                }
+
+        </script>
+
+    {% endblock %}
+{% block customCss %}
+    {#    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />#}
+
+    <style>
+        body {
+            zoom: 100%!important;
+            font-weight: bold;
+        }
+
+        th {
+            font-weight: bold !important;
+            font-size: 13px !important;
+        }
+
+        tr {
+            font-size: 11px !important;
+        }
+
+        .callsTable div div table thead tr {
+            /*font-size: 20px;*/
+        }
+
+        @media (max-width: 1920px) {
+            tbody {
+                /*font-size: 18px;*/
+                width: auto;
+            }
+        }
+
+        @media (max-width: 1350px) {
+            tbody {
+                font-size: 18px;
+            }
+        }
+        .summaryTable {
+            font-size: 17px;
+        }
+        .changefilterButton
+        {
+            text-align: center;
+        }
+        .checkEvaButton
+        {
+            text-align: center;
+        }
+        .changefilterButton button
+        {
+            width: 100px;
+        }
+        .checkEvaButton button
+        {
+            width: 100px;
+        }
+        input {
+            border: solid 2px;
+            border-radius: 8px;
+            padding: 3px;
+            border-color: slategray;
+        }
+        .start_actions a
+        {
+            font-size: 18px;
+        }
+        .dataTables_filter
+        {
+            background-color: white!important;
+        }
+
+    </style>
+
+{% endblock %}
+{% block body %}
+    <script>
+        var colorTd;
+        var userDest;
+        var colorFunctionTimeInterval;
+
+        function userDescAjax() {
+            $.ajax({
+                url: "{{ path('user_dest') }}",
+                method: "GET",
+                success: function (data) {
+                    userDest = data;
+                }
+            })
+        }
+
+        userDescAjax();
+    </script>
+
+    {% if datatable2==true %}
+        <h1 style="text-align: left;padding: 20px">{{ "Özet" | trans }}</h1>
+
+        <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px;">
+
+            <div class="successBtn ">
+                <div class="summaryTable">
+                    {{ sg_datatables_render(datatable2) }}
+                </div>
+            </div>
+            <button type="button" class="btn btn-info btn-xs " onclick="cleanSummaryFilter()"
+                    style="margin-bottom: 10px; font-size: 19px;">Filtreyi Temizle
+            </button>
+        </div>
+    {% endif %}
+    <h1 style="text-align: left;padding: 20px">{{ "Çağrı Listesi" | trans }}</h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white; font-size: 16px; ">
+        <div class="successBtn callsTable">
+
+            {{ sg_datatables_render(datatable) }}
+
+        </div>
+        <button type="button" class="btn btn-info btn-xs " onclick="cleanAgentFilter()"
+                style="margin-bottom: 10px; font-size: 19px;">Filtreyi Temizle
+        </button>
+    </div>
+
+    <div class="modal" id="record" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Ses Kaydı </h4>
+{#                    <button type="button" class="close" data-dismiss="modal">&times;</button>#}
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="card-body" style="padding:2px!important">
+
+                        <table style="width:100%" class="table-bordered table-stripped">
+                            <tr>
+                                <th class="renkliTh">Çağrı Kaydı <i style="color:green" class="fa fa-volume-up"></i>
+                                </th>
+                                <td id="userfield" style="display: none;"></td>
+                            </tr>
+                        </table>
+
+                        <div id="waveform" style="text-align:center">
+                            <div id="waveform-time-indicator">
+                                <span class="time">00:00:00 </span></div>
+
+                        </div>
+                        <div style="display: none">
+                            <audio id="audio_hidden" controls>
+                                <source src="" type="audio/wav">
+                                {#            <source src="https://tbxdev.ibb.gov.tr/153.wav" type="audio/wav">#}
+                            </audio>
+                        </div>
+
+                        <div id="waveform"></div>
+                        <div style="text-align:center" class="controls">
+                            <button type="button" class="btn btn-info btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.playPause();">
+                                <i class="fa fa-play"></i> /
+                                <i class="fa fa-pause"></i>
+                            </button>
+
+
+                            <button type="button" class="btn btn-info btn-xs" id="sesAcKapa" style="font-size:13px;"
+                                    onclick="wavesurfer.toggleMute()">
+                                <i id="iconVolume" class="fa fa-volume-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-purple btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1);">
+
+                                NORMAL
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1.1);">
+
+                                HIZLI
+                            </button>
+                            {#                            <button type="button" class="btn btn-warning btn-xs"#}
+                            {#                                    onclick="wavesurfer.setPlaybackRate(1.2);">#}
+
+                            {#                                DAHA HIZLI#}
+                            {#                            </button>#}
+                            <button type="button" class="btn btn-success btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1.3);">
+                                ÇOK HIZLI
+                            </button>
+                            <br/>
+                            <button type="button" class="btn btn-warning btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.skipBackward(5)">
+                                <i class="fa fa-step-backward"></i>
+                                Geri Sar
+                            </button>
+                            <button type="button" class="btn btn-warning btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.skipForward(5)">
+                                <i class="fa fa-step-forward"></i>
+                                İleri Sar
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger modalClose" onclick="modalClose()">Çık</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="evaCheckModal" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header" style="background-color: #d8d9da">
+                    <h4 class="modal-title">Temsilci Değerlendirme Geçmişi</h4>
+                    <button type="button" class="close" data-dismiss="modal" onclick="recordModalClose()">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne"  style="background-color: #ffb762;border-radius: 10px 10px 0px 0px;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;font-size: 17px;color: white;">
+                                     Değerlendirme İzleme
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body" style="background-color: bisque ;border-radius: 0px 0px 10px 10px;">
+                                    <table class="table table-striped table-active " id="agentCard">
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="card">
+                            <div class="card-header" id="headingTwo" style="background-color:#e8a23b;border-radius: 10px 10px 0px 0px;">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="font-weight: bold;font-size: 17px;color: white;">
+                                       Değerlendirme Formları
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div class="card-body" style="background-color: bisque;">
+                                    <table class="table table-striped table-active evaDetail">
+                                        <thead>
+                                        <tr>
+                                            <th>Kaynak</th>
+                                            <th>Değerlendirme Tarihi</th>
+                                            <th>Durumu
+{#                                                <select id='select'>#}
+{#                                                    <option value="DRAFT"> DRAFT </option>#}
+{#                                                    <option value="YAYINDA"> YAYINDA </option>#}
+{#                                                    <option value="KAYDEDİLDİ"> KAYDEDİLDİ </option>#}
+{#                                                    <option value="TEMSİLCİ İTİRAZ"> TEMSİLCİ İTİRAZ </option>#}
+{#                                                </select>#}
+                                            </th>
+                                            <th>Form Adı</th>
+{#                                            <th>Değerlendirme Sayısı</th>#}
+                                            <th>Skoru</th>
+                                            <th>Git</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="evaluatedCard">
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="historyModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Temsilci Değerlendirme Geçmişi</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <table class="table table-striped table-active">
+                        <thead>
+                        <tr>
+                            <th>Değiştiren Kişi</th>
+                            <th>Skor</th>
+                            <th>Durum</th>
+                            <th>Oluşturma Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                        </thead>
+                        <tbody id="agentHistoryCard">
+
+                        </tbody>
+
+                    </table>
+                    {#                    Değerlendirilen Kişi : <span style="font-size: 16px; color: Red"></span><br/>#}
+                    {#                    Değerlendiren Kişinin Kullanıcı Adı :  <span id="username" style="font-size: 16px; color: Red"></span><br/>#}
+                    {#                    Alan Adı : <span id="fieldHumanRead" style="font-size: 16px; color: Red"></span><br/>#}
+                    {#                    Skor : <span id="data" style="font-size: 16px; color: Red"></span><br/>#}
+                    {#                    Kayıt Tarihi : <span id="loggedAt" style="font-size: 16px; color: Red"></span>#}
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function evaluativeColor() {
+            // console.log(userDest);
+            colorTd = $(".filter_callID_twig");
+            $.each(userDest, function (index, value) {
+                for (var i = 1; i < colorTd.length; i++) {
+                    if ("{{ manager.id }}" == index  && value.destID.indexOf(colorTd[i].textContent) > -1){
+                        colorTd[i].parentElement.setAttribute("style", "background-color:limegreen!important");
+                    }else {
+                        if (value.destID.indexOf(colorTd[i].textContent) > -1 && "{{ manager.id }}" != index){
+                            colorTd[i].parentElement.setAttribute("style", "background-color:orange!important");
+                        }else {
+                            if (value.destID.indexOf(colorTd[i].textContent) > -1 && value.role.indexOf("ROLE_SUPERVISOR") > -1){
+                                colorTd[i].parentElement.setAttribute("style", "background-color:lightblue!important");
+                            }
+                        }
+                    }
+
+                }
+            });
+        }
+        function colorTimeIntervalFunction(){
+            clearInterval(colorFunctionTimeInterval);
+            colorFunctionTimeInterval = setInterval(function () {
+                evaluativeColor();
+            },1000);
+        }
+        $(document).ready(function () {
+            colorTimeIntervalFunction()
+        });
+
+        function modalClose() {
+            if (!wavesurfer.play())
+                wavesurfer.playPause();
+            $(function () {
+                $('#record').modal('toggle');
+            });
+
+        }
+
+
+        function callPlayClick(audioId) {
+
+            var userfieldID = $(".callPlay").data("id");
+            $('#userfield').html(userfieldID);
+            $(".modal-body .card-body table  tr td #userfield").val(userfieldID);
+
+            //var audioId = $(".callPlay").data("audioId");
+            //$('#audioId').html($audioId);
+            var audioUrl = "/quality/voice-record/" + audioId;
+            $('#audio_hidden source').attr('src', audioUrl);
+            wavesurfer.load(audioUrl);
+        }
+
+        $(document).ready(function($) {
+
+            $('#selectEva').change(function() {
+
+                var selection = $(this).val();
+                var dataset = $('#evaluatedCard').find('tr');
+
+                dataset.show();
+
+                dataset.filter(function(index, item) {
+                    return $(item).find('td:first-child').text().split(',').indexOf(selection) === -1;
+                }).hide();
+
+            });
+        });
+
+
+        var loginUser="{{ manager }}";
+        function historyCheck(id) {
+            $('#agentHistoryCard').empty();
+            $.ajax({
+                url:"/quality/sourceId-Check/"+id,
+                dataType: 'json',
+                success: function (data) {
+                    var historyJson = JSON.parse(JSON.stringify(data));
+                    console.log(historyJson);
+                        var evaluativeName = '******* ******';
+                        {% if is_granted('ROLE_KALITE_AGENT') %}
+                        evaluativeName = historyJson.evaluativeName;
+                        {% endif %}
+                        $('#agentHistoryCard').append('<tr>' +
+                            '<td>' + evaluativeName + '</td>' +
+                            '<td>' + historyJson.evaScore + '</td>' +
+                            '<td>' + historyJson.evaStatu + '</td>' +
+                            '<td>' + historyJson.evaDate + '</td>' +
+                            '<td><a href="/quality/evaluation/' + historyJson.evaId + '" class="btn btn-success" >Git</a></td>' +
+                            '</tr>');
+                }});
+        }
+
+    </script>
+{% endblock %}
+
+
+
+
+
+
+

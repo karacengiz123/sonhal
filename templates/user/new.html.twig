@@ -1,0 +1,15 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Yeni Kullanıcı{% endblock %}
+
+{% block body %}
+    <a class=" btn btn-info" style="padding: 10px; float: right" href="{{ path('user_index') }}">Listeye geri dön</a>
+
+    <h1 style="padding: 20px">Yeni Kullanıcı oluştur</h1>
+<div class="col-lg-12" style="padding: 20px;background-color: white">
+
+    {{ include('user/_form.html.twig') }}
+    <br/>
+    <br/>
+</div>
+{% endblock %}

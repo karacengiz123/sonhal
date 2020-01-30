@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calls index{% endblock %}
+
+{% block body %}
+    <h1>Calls index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Idx</th>
+                <th>CallType</th>
+                <th>CallId</th>
+                <th>Dt</th>
+                <th>Did</th>
+                <th>Clid</th>
+                <th>ChannelId</th>
+                <th>DtQueue</th>
+                <th>Queue</th>
+                <th>DtExten</th>
+                <th>Exten</th>
+                <th>DtHangup</th>
+                <th>CallStatus</th>
+                <th>Userfield</th>
+                <th>ExtenChannelId</th>
+                <th>DurIvr</th>
+                <th>DurQueue</th>
+                <th>DurExten</th>
+                <th>QueueCallId</th>
+                <th>WhoCompleted</th>
+                <th>Uid</th>
+                <th>Uid2</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for call in calls %}
+            <tr>
+                <td>{{ call.idx }}</td>
+                <td>{{ call.callType }}</td>
+                <td>{{ call.callId }}</td>
+                <td>{{ call.dt ? call.dt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ call.did }}</td>
+                <td>{{ call.clid }}</td>
+                <td>{{ call.channelId }}</td>
+                <td>{{ call.dtQueue ? call.dtQueue|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ call.queue }}</td>
+                <td>{{ call.dtExten ? call.dtExten|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ call.exten }}</td>
+                <td>{{ call.dtHangup ? call.dtHangup|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ call.callStatus }}</td>
+                <td>{{ call.userfield }}</td>
+                <td>{{ call.extenChannelId }}</td>
+                <td>{{ call.durIvr }}</td>
+                <td>{{ call.durQueue }}</td>
+                <td>{{ call.durExten }}</td>
+                <td>{{ call.queueCallId }}</td>
+                <td>{{ call.whoCompleted }}</td>
+                <td>{{ call.uid }}</td>
+                <td>{{ call.uid2 }}</td>
+                <td>
+                    <a href="{{ path('calls_show', {'idx': call.idx}) }}">show</a>
+                    <a href="{{ path('calls_edit', {'idx': call.idx}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="23">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('calls_new') }}">Create new</a>
+{% endblock %}

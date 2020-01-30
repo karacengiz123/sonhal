@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AgentBreak{% endblock %}
+
+{% block body %}
+    <h1>AgentBreak</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ agent_break.id }}</td>
+            </tr>
+            <tr>
+                <th>StartTime</th>
+                <td>{{ agent_break.startTime ? agent_break.startTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>EndTime</th>
+                <td>{{ agent_break.endTime ? agent_break.endTime|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{ agent_break.duration }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('agent_break_index') }}">back to list</a>
+
+    <a href="{{ path('agent_break_edit', {'id': agent_break.id}) }}">edit</a>
+
+    {{ include('agent_break/_delete_form.html.twig') }}
+{% endblock %}

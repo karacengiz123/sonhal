@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calls{% endblock %}
+
+{% block body %}
+    <h1>Calls</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Idx</th>
+                <td>{{ call.idx }}</td>
+            </tr>
+            <tr>
+                <th>CallType</th>
+                <td>{{ call.callType }}</td>
+            </tr>
+            <tr>
+                <th>CallId</th>
+                <td>{{ call.callId }}</td>
+            </tr>
+            <tr>
+                <th>Dt</th>
+                <td>{{ call.dt ? call.dt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Did</th>
+                <td>{{ call.did }}</td>
+            </tr>
+            <tr>
+                <th>Clid</th>
+                <td>{{ call.clid }}</td>
+            </tr>
+            <tr>
+                <th>ChannelId</th>
+                <td>{{ call.channelId }}</td>
+            </tr>
+            <tr>
+                <th>DtQueue</th>
+                <td>{{ call.dtQueue ? call.dtQueue|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Queue</th>
+                <td>{{ call.queue }}</td>
+            </tr>
+            <tr>
+                <th>DtExten</th>
+                <td>{{ call.dtExten ? call.dtExten|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Exten</th>
+                <td>{{ call.exten }}</td>
+            </tr>
+            <tr>
+                <th>DtHangup</th>
+                <td>{{ call.dtHangup ? call.dtHangup|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CallStatus</th>
+                <td>{{ call.callStatus }}</td>
+            </tr>
+            <tr>
+                <th>Userfield</th>
+                <td>{{ call.userfield }}</td>
+            </tr>
+            <tr>
+                <th>ExtenChannelId</th>
+                <td>{{ call.extenChannelId }}</td>
+            </tr>
+            <tr>
+                <th>DurIvr</th>
+                <td>{{ call.durIvr }}</td>
+            </tr>
+            <tr>
+                <th>DurQueue</th>
+                <td>{{ call.durQueue }}</td>
+            </tr>
+            <tr>
+                <th>DurExten</th>
+                <td>{{ call.durExten }}</td>
+            </tr>
+            <tr>
+                <th>QueueCallId</th>
+                <td>{{ call.queueCallId }}</td>
+            </tr>
+            <tr>
+                <th>WhoCompleted</th>
+                <td>{{ call.whoCompleted }}</td>
+            </tr>
+            <tr>
+                <th>Uid</th>
+                <td>{{ call.uid }}</td>
+            </tr>
+            <tr>
+                <th>Uid2</th>
+                <td>{{ call.uid2 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('calls_index') }}">back to list</a>
+
+    <a href="{{ path('calls_edit', {'idx': call.idx}) }}">edit</a>
+
+    {{ include('calls/_delete_form.html.twig') }}
+{% endblock %}

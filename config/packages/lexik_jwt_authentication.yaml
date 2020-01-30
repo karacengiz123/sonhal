@@ -1,0 +1,17 @@
+lexik_jwt_authentication:
+    secret_key:       '%kernel.project_dir%/config/jwt/private.pem' # required for token creation
+    public_key:       '%kernel.project_dir%/config/jwt/public.pem'  # required for token verification
+    pass_phrase:      'IBB12300' # required for token creation, usage of an environment variable is recommended
+    token_ttl:        86400
+    token_extractors:
+      authorization_header:
+        enabled: true
+        prefix:  Bearer
+        name:    Authorization
+
+      cookie:
+        enabled: true
+        name:    BEARER
+      query_parameter:
+        enabled: true
+        name:    bearer

@@ -1,0 +1,49 @@
+controllers:
+    resource: ../../src/Controller/
+    type: annotation
+
+#    İbb Supervisor Bundle Ekranları Controller Yönlendirmesi
+ibb-staff-bundle-controller:
+    resource: ../../src/IbbStaffBundle/Controller/
+    type: annotation
+
+#    User Bundle Ekranları Controller Yönlendirmesi
+user-bundle-controller:
+    resource: ../../src/UserBundle/Controller/
+    type: annotation
+
+#    User Bundle Ekranları Controller Yönlendirmesi
+asterisk-bundle-controller:
+    resource: ../../src/Asterisk/Controller/
+    type: annotation
+
+IbbEvalutionManagement-bundle-controller:
+    resource: ../../src/IbbEvalutionManagementBundle/Controller/
+    type: annotation
+    prefix: quality
+
+igdas-bundle-controller:
+    resource: ../../src/IVR/IgdasBundle/Controller/
+    type: annotation
+
+ibb-bundle-controller:
+    resource: ../../src/IVR/IBBBundle/Controller/
+    type: annotation
+
+siebelEvents-bundle-controller:
+    resource: ../../src/CrmIntegration/SiebelBundle/Controller/
+    type: annotation
+
+softphone-bundle-controller:
+    resource: ../../src/SoftphoneBundle/Controller/
+    type: annotation
+
+sg_datatables_bundle:
+    resource: "@SgDatatablesBundle/Controller/"
+    type:     annotation
+    prefix:   /sg
+
+#    Pbx Managament Bundle Ekranları Controller Yönlendirmesi
+pbx-managament-bundle-controller:
+    resource: ../../src/PbxManagamentBundle/Controller/
+    type: annotation

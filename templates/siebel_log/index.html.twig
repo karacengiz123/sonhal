@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SiebelLog index{% endblock %}
+
+{% block body %}
+    <h1>SiebelLog index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Callid</th>
+                <th>Response</th>
+                <th>Request</th>
+                <th>CreatedDate</th>
+                <th>ActivityId</th>
+                <th>SRId</th>
+                <th>ContactId</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for siebel_log in siebel_logs %}
+            <tr>
+                <td>{{ siebel_log.id }}</td>
+                <td>{{ siebel_log.callid }}</td>
+                <td>{{ siebel_log.response }}</td>
+                <td>{{ siebel_log.request }}</td>
+                <td>{{ siebel_log.createdDate ? siebel_log.createdDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ siebel_log.activityId }}</td>
+                <td>{{ siebel_log.SRId }}</td>
+                <td>{{ siebel_log.ContactId }}</td>
+                <td>
+                    <a href="{{ path('siebel_log_show', {'id': siebel_log.id}) }}">show</a>
+                    <a href="{{ path('siebel_log_edit', {'id': siebel_log.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('siebel_log_new') }}">Create new</a>
+{% endblock %}

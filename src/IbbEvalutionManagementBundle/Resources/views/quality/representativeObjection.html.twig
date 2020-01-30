@@ -1,0 +1,382 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block customCSS %}
+    <style>
+        .ayarla {
+            position: absolute;
+            width: 500px;
+            right: 160px;
+            top: 150px;
+            z-index: 10040;
+        }
+        .pagination{
+            /* justify-content: center!important; */
+
+        }
+        .page-link{
+
+            background-color: unset!important;
+            color:black!important;
+            border: 1px solid #ebebeb!important;
+        }
+        .uyari{
+            position: absolute;
+            right: 40px;
+            bottom: 40px;
+        }
+        .small-input{
+            height: 25px;
+        }
+        .dark-link{
+            color:#000;
+            padding-bottom: 3px;
+        }
+        .form-group{
+            margin-bottom:15px!important;
+        }
+        .genislik{
+            width:100px!important;
+        }
+        .genislik2{
+            min-width: unset!important;
+            width:25px!important;
+
+        }
+        table{
+            font-size:15px!important;
+        }
+        table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:after {
+            top: 0px;
+        }
+        table.dataTable thead .sorting:before, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_desc_disabled:before {
+            top: 0px;
+        }
+        table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {
+            padding-right: unset!important;
+        }
+        .greenSelect{
+            color:#fff!important;
+            background-color: #00c292;
+        }
+        .blueSelect{
+            color:#fff!important;
+            background-color: skyblue;
+        }
+        .darkSelect{
+            color:#fff!important;
+            background-color: darkcyan;
+        }
+
+    </style>
+{% endblock %}
+
+{% block customJS %}
+    <script>
+        // MAterial Date picker
+        $('#mdate').bootstrapMaterialDatePicker({ weekStart: 0, time: false });
+        $('#timepicker').bootstrapMaterialDatePicker({ format: 'HH:mm', time: true, date: false });
+        $('#date-format').bootstrapMaterialDatePicker({ format: 'dddd DD MMMM YYYY - HH:mm' });
+
+        $('#min-date').bootstrapMaterialDatePicker({ format: 'DD/MM/YYYY HH:mm', minDate: new Date() });
+        // Clock pickers
+        $('#single-input').clockpicker({
+            placement: 'bottom',
+            align: 'left',
+            autoclose: true,
+            'default': 'now'
+        });
+        $('.clockpicker').clockpicker({
+            donetext: 'Done',
+        }).find('input').change(function() {
+            console.log(this.value);
+        });
+        $('#check-minutes').click(function(e) {
+            // Have to stop propagation here
+            e.stopPropagation();
+            input.clockpicker('show').clockpicker('toggleView', 'minutes');
+        });
+        if (/mobile/i.test(navigator.userAgent)) {
+            $('input').prop('readOnly', true);
+        }
+        // Colorpicker
+        $(".colorpicker").asColorPicker();
+        $(".complex-colorpicker").asColorPicker({
+            mode: 'complex'
+        });
+        $(".gradient-colorpicker").asColorPicker({
+            mode: 'gradient'
+        });
+        // Date Picker
+        jQuery('.mydatepicker, #datepicker').datepicker();
+        jQuery('#datepicker-autoclose').datepicker({
+            autoclose: true,
+            todayHighlight: true
+        });
+        jQuery('#date-range').datepicker({
+            toggleActive: true
+        });
+        jQuery('#datepicker-inline').datepicker({
+            todayHighlight: true
+        });
+        // Daterange picker
+        $('.input-daterange-datepicker').daterangepicker({
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse'
+        });
+        $('.input-daterange-timepicker').daterangepicker({
+            timePicker: true,
+            format: 'MM/DD/YYYY h:mm A',
+            timePickerIncrement: 30,
+            timePicker12Hour: true,
+            timePickerSeconds: false,
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse'
+        });
+        $('.input-limit-datepicker').daterangepicker({
+            format: 'MM/DD/YYYY',
+            minDate: '06/01/2015',
+            maxDate: '06/30/2015',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-danger',
+            cancelClass: 'btn-inverse',
+            dateLimit: {
+                days: 6
+            }
+        });
+    </script>
+
+    <script>
+        var it6 = $('#datatable').DataTable( {
+            dom: 'rtip',
+
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+        it6.on( 'order.dt search.dt', function () {
+            it6.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            } );
+        } ).draw();
+
+        var temsilci = $('#temsilci').DataTable( {
+            dom: 'rtip',
+
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+        temsilci.on( 'order.dt search.dt', function () {
+            temsilci.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            } );
+
+        } ).draw();
+        var itiraz = $('#itiraz').DataTable( {
+            dom: 'rtip',
+
+            "ordering": true,
+
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        } );
+
+        itiraz.on( 'order.dt search.dt', function () {
+            itiraz.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            } );
+
+        } ).draw();
+    </script>
+
+    <script>
+        function temizle (){
+            /* Single line Reset function executes on click of Reset Button */
+            $("#temsilciFiltre")[0].reset();
+        }
+
+        $(document).ready(function(){
+            var metin='<small class="uyari">*Seçtiğiniz kriterlere uygun son 500 çağrı listelenmektedir</small>'
+
+            $('.page-link').addClass('btn btn-xs btn-default');
+            $('[rel="tooltip"]').tooltip({trigger: "hover"});
+        })
+
+        $('tr#deneme').click(function(){
+            alert('bu kolona tıklandı')
+        })
+
+    </script>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h2 >Değerlendirilmeleriniz</h2>
+                <div class="col-lg-12">
+                    <div class="card border-info">
+                        <div class="card-header bg-info " style="background-color:#5372c6!important;border-radius:3px">
+                            <h4 class="m-b-0 text-white">Değerlendirilen: TEST_AGENT 012345- Tüm Süreçler</h4></div>
+                        <div class="card-body">
+                            <h5 class="text-center">
+                                <div class="input-group">
+                                    <div class="input-group-btn search-panel">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            <i class="fa fa-filter"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-xs " data-toggle="">
+                                            <strong>TÜMÜ</strong>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" >
+                                            <li><a class="dark-link" href="">Süreçler1</a></li>
+                                            <li><a class="dark-link" href="">Süreçler2</a></li>
+                                            <li><a class="dark-link" href="">Süreçler3</a></li>
+                                            <li><a class="dark-link" href="">Süreçler4</a></li>
+                                            <li><a class="dark-link" href="">Süreçler5</a></li>
+                                            <li><a class="dark-link" href="">Süreçler6</a></li>
+                                            <li><a class="dark-link" href="">Süreçler7</a></li>
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" name="search_param" value="all" id="search_param">
+                                    <input type="text" class="form-control  form-control-sm small-input" name="x" placeholder="Ara...">
+                                    <span class="input-group-btn">
+                                                <button class="btn btn-default btn-xs" type="button"><span class="fa fa-search"></span></button>
+                                            </span>
+                                </div>
+                            </h5>
+                            <table style="width:100%" class="display table-bordered table-hovered  danger-bordered-table" id="temsilci">
+                                <thead id="tblHead" style="background-color:#f7c8c8!important">
+                                <tr>
+                                    <th>No </th>
+                                    <th>TCNo </th>
+                                    <th>Adı </th>
+                                    <th>Soyadı</th>
+                                    <th>Dahili No</th>
+                                    <th>Grup</th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">A</span></th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">Ö</span></th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">D</span></th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">Y</span></th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">T</span></th>
+                                    <th class="text-center genislik"><span class="btn btn-warning btn-sm">B</span></th>
+                                    <th class="text-right genislik"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>test.agent</td>
+                                    <td>12345678900</td>
+                                    <td>Test</td>
+                                    <td>Agent</td>
+                                    <td>123456</td>
+                                    <td>TEST_GRUP</td>
+                                    <td class="text-center" >12</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">99</td>
+                                    <td class="text-center">98</td>
+                                    <td class="text-center">22</td>
+                                    <td class="text-center">77</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-success  btn-sm" title="Detayları Gör" data-backdrop="static" data-keyboard="false" data-target="#degerlendirme"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                <tr  >
+                                    <td>test.agent</td>
+                                    <td>12345678900</td>
+                                    <td>Test</td>
+                                    <td>Agent 2</td>
+                                    <td>123456</td>
+                                    <td>TEST_GRUP</td>
+                                    <td class="text-center" >32</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">55</td>
+                                    <td class="text-center">33</td>
+                                    <td class="text-center">22</td>
+                                    <td class="text-center">87</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-success  btn-sm" title="Detayları Gör" data-backdrop="static" data-keyboard="false" data-target="#degerlendirme"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card border-info">
+                        <div class="card-header bg-info " style="background-color:#5372c6!important;border-radius:3px">
+                            <h4 class="m-b-0 text-white">İtiraz Ettiğiniz Değerlendirmeler</h4></div>
+                        <div class="card-body">
+                            <h5 class="text-center">
+                                <div class="input-group">
+                                    <div class="input-group-btn search-panel">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            <i class="fa fa-filter"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-xs " data-toggle="">
+                                            <strong>TÜMÜ</strong>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a class="dark-link" href="">Süreçler1</a></li>
+                                            <li><a class="dark-link" href="">Süreçler2</a></li>
+                                            <li><a class="dark-link" href="">Süreçler3</a></li>
+                                            <li><a class="dark-link" href="">Süreçler4</a></li>
+                                            <li><a class="dark-link" href="">Süreçler5</a></li>
+                                            <li><a class="dark-link" href="">Süreçler6</a></li>
+                                            <li><a class="dark-link" href="">Süreçler7</a></li>
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" name="search_param" value="all" id="search_param">
+                                    <input type="text" class="form-control  form-control-sm small-input" name="x" placeholder="Ara...">
+                                    <span class="input-group-btn">
+                                                <button class="btn btn-default btn-xs" type="button"><span class="fa fa-search"></span></button>
+                                            </span>
+                                </div>
+                            </h5>
+                            <table style="width:100%" class="display table-bordered table-hovered  danger-bordered-table" id="itiraz">
+                                <thead id="tblHead" style="background-color:#f7c8c8!important">
+                                <tr>
+                                    <th>Değerlendiren</th>
+                                    <th>Değerlendirilen</th>
+                                    <th>Değerlendirme Tarihi</th>
+                                    <th>Kaynak Tanımı</th>
+                                    <th>İtiraz Sayısı</th>
+                                    <th>Skoru</th>
+                                    <th>Statü</th>
+                                    <th></th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>***</td>
+                                    <td>Test Agent</td>
+                                    <td>01-01-2018 00:00:00</td>
+                                    <td>0123456 (05414093461-Test Agent)01-01-2018 00:00:00 GMT +3</td>
+                                    <td>1</td>
+                                    <td>22</td>
+                                    <td>İtiraz</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-success  btn-sm" title="Detayları Gör" data-backdrop="static" data-keyboard="false" data-target="#degerlendirme"  data-toggle="modal" rel="tooltip" data-placement="left" href="#"><i class="fa fa-eye"></i></a>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,167 @@
+{% extends '@User/base.html.twig' %}
+
+{% block body %}
+
+<body class="horizontal-nav skin-megna fixed-layout">
+    <div class="preloader">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">BHM Teknolojileri</p>
+        </div>
+    </div>
+
+    <div id="main-wrapper">
+        <div class="page-wrapper">
+            <div class="container-fluid">
+
+                <div class="row page-titles">
+                    <div class="col-md-5 align-self-center">
+                        <h4 class="text-themecolor">Users</h4>
+                    </div>
+                    <div class="col-md-7 align-self-center text-right">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Anasayfa</a></li>
+                                <li class="breadcrumb-item active">Users</li>
+                            </ol>
+                            {#<button type="button" class="btn btn-info  d-lg-block m-l-15"><i class="fa fa-plus-circle"></i> Create New</button>#}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <style>
+                        #example23_filter{
+                            float: left!important;
+                        }
+                    </style>
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive m-t-40" style="margin-top: 0px!important;">
+                                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal_create" style="float: right!important;">Ekle</a>
+                                    <table id="example23" class="display nowrap table table-hover table-striped table-bordered full-color-table full-primary-table hover-table" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Kullanıcı Adı</th>
+                                            <th>E-Posta</th>
+                                            <th>Son Giriş Tarihi</th>
+                                            <th>Düzenle</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in users %}
+                                                <tr>
+                                                    <td>{{ user.username }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ user.lastlogin|date('d-m-Y / h:i:s') }}</td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal_{{ user.id }}">Düzenle</a>
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="exampleModal_{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h3 class="modal-title" id="exampleModalLabel" style="color: black!important;">Kullanıcı Düzenle</h3>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form class="form-horizontal form-material" id="loginform" action="/users/edit/save" method="post">
+                                                                            <div>
+                                                                                <label style="color: black!important;">Kullanıcı Adı</label>
+                                                                                <div class="form-group ">
+                                                                                    <input type="text" id="username" name="username" value="{{ user.username }}" required="required" autocomplete="username" class="form-control" placeholder="Kullanıcı Adı"/>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <label style="color: black!important;">E-Posta</label>
+                                                                                <div class="form-group">
+                                                                                    <input type="text" id="email" name="email" value="{{ user.email }}" required="required" autocomplete="username" class="form-control" placeholder="E-Posta"/>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <label style="color: black!important;">Şifre</label>
+                                                                                <div class="form-group">
+                                                                                    <input type="text" id="password" name="password" autocomplete="username" class="form-control" placeholder="Yeni Şifre"/>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group text-center">
+                                                                                <input type="text" id="id" name="id" value="{{ user.id }}" required="required" autocomplete="id" class="form-control" placeholder="E-Posta" hidden/>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <div class="col-sm-2">
+                                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                                                                        </div>
+                                                                        <div class="col-sm-2">
+                                                                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                                                                        </div>
+                                                                    </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="exampleModalLabel" style="color: black!important;">Kullanıcı Ekle</h3>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="form-horizontal form-material" id="loginform" action="/users/create" method="post">
+                                    <div>
+                                        <label style="color: black!important;">Kullanıcı Adı</label>
+                                        <div class="form-group ">
+                                            <input type="text" id="username" name="username" required="required" autocomplete="username" class="form-control" placeholder="Kullanıcı Adı"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style="color: black!important;">E-Posta</label>
+                                        <div class="form-group">
+                                            <input type="text" id="email" name="email" required="required" autocomplete="username" class="form-control" placeholder="E-Posta"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label style="color: black!important;">Şifre</label>
+                                        <div class="form-group">
+                                            <input type="text" id="password" name="password" autocomplete="username" class="form-control" placeholder="Yeni Şifre"/>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}

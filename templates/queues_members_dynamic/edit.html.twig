@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit QueuesMembersDynamic{% endblock %}
+
+{% block body %}
+    <h1>Edit QueuesMembersDynamic</h1>
+
+    {{ include('queues_members_dynamic/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('queues_members_dynamic_index') }}">back to list</a>
+
+    {{ include('queues_members_dynamic/_delete_form.html.twig') }}
+{% endblock %}

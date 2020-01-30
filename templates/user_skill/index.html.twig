@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserSkill index{% endblock %}
+
+{% block body %}
+    <h1>UserSkill index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Queue</th>
+                <th>Member</th>
+                <th>Penalty</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user_skill in user_skills %}
+            <tr>
+                <td>{{ user_skill.id }}</td>
+                <td>{{ user_skill.queue }}</td>
+                <td>{{ user_skill.member }}</td>
+                <td>{{ user_skill.penalty }}</td>
+                <td>
+                    <a href="{{ path('user_skill_show', {'id': user_skill.id}) }}">show</a>
+                    <a href="{{ path('user_skill_edit', {'id': user_skill.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('user_skill_new') }}">Create new</a>
+{% endblock %}

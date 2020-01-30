@@ -1,0 +1,171 @@
+{% extends'layout/base.html.twig' %}
+{% block title %}İgdaş Ivr Rapor{% endblock %}
+{% block customCss %}
+    <style>
+        .dt-buttons {
+            margin-left: 20px;
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script>
+
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#igdasIvrListTableDiv").css("display", "none");
+                $('#igdasIvrListTable').dataTable().fnDestroy();
+                $('#igdasIvrListTable').html("");
+                tableFilling = false;
+            }
+
+        }
+
+        function displayBlockTableDiv() {
+            $("#igdasIvrListTableDiv").css("display", "block");
+        }
+
+        function modalStart(modalText = null) {
+            $("#loadIgdas").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadIgdasIvrText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadIgdasIvrText").html(modalText);
+            }
+        }
+
+        function modalFinish() {
+            $("#loadIgdasIvr").modal('hide');
+            $("#loadIgdasIvrText").html("");
+        }
+
+        function igdasIvrValidateForm() {
+            modalStart();
+            $.ajax({
+                type: 'POST',
+                url: '/igdas-rapor',
+                data: $('#formIgdasIvrIdSelect').serialize(),
+                success: function (data) {
+                    if ($.isArray(data) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#igdasIvrListTable').DataTable({
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: [
+                                {data: "dateRange", name: "dateRange", title: "Tarih"},
+                                // {data: "dateRangeTime", name: "dateRange", title: "24/15 dklık<br/>veya Saatlik"},
+                                {data: "igdasTotalCall", name: "igdasTotalCall", title: "Toplam Gelen Çağrı"},
+                                {data: "ivrTotalCloseCall", name: "ivrTotalCloseCall", title: "IVR'da Kapanan Çağrı"},
+                                { data: "igdasTotalAnswerCall", name: "igdasTotalAnswerCall",title: "Temsilciye Aktarılan"  },
+                            ],
+                            order: [],
+                            data: data
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            }, 1000);
+                        tableFilling = true;
+
+                    } else {
+                        modalStart(data);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+
+            });
+        }
+
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>İgdaş IVR</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formIgdasIvrIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="igdasIvrValidateForm()" class="btn" value="Listele"
+               style="background-color: limegreen">
+    </div>
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+
+
+            <!-- TABLE & SELECT START -->
+            <div id="igdasIvrListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="igdasIvrListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadIgdasIvr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadIgdasIvrText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

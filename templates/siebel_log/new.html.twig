@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New SiebelLog{% endblock %}
+
+{% block body %}
+    <h1>Create new SiebelLog</h1>
+
+    {{ include('siebel_log/_form.html.twig') }}
+
+    <a href="{{ path('siebel_log_index') }}">back to list</a>
+{% endblock %}

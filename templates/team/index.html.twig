@@ -1,0 +1,58 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Takım Listesi{% endblock %}
+
+{% block body %}
+
+    <h1 style="padding: 20px">Takım Listesi</h1>
+    <div style="padding:20px;  background-color: white">
+    <a href="{{ path('team_new') }}" style="float: right;margin-bottom: 20px!important;"><button type="button" class="btn waves-effect waves-light btn-success">Yeni Oluştur</button></a>
+
+
+    <table id="teamTable" class="table table-striped table-bordered" >
+        <thead>
+            <tr>
+                <th>İsim</th>
+                <th style="width: 168px">Mola Limiti</th>
+                <th style="width: 230px!important; text-align: center">Eylemler</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for team in teams %}
+            <tr>
+                <td>{{ team.name }}</td>
+                <td>{{ team.breakLimit }}</td>
+                <td>
+                    <a style="float: right;margin: 5px" href="{{ path('team_show', {'id': team.id}) }}"><button type="button" class="btn  btn-info">Göster</button></a>
+
+                    <a style="float: right;margin: 5px" href="{{ path('team_edit', {'id': team.id}) }}"><button type="button" class="btn btn-warning">Güncelle</button></a>
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Kayıt bulunamadı.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
+{% block customScript %}
+    <script>
+        $('#teamTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            "language": {
+                url: 'https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json'
+            }
+        });
+        $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
+    </script>
+
+{% endblock %}

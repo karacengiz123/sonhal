@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EvaluationAnswer index{% endblock %}
+
+{% block body %}
+    <h1>EvaluationAnswer index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>DeletedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation_answer in evaluation_answers %}
+            <tr>
+                <td>{{ evaluation_answer.id }}</td>
+                <td>{{ evaluation_answer.createdAt ? evaluation_answer.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation_answer.updatedAt ? evaluation_answer.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation_answer.deletedAt ? evaluation_answer.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('evaluation_answer_show', {'id': evaluation_answer.id}) }}">show</a>
+                    <a href="{{ path('evaluation_answer_edit', {'id': evaluation_answer.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('evaluation_answer_new') }}">Create new</a>
+{% endblock %}

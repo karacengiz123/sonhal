@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit EvaluationExtraSource{% endblock %}
+
+{% block body %}
+    <h1>Edit EvaluationExtraSource</h1>
+
+    {{ include('evaluation_extra_source/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('evaluation_extra_source_index') }}">back to list</a>
+
+    {{ include('evaluation_extra_source/_delete_form.html.twig') }}
+{% endblock %}

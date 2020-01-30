@@ -1,0 +1,5 @@
+Disk: /boot #UsedDisk: % 26 #AvailDisk:  792M #TotalDisk: 1.1G //
+Webserver: active (running) //
+UsedRam: 1764028 //
+FreeRam: 1334360 //
+TotalRam: 65789932 //

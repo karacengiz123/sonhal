@@ -1,0 +1,348 @@
+{% extends 'layout/base.html.twig' %}
+
+
+
+    {% block customScript %}
+        {##}
+        {#        <script src="/assets/dist/js/wavesurfer-2.1.3/wavesurfer.js" ></script>#}
+        <script src="/assets/js/wavesurfer.min.js"></script>
+
+        <script type="text/javascript">
+            function changeAgentfilter(id) {
+                $('#sg-datatables-calls_datatable-head-filter-2').val(id).change();
+            }
+
+            function cleanAgentFilter(){
+                window.localStorage.removeItem("DataTables_sg-datatables-calls_datatable_/quality/","");
+                location.reload();
+            }
+
+            // $(".").click(function () {
+
+                // var cookies = document.cookie.split(";");
+
+                // for (var i = 0; i < cookies.length; i++) {
+                //     var cookie = cookies[i];
+                //     var eqPos = cookie.indexOf("=");
+                //     var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                //     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                // }
+                // document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+
+                //
+                // $('#sg-datatables-calls_datatable_wrapper').dataTable({
+                //     "bProcessing":true,
+                //     "bStateSave":false,
+                // });
+                // var table = $('#sg-datatables-calls_datatable_wrapper').DataTable();
+            // table.fnFilterClear()
+
+                // $.removeCookie({ path: '/' });
+
+                // $('#sg-datatables-calls_datatable-filterrow input[type="text"]').each(function (i,el) {
+                //     console.log(el);
+                //     $(el).val(null).trigger("change");
+                // });
+
+
+                // $("#sg-datatables-calls_datatable").DataTable().clear().draw();
+                // $("#sg-datatables-calls_datatable-head-filter-3").val("").trigger("change");
+
+                // function reset_dt_view() {
+                //     localStorage.removeItem('DataTables_'+window.location.pathname); /***** Bakkk
+                // }
+            // });
+
+            var audio = $('#audio_hidden');
+            var durationWave = Math.round(audio[0].duration);
+            var wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'violet',
+                progressColor: 'purple',
+                barWidth: "3",
+                barHeight: "3",
+                barGap: "0",
+                cursorWidth: "4",
+                duration: durationWave
+            });
+
+            // wavesurfer.load('https://tbxdev.ibb.gov.tr/153.wav');
+
+            wavesurfer.on('ready', function () {
+                $('#play-pause').click(function () {
+                    wavesurfer.playPause();
+                });
+            });
+
+            wavesurfer.on('ready', updateTimer);
+            wavesurfer.on('audioprocess', updateTimer);
+            wavesurfer.on('seek', updateTimer);
+
+            function updateTimer() {
+                var formattedTime = secondsToTimestamp(wavesurfer.getCurrentTime());
+                $('#waveform-time-indicator .time').text(formattedTime);
+            }
+
+            function secondsToTimestamp(seconds) {
+                seconds = Math.floor(seconds);
+                var h = Math.floor(seconds / 3600);
+                var m = Math.floor((seconds - (h * 3600)) / 60);
+                var s = seconds - (h * 3600) - (m * 60);
+
+                h = h < 10 ? '0' + h : h;
+                m = m < 10 ? '0' + m : m;
+                s = s < 10 ? '0' + s : s;
+                return h + ':' + m + ':' + s;
+            }
+
+
+        </script>
+
+    {% endblock %}
+{% block customCss %}
+    {#    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />#}
+
+    <style>
+        th
+        {
+            font-weight: bold!important;
+        }
+        .successBtn
+        {
+            font-weight: bold;
+            font-size: 21px;
+        }
+
+        body {
+            font-weight: unset !important;
+        }
+
+        .callsTable div div table thead tr {
+            /*font-size: 20px;*/
+        }
+
+        .successBtn dataTables_wrapper dt-bootstrap4 no-footer font {
+            /*font-size: 16px;*/
+            zoom: 90% !important;
+        }
+
+        @media (max-width: 1920px) {
+            tbody {
+                /*font-size: 18px;*/
+                width: auto;
+            }
+
+            /*table.dataTable{*/
+            /*zoom:80%!important;*/
+            /*}*/
+            div.dataTables_wrapper div.dataTables_paginate {
+                zoom: 130% !important;
+            }
+
+
+            .col-lg-12 {
+                zoom: 62% !important;
+                /*font-size: 16px!important;*/
+            }
+
+
+        }
+
+        @media (max-width: 1350px) {
+            tbody {
+                font-size: 18px;
+            }
+
+            /*table.dataTable{*/
+            /*zoom:80%!important;*/
+            /*}*/
+            div.dataTables_wrapper div.dataTables_paginate {
+                zoom: 130% !important;
+            }
+
+            .col-lg-12 {
+                zoom: 62% !important;
+                /*font-size: 16px!important;*/
+            }
+
+        }
+
+        .start_actions a {
+            font-size: 25px;
+        }
+
+        .summaryTable {
+            font-size: 17px;
+        }
+        .select2 {
+            width: 200.08px!important;
+        }
+
+        input{
+            border: solid 2px;
+            border-radius: 8px;
+            padding: 3px;
+            border-color: slategray;
+        }
+
+    </style>
+
+{% endblock %}
+{% block body %}
+
+    {% if datatable2==true %}
+    <h1 style="text-align: left;padding: 20px">{{ "Özet" | trans }}</h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px; zoom: 70%!important;">
+
+        <div class="successBtn ">
+            <div class="summaryTable">
+                {{ sg_datatables_render(datatable2) }}
+            </div>
+        </div>
+
+    </div>
+{% endif %}
+    <h1 style="text-align: left;padding: 20px">{{ "Çağrı Listesi" | trans }}</h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white; zoom: 64%!important; font-size: 16px; ">
+        <div class="successBtn callsTable">
+
+            {{ sg_datatables_render(datatable) }}
+
+        </div>
+        <button type="button" class="btn btn-info btn-xs " onclick="cleanAgentFilter()"
+                style="margin-bottom: 10px; font-size: 22px;">Filtreyi Temizle
+        </button>
+    </div>
+
+    <div class="modal" id="record">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Ses Kaydı </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="card-body" style="padding:2px!important">
+
+                        <table style="width:100%" class="table-bordered table-stripped">
+                            <tr>
+                                <th class="renkliTh">Çağrı Kaydı <i style="color:green" class="fa fa-volume-up"></i>
+                                </th>
+                                <td id="userfield" style="display: none;"></td>
+                            </tr>
+                        </table>
+
+                        <div id="waveform" style="text-align:center">
+                            <div id="waveform-time-indicator">
+                                <span class="time">00:00:00 </span></div>
+
+                        </div>
+                        <div style="display: none">
+                            <audio id="audio_hidden" controls>
+                                <source src="" type="audio/wav">
+                                {#            <source src="https://tbxdev.ibb.gov.tr/153.wav" type="audio/wav">#}
+                            </audio>
+                        </div>
+
+                        <div id="waveform"></div>
+                        <div style="text-align:center" class="controls">
+                            <button type="button" class="btn btn-info btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.playPause();">
+                                <i class="fa fa-play"></i> /
+                                <i class="fa fa-pause"></i>
+                            </button>
+
+
+                            <button type="button" class="btn btn-info btn-xs" id="sesAcKapa" style="font-size:13px;"
+                                    onclick="wavesurfer.toggleMute()">
+                                <i id="iconVolume" class="fa fa-volume-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-purple btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1);">
+
+                                NORMAL
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1.1);">
+
+                                HIZLI
+                            </button>
+                            {#                            <button type="button" class="btn btn-warning btn-xs"#}
+                            {#                                    onclick="wavesurfer.setPlaybackRate(1.2);">#}
+
+                            {#                                DAHA HIZLI#}
+                            {#                            </button>#}
+                            <button type="button" class="btn btn-success btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.setPlaybackRate(1.3);">
+                                ÇOK HIZLI
+                            </button>
+                            <br/>
+                            <button type="button" class="btn btn-warning btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.skipBackward(5)">
+                                <i class="fa fa-step-backward"></i>
+                                Geri Sar
+                            </button>
+                            <button type="button" class="btn btn-warning btn-xs" style="font-size:13px;"
+                                    onclick="wavesurfer.skipForward(5)">
+                                <i class="fa fa-step-forward"></i>
+                                İleri Sar
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger modalClose" onclick="modalClose()">Çık</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // $('#sg-datatables-evaluation_summary_datatable_wrapper').dataTable( {
+        //     "order": [[ 0, 'asc' ], [ 1, 'asc' ]]
+        // } );
+        function modalClose() {
+            if (!wavesurfer.play())
+                wavesurfer.playPause();
+            $(function () {
+                $('#record').modal('toggle');
+            });
+
+        }
+
+        function callPlayClick(audioId) {
+
+            var userfieldID = $(".callPlay").data("id");
+            $('#userfield').html(userfieldID);
+            $(".modal-body .card-body table  tr td #userfield").val(userfieldID);
+
+            //var audioId = $(".callPlay").data("audioId");
+            //$('#audioId').html($audioId);
+            var audioUrl = "/quality/voice-record/" + audioId;
+            $('#audio_hidden source').attr('src', audioUrl);
+            wavesurfer.load(audioUrl);
+        }
+        // $('#sg-datatables-calls_datatable_wrapper').dataTable({
+        //     "bProcessing":true,
+        //     "bStateSave":false,
+        // });
+
+
+
+    </script>
+{% endblock %}
+
+

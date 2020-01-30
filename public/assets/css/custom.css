@@ -1,0 +1,87 @@
+.table_mola_kontrol_div{
+    margin-top: 0px!important;
+}
+.table_mola_kontrol_div table thead tr{
+    background-color: #f5f5f5 !important;
+}
+.table_mola_kontrol_div table tbody tr td input{
+    width: 100%!important;
+}
+.footer{
+    bottom: 0px!important;
+    position: absolute!important;
+}
+.footer_bosluk{
+    padding-bottom: 30px!important;
+}
+.btn_skill{
+    margin-right: 15px!important;
+}
+.skill_div_nav{
+    background-color: #01c0c8!important;
+    margin-bottom: 20px!important;
+}
+.skill_form_group_div{
+    margin-top: 10px!important;
+    float: left!important;
+}
+.skill_form_group_div label{
+    font-size: 16px!important;
+    font-weight: bold!important;
+}
+.agent_arama_btn{
+    float: right!important;
+    text-align: right!important;
+    right: 0px!important;
+    margin: 0px!important;
+    padding: 0px!important;
+}
+.agent_arama_btn button{
+    width: 100%!important;
+}
+.agent_arama_btn{
+    margin-bottom: 0px!important;
+}
+.agent_arama_name{
+    float: left!important;
+    margin: 0px!important;
+    padding: 0px!important;
+}
+.agent_arama_div{
+    margin-bottom: 6px!important;
+}
+.agent_arama_btn button i{
+    margin-left: 15px!important;
+    font-size: 15px!important;
+}
+.agent_arama_btn button{
+    font-size: 18px!important;
+}
+.skill_management_div_left{
+    float: left!important;
+}
+.skill_management_div_right{
+    float: right!important;
+}
+.div_table_agent_bilgileri{
+    margin: 0px!important;
+    padding: 0px!important
+}
+.div_table_agent_bilgileri h4{
+    margin-top: 25px!important;
+}
+.cc_pulse_btn{
+    float: left!important;
+    background-color: #e78a6e !important;
+}
+.cc_pulse_btn:hover{
+    font-size: 16px!important;
+    background-color: #e78a6e!important;
+}
+.cc_pulse_btn_div{
+    border-bottom: 45px solid #feeae4 !important;
+    margin-bottom: 30px!important;
+}
+.top-sidebar{
+    background-color: white!important;
+}

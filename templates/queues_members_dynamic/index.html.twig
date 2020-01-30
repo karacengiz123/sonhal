@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}QueuesMembersDynamic index{% endblock %}
+
+{% block body %}
+    <h1>QueuesMembersDynamic index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Queue</th>
+                <th>Member</th>
+                <th>Penalty</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for queues_members_dynamic in queues_members_dynamics %}
+            <tr>
+                <td>{{ queues_members_dynamic.id }}</td>
+                <td>{{ queues_members_dynamic.queue }}</td>
+                <td>{{ queues_members_dynamic.member }}</td>
+                <td>{{ queues_members_dynamic.penalty }}</td>
+                <td>
+                    <a href="{{ path('queues_members_dynamic_show', {'id': queues_members_dynamic.id}) }}">show</a>
+                    <a href="{{ path('queues_members_dynamic_edit', {'id': queues_members_dynamic.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('queues_members_dynamic_new') }}">Create new</a>
+{% endblock %}

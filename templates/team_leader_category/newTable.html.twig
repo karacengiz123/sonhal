@@ -1,0 +1,62 @@
+{% extends "layout/base.html.twig" %}
+{% block body %}
+
+
+    <div class="row" style="padding: 20px!important; background: white">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Takım Lideri Kategori Bazlı Değerlendirme</h4>
+                    <div class="table-responsive m-t-40">
+                        <div id="example23_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4"><div class="dt-buttons">
+                            </div>
+                            <div id="example23_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="example23"></label></div>
+                            <table id="example23" class="display nowrap table table-hover table-striped table-bordered dataTable" cellspacing="0" width="100%" role="grid" aria-describedby="example23_info" style="width: 100%;">
+                                <thead>
+
+                                <tr role="row">
+                                    {% for rez,rows in  datatable %}
+{{ dump(rows) }}
+                                    <th class="sorting_asc" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 141px;"></th>
+{#                                    {{ dump(rows) }}#}
+                                    <th class="sorting" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 216px;">{{ rez }}</th>
+
+                                    <th class="sorting" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: 103px;">Değerlendirme Sayısı : </th>
+
+                                </tr>
+                                <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 141px;">Kategoriler</th>
+
+                                    <th class="sorting" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 216px;">Paun</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example23" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: 103px;">Max Puan</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for row in  rows %}
+
+                                <tr role="row" class="odd">
+                                    {% for key, value in row %}
+
+                                    <td class="sorting_1">{{ key}}</td>
+                                    {% for item in value %}
+
+                                    <td>{{ item.sumSort }}</td>
+{#                                    <td>{{ item.sumMaxScore }}</td>#}
+                                    {% endfor %}
+
+                                </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% endfor %}
+                                </tbody>
+
+                            </table><div class="dataTables_info" id="example23_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div><div class="dataTables_paginate paging_simple_numbers" id="example23_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example23_previous"><a href="#" aria-controls="example23" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example23" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="2" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="3" tabindex="0" class="page-link">3</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="4" tabindex="0" class="page-link">4</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="5" tabindex="0" class="page-link">5</a></li><li class="paginate_button page-item "><a href="#" aria-controls="example23" data-dt-idx="6" tabindex="0" class="page-link">6</a></li><li class="paginate_button page-item next" id="example23_next"><a href="#" aria-controls="example23" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li></ul></div></div>
+                    </div>
+                </div>
+            </div>
+            <!-- table responsive -->
+
+        </div>
+    </div>
+
+{% endblock %}

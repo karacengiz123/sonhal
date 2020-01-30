@@ -1,0 +1,2299 @@
+{% extends 'layout/Softphone_base.html.twig' %}
+{% block title %}Softphone Screen{% endblock %}
+{% block customCss %}
+    <title>IBB Softphone Screen</title>
+
+    <link rel="stylesheet" href="/assets/screen/all.css"
+          integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <script src="/assets/screen/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/assets/softphoneAsset/css/style.css">
+
+    <link rel="stylesheet" href="/assets/softphoneAsset/css/select2.min.css">
+
+
+    <style>
+        .nav-tabs .nav-link {
+            border: none !important;
+            padding: 0px !important;
+            width: 100% !important;
+        }
+
+        .nav-tabs .nav-item {
+            margin-top: 5px !important;
+            width: 100% !important;
+        }
+        #lastCallsMenu{
+            width: 300px!important;
+            min-width: 300px!important;
+            max-width: 300px!important;
+        }
+        #lastCallsMenu div table tr td{
+            max-height: 30px!important;
+            margin: 0px!important;
+            padding: 5px 0px 5px 5px!important;
+        }
+        #lastCallsMenu div h5{
+            margin-left: 5px!important;
+        }
+    </style>
+
+{% endblock %}
+{% block body %}
+    <audio id="audio_remote" autoplay="autoplay" audio.controls=true; volume="0.8"></audio>
+    <audio id="ringtone" loop src="/assets/softphoneAsset/sounds/ringtone.wav"></audio>
+    <audio id="ringbacktone" loop src="/assets/softphoneAsset/sounds/ringbacktone.wav"></audio>
+    <audio id="dtmfTone" src="/assets/softphoneAsset/sounds/dtmf.wav"></audio>
+    <style>
+        #crmRefresh{
+            position: fixed;
+            top: 50px;
+            right: 5px;
+        }
+    </style>
+    <button type="button" class="btn btn-sm btn-warning" id="crmRefresh"
+            onclick='iframeControl();onMyFrameLoad();'>
+         CRM YENİLE &nbsp;<i class="fas fa-sync-alt"></i>
+    </button>
+    <div id="iFrameDiv">
+    </div>
+    <div class="row fixed-bottom"
+         style="border-top: 1px solid black!important; padding: 5px 20px 20px 20px!important; background-color: white!important; bottom: 0px!important;">
+        <ul class="nav nav-tabs col-lg-1" id="myTab" role="tablist" style="border: none!important;">
+            <div>
+                <img src="/assets/images/tbxProLogo.png" class="img-responsive" style="width: 100%!important;">
+            </div>
+
+            <li class="nav-item btn btn-default"
+                style="padding: 0px!important; height: 30px!important; vertical-align: middle!important;" id="homeBtn">
+                <a class="nav-link active show" id="home-tab" data-toggle="tab" href="#home" role="tab"
+                   aria-controls="home" aria-selected="true"
+                   style="width: 100%!important; height: 100%!important; padding-top: 5px!important;">Inbound</a>
+            </li>
+            <li class="nav-item btn btn-default" id="profileTab"
+                style="padding: 0px!important; height: 30px!important; vertical-align: middle!important;">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+                   aria-controls="profile" aria-selected="false"
+                   style="width: 100%!important; height: 100%!important; padding-top: 5px!important;" name="profile-tab">Outbound</a>
+            </li>
+        </ul>
+
+        <div class="col-lg-10" style="width: 100%!important; padding-top: 10px!important;">
+
+            <div class="content" style="width: 100%!important;">
+
+                <div class="bd-example bd-example-tabs"
+                     style="max-height: 50px!important; min-height: 50px!important; width: 100%!important;">
+
+
+                    <div class="tab-content" id="myTabContent">
+                        <!-- INBOUND TAB -->
+                        <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="inbound-grup col-lg-12">
+                                <div id='divCallOptions' class='call-options'
+                                     style='opacity: 0; margin-top: 0px; display: none;'></div>
+                                <div id="tdVideo" style="display: none;"></div>
+
+                                <div class="inputs row" style="margin-left: 0px!important;">
+                                    <div class="col-lg-2">
+                                        <input type="text" name="" disabled class="form-control form-control-sm"
+                                               id="txtRegStatus"
+                                               placeholder="Durum" width="100px" style="display:none!important;">
+                                        <input type="text" name="" disabled class="form-control form-control-sm "
+                                               id="txtCallStatus"
+                                               placeholder=""
+                                               style="margin-top: 5px!important; display: none!important;">
+                                        <div class="col-lg-12">
+                                            <span class="timer" id="inboundTimer" style="margin-left: 0px!important;">00:00:00</span>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <button type="button" id="doneToCall" class="btn btn-sm btn-success"
+                                                    onclick='disableAcw();' style="display: none;">
+                                                <i class="fa fa-ok"></i> Hazır Duruma Geç
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <input type="button" class="btn btn-warning" id="btnPause"
+                                                   value="Moladan Çık" onclick='molaBitir();'
+                                                   style="display: none;"/>
+                                        </div>
+                                        <div class="col-lg-12" style="margin-top: 5px!important;">
+
+                                            <label id="txtInboundNumber"></label>
+                                            <label id="surveyFlag"></label>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <style>
+                                            .buttonsUp button {
+                                                padding: 4px 7px 3px 7px !important;
+
+                                            }
+
+                                            .buttonsDown button {
+                                                padding: 4px 7px 3px 7px !important;
+                                            }
+
+                                            .buttonsDown {
+                                                margin-top: 5px !important;
+                                            }
+
+                                            .div_input input {
+                                                margin-top: 5px !important;
+                                            }
+
+                                            .buttonsUp button, .buttonsUp div {
+                                                margin-right: 5px !important;
+                                            }
+                                        </style>
+                                        <div class="buttonsUp" style="margin-bottom: 5px!important;">
+                                            <span>Tuşlama Alanı</span>
+                                            <input type="text" class="form-control form-control-sm col-lg-12" placeholder="" name="" id="numPadInbound" style="width:395px!important; border: 1px solid orange">
+                                        </div>
+                                        <div class="buttonsUp" style="display: flex!important;">
+{#                                            <button type="button" class="btn btn-sm btn-success" id="btnAnswer"#}
+{#                                                    onclick='sipCall("call-audio");'>#}
+{#                                                <i class="fa fa-phone"></i> CEVAPLA#}
+{#                                            </button>#}
+
+
+                                            <div class="btn-group dropup">
+                                                <button type="button" id="molaBtn"
+                                                        class="btn btn-secondary dropdown-toggle btn-sm"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                    <i class="fa fa-times"></i> MOLA
+                                                </button>
+                                                <div class="dropdown-menu" id="molaMenu">
+                                                </div>
+                                            </div>
+                                            <div class="btn-group dropup">
+                                                <button type="button" id="islevlerBtn"
+                                                        class="btn btn-secondary dropdown-toggle btn-sm btn-cyan"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                    <i class="fas fa-play"></i> İŞLEMLER
+                                                </button>
+                                                <div class="dropdown-menu" id="acwMenu">
+
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-cyan" id="btnSoru"
+                                                    style="display: none;" disabled onclick='callQuestionOn();'> SORU
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-warning" id="btnHoldResume"
+                                                    disabled onclick='sipToggleHoldResume();'>
+                                                <i class="fa fa-pause-circle"></i> BEKLET
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-info" id="btnTransfer" disabled
+                                                    onclick='sipTransfer();'>
+                                                <i class="fa fa-exchange-alt"></i> TRANSFER
+                                            </button>
+                                            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                                <button type="button" class="btn btn-sm btn-info"
+                                                        onclick='createCaseDesktop(igdasState,igdasTDCID,igdasTalepTipi,igdasIVRDurumKodu,igdasAgent,igdasCallID,igdasAciklama);'>
+                                                    İGDAŞ
+                                                </button>
+                                            {% endif %}
+
+                                            {#<a href="microsoft-edge:http://www.itworld.com/blog/readme-file">Open README file with Edge</a>#}
+                                        </div>
+                                        <div class="buttonsDown">
+                                            <button type="button" class="btn btn-sm btn-danger" id="btnHangUp"
+                                                    onclick='sipHangUp();' disabled>
+                                                <i class="fa fa-phone-slash"></i> KAPAT
+                                            </button>
+
+                                            <button type="button" class="btn btn-sm btn-warning" id="btnMute" disabled
+                                                    onclick='sipToggleMute();'>
+                                                <i class="fa fa-microphone-slash"></i> <span
+                                                        id="btnMuteSpan">SESSİZ</span>
+                                            </button>
+                                            {#<button type="button" disabled class="btn btn-sm btn-primary">#}
+                                            {#<i class="fa fa-users"></i> KONFERANS#}
+                                            {#</button>#}
+                                            <div class="btn-group dropup" style="width:50%!important;">
+                                                <select disabled class="form-control" name="ivrMenu" id="ivrMenu"
+                                                        style="padding: 0px!important; min-height: 30px!important; height: 30px!important;">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-2" style="display:none!important;">
+                                        <div class=" form-inline">
+                                            <div class="col-xs-6">
+                                                <div class="range range-success">
+                                                    <input type="range" name="range" min="1" max="100" value="50">
+                                                    <output><i class="fa fa-microphone"></i></output>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <div class="range v1 range-primary">
+                                                    <input id="speakerVol" type="range" name="range" min="1" max="100"
+                                                           value="80"
+                                                           onchange="document.getElementById('audio_remote').volume=this.value / 100;">
+                                                    <output onclick="document.getElementById('speakerVol').value=0; document.getElementById('audio_remote').volume=0;">
+                                                        <i class="fa fa-headphones"></i></output>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="col-lg-6 div_input" style="float: left!important;">
+                                            <input type="text" name="ivr1" id="ivr1"
+                                                   class="form-control form-control-sm" disabled placeholder="">
+                                            <input type="text" name="ivr2" id="ivr2"
+                                                   class="form-control form-control-sm" disabled placeholder="">
+                                        </div>
+                                        <div class="col-lg-6 div_input" style="float: left!important;">
+                                            <input type="text" name="ivr3" id="ivr3"
+                                                   class="form-control form-control-sm" disabled placeholder="">
+                                            <input type="text" name="lastQue" id="lastQue"
+                                                   class="form-control form-control-sm" disabled placeholder="">
+                                            <input type="text" name="" class="form-control form-control-sm" disabled
+                                                   placeholder="" style="display:none!important;">
+                                            <input type="text" name="" class="form-control form-control-sm" disabled
+                                                   placeholder="" style="display:none!important;">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- INBOUND TAB END nhnhnh-->
+
+                        <!-- OUTBOUND TAB -->
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="inbound-grup col-lg-12">
+                                <div class="col-lg-2" style="float: left">
+                                    <img src="/assets/softphoneAsset/user.png" alt="" class="col-lg-4"
+                                         style="float: left!important; display:none!important;">
+                                    <div class="col-lg-12">
+                                        <input type="text" class="form-control form-control-sm col-lg-12"
+                                               placeholder="905xxxxxxxxx" name="" id="txtPhoneNumber"
+                                               style="width:180px;">
+                                    </div>
+                                    <div class="col-lg-12" style="display:none!important;">
+                                        <input type="text" name="" disabled class="form-control form-control-sm "
+                                               id="txtCallStatusOut"
+                                               placeholder="" style="margin-top: 5px!important;">
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <label id="outBoundTimer" class="timer col-lg-12"
+                                               style="margin-bottom: 0px!important; margin-left: 0px!important;">00:00:00</label>
+                                    </div>
+                                    <label id="labelRinging" ></label>
+                                    <div class="col-lg-12">
+                                        <button id="btnAramaktanVazgec" type="button" class="btn btn-sm btn-danger"
+                                                style="display: none;" onclick='outboundStopTimerOwnAramakIstemiyor();'>
+                                            <i class="fa fa-cancel"></i> Aranmaktan Vazgeçildi
+                                        </button>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <button id="disableAcwOutBoundBtn" type="button" class="btn btn-sm btn-success"
+                                                style="display: none;" onclick='disableAcwOutBound();'>
+                                            <i class="fa fa-cancel"></i> Hazır Duruma Geç
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5" style="float: left">
+                                    <div class="buttonsUp" style="margin-bottom: 5px!important;">
+                                        <span>Tuşlama Alanı</span>
+                                        <input type="text" class="form-control form-control-sm col-lg-12" placeholder="" name="" id="numPadOutbound" style="width:76%!important; border: 1px solid orange">
+                                    </div>
+                                    <div class="col-lg-12 buttonsUp" style="margin: 0px!important; padding: 0px!important;">
+                                        <div class="col-lg-12" style="margin: 0px!important; padding: 0px!important; float: left!important;">
+                                            <button id="outBoundCallButton" type="button" class="btn btn-sm btn-success"><i
+                                                        class="fa fa-phone"></i> Ara
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" disabled id="outBoundHangUpBtn"
+                                                    onclick='sipHangUpOutbound();'>
+                                                <i class="fa fa-phone-slash"></i> KAPAT
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-cyan" id="btnSoruOutbound"
+                                                    style="display: none;" disabled onclick='callQuestionOn();'> SORU
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" disabled id="outBoundHoldBtn"
+                                                    onclick="sipToggleHoldResume();">
+                                                <i class="fa fa-pause"></i> BEKLET
+                                            </button>
+                                            <div class="btn-group dropup">
+                                                <button type="button" id="outboundQuestionBtn"
+                                                        class="btn btn-secondary dropdown-toggle btn-sm btn-cyan"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false" disabled>
+                                                    <i class="fas fa-play"></i> İŞLEMLER
+                                                </button>
+                                                <div class="dropdown-menu" id="outboundQuestion">
+
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-warning" disabled id="outBoundMuteBtn"
+                                                    onclick='sipToggleMute();'><i
+                                                        class="fa fa-microphone-slash"></i> SESSİZ
+                                            </button>
+                                            <button id="btnAra" type="button" class="btn btn-sm btn-success"
+                                                    style="display:none!important;"><i
+                                                        class="fa fa-phone"></i> btnAra
+                                            </button>
+
+                                            <select disabled class="form-control col-lg-5 btn" id="ivrMenuOutbound"
+                                                    style="padding: 0px!important; min-height: 30px!important; height: 30px!important;">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if is_granted('ROLE_OUTBOUND') %}
+                                    <div class="col-lg-2" style="float: left">
+                                        <div class="col-lg-12">
+                                            <div style="text-align: -webkit-center;"><label>SONUÇ SEÇ</label></div>
+                                            <select name="" class="form-control form-control-sm" id="outBoundSelect">
+                                                <option selected>Seçiniz..</option>
+                                                <option value="All">TÜMÜ</option>
+                                                <option value="Female">FEMALE</option>
+                                                <option value="Anket">ANKET</option>
+                                            </select>
+                                            <div class="col-lg-12" style="padding: 0px!important; margin: 0px!important;">
+                                                <button disabled id="btnSendSurvey" type="button" class="btn btn-sm btn-purple" onclick="sendSurvey();" style="width: 100%!important;">  Ankete Yönlendir</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <button hidden disabled id="btnSendSurvey" type="button" class="btn btn-sm btn-purple"style="width: 100%!important;">  Ankete Yönlendir</button>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                        <!-- OUTBOUND TAB END -->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-1" style="float: right!important; margin: 0px!important; padding: 0px!important; margin-top: 10px!important;">
+            <input type="button" class="btn btn-success" id="btnRegister" value="Giriş" onclick='sipRegister();'
+                   style="display: none; float:right!important;"/>&nbsp;
+            <input type="button" class="btn btn-danger" id="btnUnRegister" value="Çıkış" onclick='sipUnRegister();'
+                   style="display: none; float:right!important;"/>
+            <span id="dahiliNo" style="color: red!important; font-size: 30px!important; font-weight: bold!important;"></span>
+            <div class="btn-group dropup">
+                <button type="button" id="lastCalls"
+                        class="btn btn-secondary dropdown-toggle btn-sm"
+                        data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false"> Son Çağrı
+                </button>
+                <div class="dropdown-menu" id="lastCallsMenu">
+                    <div>
+                        <h5>inbound</h5>
+                        <table id="inboundlastCalls" class="table table-bordered col-md-4">
+                        </table>
+                    </div>
+                    <div>
+                        <h5>outbound</h5>
+                        <table id="outboundlastCalls" class="table table-bordered col-md-4">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+
+            <input type="hidden" style="width: 100%; height: 100%" id="txtDisplayName" value=""
+                   placeholder="e.g. John Doe"/>
+            <input type="hidden" style="width: 100%; height: 100%" id="txtPrivateIdentity" value=""
+                   placeholder="e.g. +33600000000"/>
+            <input type="hidden" style="width: 100%; height: 100%" id="txtPublicIdentity" value=""
+                   placeholder="e.g. sip:+33600000000@doubango.org"/>
+
+            <input type="hidden" style="width: 100%; height: 100%" id="txtPassword" value=""/>
+            <input type="hidden" style="width: 100%; height: 100%" id="txtRealm" value=""
+                   placeholder="e.g. doubango.org"/>
+        </div>
+
+        <div id="divVideo" style="display: none;"></div>
+
+        <!-- /container -->
+        <!-- Glass Panel -->
+        <div id='divGlassPanel' class='glass-panel' style='visibility:hidden'></div>
+        <!-- KeyPad Div -->
+        <!-- Silinecek Son -->
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+            <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Dikkat..!!</h1>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h1 id="flashingText"></h1>
+                    <h1 id="flashingText2"></h1>
+                    <h1 id="flashingText3"></h1>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="breakTextModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+            <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                <div class="modal-body">
+                    <h1 id="breakText"></h1>
+                    <div class="outer" id="modalAnimation">
+                        <div class="inner">
+                            <div class="small"></div>
+                            <div class="small"></div>
+                            <div class="small"></div>
+                            <div class="small"></div>
+                        </div>
+                        <div class="big">
+                            <div class="small"></div>
+                        </div>
+                        <div class="big">
+                            <div class="small"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block customScript %}
+    <script>
+        function getTokenStorage() {
+            return window.localStorage.getItem('token')
+        }
+        function lastRegister() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/last-register-control',
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function (data) {
+
+                }
+            });
+        }
+    </script>
+    <script src="/assets/dist/js/bootstrap-slider/bootstrap-slider.js"></script>
+    <script src="/assets/softphoneAsset/SIPml-api.js?svn=252" type="text/javascript"></script>
+    <script>
+
+        igdasControl();
+
+        var tbxDebug=false;
+        var tokenArray;
+        var tokenVariableArray;
+        var tokenUserName;
+        var token = $.ajax({
+            async: false,
+            url: "{{ path('jwt') }}"
+        }).responseJSON;
+
+        window.localStorage.setItem('token', token.token);
+        tokenArray = window.localStorage.getItem("token").split(".");
+        tokenVariableArray = JSON.parse(atob(tokenArray[1]));
+        tokenUserName = tokenVariableArray["username"];
+
+    </script>
+
+    <script type="text/javascript">
+
+        var sTransferNumber, callID, isOutBoundFree;
+        var oRingTone, oRingbackTone;
+        var oSipStack, oSipSessionRegister, oSipSessionCall, oSipSessionTransferCall;
+        var videoRemote, videoLocal, audioRemote;
+        var bFullScreen = false;
+        var oNotifICall;
+        var bDisableVideo = false;
+        var viewVideoLocal, viewVideoRemote, viewLocalScreencast; // <video> (webrtc) or <div> (webrtc4all)
+        var oConfigCall;
+        var oReadyStateTimer;
+        var toBeSentData = {};
+        var surveyFlag = "N";
+        var CallOrigCallID;
+        var callStatus;
+        var ivrChoice;
+        var timer;
+        var siebelUsername = '{{ app.user.username }}';
+        var siebelData;
+        var isOutboundSRCall = false;
+        var number;
+
+        var acwAndBreakControl=0;
+        var dahiliNo;
+        var callQuestion = 0;
+        var activeCall = false;
+        var molaChange = 0;
+        var callType = "";
+        var register = "off";
+        var molaVeAcwKontrol;
+        var molaDisArama = 0;
+        var incallNumber = 0;
+
+        // TODO: İgdaş CRM için değişkenler düzenlenecek ve link düzenlenecek.
+        // İGDAŞ PARAMETRELER
+        var igdasIframe = false;
+        var igdasState = "Active";
+        var igdasTDCID ="";//= "66b90e0d-dcde-44f8-a914-1493a81255c6";
+        var igdasTalepTipi ="";//= "Talep";
+        var igdasIVRDurumKodu =0;//= 311;
+        var igdasAgent = String(siebelUsername);//= "salih.inci";// mail adresinin @ işaretinden önceki bölmü yazılacak.
+        var igdasCallID ="";//= "A2BB501F-464A11E9-BFF99A66-73656183@10.5.95.149";
+        var igdasTelefonNo = "";
+        var igdasAciklama ="";//= "İGDAŞ CREATECASE TEST";
+        // İGDAŞ PARAMETRELER = "
+
+        var inboubdAnketCallIdValue = 0;
+
+        C =
+            {
+                divKeyPadWidth: 220
+            };
+
+        window.onload = function () {
+            window.console && window.console.info && window.console.info("location=" + window.location);
+
+            videoLocal = document.getElementById("video_local");
+            videoRemote = document.getElementById("video_remote");
+            audioRemote = document.getElementById("audio_remote");
+
+            document.onkeyup = onKeyUp;
+            document.body.onkeyup = onKeyUp;
+            //divCallCtrl.onmousemove = onDivCallCtrlMouseMove;
+
+            // set debug level
+            SIPml.setDebugLevel((window.localStorage && window.localStorage.getItem('org.doubango.expert.disable_debug') == "true") ? "error" : "info");
+
+            // Initialize call button
+            uiBtnCallSetText("Ara");
+
+            var getPVal = function (PName) {
+                var query = window.location.search.substring(1);
+                var vars = query.split('&');
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    if (decodeURIComponent(pair[0]) === PName) {
+                        return decodeURIComponent(pair[1]);
+                    }
+                }
+                return null;
+            };
+
+            var preInit = function () {
+                // set default webrtc type (before initialization)
+                var s_webrtc_type = getPVal("wt");
+                var s_fps = getPVal("fps");
+                var s_mvs = getPVal("mvs");
+                var s_mbwu = getPVal("mbwu");
+                var s_mbwd = getPVal("mbwd");
+                var s_za = getPVal("za");
+                var s_ndb = getPVal("ndb");
+
+                if (s_webrtc_type) SIPml.setWebRtcType(s_webrtc_type);
+
+                SIPml.init(postInit);
+                setTimeout(function () {
+                    sipRegister();
+                },10000);
+
+
+
+                // set other options after initialization
+                if (s_fps) SIPml.setFps(parseFloat(s_fps));
+                if (s_mvs) SIPml.setMaxVideoSize(s_mvs);
+                if (s_mbwu) SIPml.setMaxBandwidthUp(parseFloat(s_mbwu));
+                if (s_mbwd) SIPml.setMaxBandwidthDown(parseFloat(s_mbwd));
+                if (s_za) SIPml.setZeroArtifacts(s_za === "true");
+                if (s_ndb == "true") SIPml.startNativeDebug();
+
+                //var rinningApps = SIPml.getRunningApps();
+                //var _rinningApps = Base64.decode(rinningApps);
+                //tsk_utils_log_info(_rinningApps);
+            };
+
+            oReadyStateTimer = setInterval(function () {
+                    if (document.readyState === "complete") {
+                        clearInterval(oReadyStateTimer);
+                        // initialize SIPML5
+                        preInit();
+                    }
+                },
+                500);
+
+            /*if (document.readyState === "complete") {
+                preInit();
+            }
+            else {
+                document.onreadystatechange = function () {
+                     if (document.readyState === "complete") {
+                        preInit();
+                    }
+                }
+           }*/
+
+        };
+
+
+
+
+
+
+        function postInit() {
+
+            // FIXME: displays must be per session
+            viewVideoLocal = videoLocal;
+            viewVideoRemote = videoRemote;
+
+            if (!SIPml.isWebRtcSupported()) {
+                if (confirm('Your browser don\'t support WebRTC.\naudio/video calls will be disabled.\nDo you want to download a WebRTC-capable browser?')) {
+                    window.location = 'https://www.google.com/intl/en/chrome/browser/';
+                }
+            }
+
+
+            document.body.style.cursor = 'default';
+            oConfigCall = {
+                audio_remote: audioRemote,
+                video_local: viewVideoLocal,
+                video_remote: viewVideoRemote,
+                screencast_window_id: 0x00000000, // entire desktop
+                bandwidth: {audio: undefined, video: undefined},
+                video_size: {minWidth: undefined, minHeight: undefined, maxWidth: undefined, maxHeight: undefined},
+                events_listener: {events: '*', listener: onSipEventSession},
+                sip_caps: [
+                    {name: '+g.oma.sip-im'},
+                    {name: 'language', value: '\"en,fr\"'}
+                ]
+            };
+            if(tbxDebug==true) console.log("post init calıştı");
+            if(tbxDebug==true) console.log(oConfigCall);
+        }
+
+
+        function loadCallOptions() {
+            if (window.localStorage) {
+                var s_value;
+                if ((s_value = window.localStorage.getItem('org.doubango.call.phone_number'))) txtPhoneNumber.value = s_value;
+                bDisableVideo = (window.localStorage.getItem('org.doubango.expert.disable_video') == "true");
+
+                txtCallStatus.value = 'Video ' + (bDisableVideo ? 'disabled' : 'enabled') + '';
+            }
+        }
+
+        function saveCallOptions() {
+            if (window.localStorage) {
+                window.localStorage.setItem('org.doubango.call.phone_number', txtPhoneNumber.value);
+                window.localStorage.setItem('org.doubango.expert.disable_video', bDisableVideo ? "true" : "false");
+            }
+        }
+
+        function loadCredentials() {
+            dahiliNo = tokenVariableArray["extension"];
+
+            txtDisplayName.value = "BHM Client";
+            txtPrivateIdentity.value = tokenVariableArray["extension"];
+            txtPublicIdentity.value = "sip:" + tokenVariableArray["extension"] + "@"+ tbxSipServer;
+            txtPassword.value = "Q1w2e3r4";
+            txtRealm.value = tbxSipServer;
+        };
+
+        function saveCredentials() {
+            if (window.localStorage) {
+                window.localStorage.setItem('org.doubango.identity.display_name', tokenVariableArray["extension"]);
+                window.localStorage.setItem('org.doubango.identity.impi', tokenVariableArray["extension"]);
+                window.localStorage.setItem('org.doubango.identity.impu', 'sip:' + tokenVariableArray["extension"] + "@"+ tbxSipServer);
+                window.localStorage.setItem('org.doubango.identity.password', txtPassword.value);
+                window.localStorage.setItem('org.doubango.identity.realm', txtRealm.value);
+                window.localStorage.setItem('org.doubango.expert.disable_video', "true");
+                window.localStorage.setItem('org.doubango.expert.enable_rtcweb_breaker', "true");
+                window.localStorage.setItem('org.doubango.expert.ice_servers', "[]");
+                window.localStorage.setItem('org.doubango.expert.disable_early_ims', "true");
+                window.localStorage.setItem('org.doubango.expert.disable_debug', "true");
+                window.localStorage.setItem('org.doubango.expert.enable_media_caching', "true");
+                window.localStorage.setItem('org.doubango.expert.disable_callbtn_options', "false");
+
+
+            }
+        };
+
+        // sends SIP REGISTER request to login
+        function sipRegister() {
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ path('sipservercall') }}',
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function(data) {
+
+                    tbxSipServer = data.sipServerCall;
+
+                    loadCredentials();
+                    loadCallOptions();
+
+
+
+                    addUpdateRemove();
+                    $("#dahiliNo").html(dahiliNo.substr(dahiliNo.length-3));
+
+                    // catch exception for IE (DOM not ready)
+                    try {
+                        // btnRegister.style.visibility = 'hidden';
+                        if (!txtRealm.value || !txtPrivateIdentity.value || !txtPublicIdentity.value) {
+                            txtRegStatus.value = 'Zorunlu alanları doldurunuz';
+                            // btnRegister.style.visibility = 'visible';
+                            return;
+                        }
+                        var o_impu = tsip_uri.prototype.Parse(txtPublicIdentity.value);
+                        if (!o_impu || !o_impu.s_user_name || !o_impu.s_host) {
+                            txtRegStatus.value = "" + txtPublicIdentity.value + "geçerli değil";
+                            // btnRegister.visibility = 'visible';
+                            return;
+                        }
+
+                        // enable notifications if not already done
+                        if (window.webkitNotifications && window.webkitNotifications.checkPermission() != 0) {
+                            window.webkitNotifications.requestPermission();
+                        }
+
+                        // save credentials
+                        saveCredentials();
+
+                        // update debug level to be sure new values will be used if the user haven't updated the page
+                        SIPml.setDebugLevel((window.localStorage && window.localStorage.getItem('org.doubango.expert.disable_debug') == "true") ? "error" : "info");
+
+                        // create SIP stack
+                        oSipStack = new SIPml.Stack({
+                                realm: txtRealm.value,
+                                impi: txtPrivateIdentity.value,
+                                impu: txtPublicIdentity.value,
+                                password: txtPassword.value,
+                                display_name: txtDisplayName.value,
+                                websocket_proxy_url: 'wss://'+tbxSipServer+':8089/ws',
+                                outbound_proxy_url: (window.localStorage ? window.localStorage.getItem('org.doubango.expert.sip_outboundproxy_url') : null),
+                                ice_servers: (window.localStorage ? window.localStorage.getItem('org.doubango.expert.ice_servers') : null),
+                                enable_rtcweb_breaker: (window.localStorage ? window.localStorage.getItem('org.doubango.expert.enable_rtcweb_breaker') == "true" : false),
+                                events_listener: {events: '*', listener: onSipEventStack},
+                                enable_early_ims: (window.localStorage ? window.localStorage.getItem('org.doubango.expert.disable_early_ims') != "true" : true), // Must be true unless you're using a real IMS network
+                                enable_media_stream_cache: (window.localStorage ? window.localStorage.getItem('org.doubango.expert.enable_media_caching') == "true" : false),
+                                bandwidth: (window.localStorage ? tsk_string_to_object(window.localStorage.getItem('org.doubango.expert.bandwidth')) : null), // could be redefined a session-level
+                                video_size: (window.localStorage ? tsk_string_to_object(window.localStorage.getItem('org.doubango.expert.video_size')) : null), // could be redefined a session-level
+                                sip_headers: [
+                                    {name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.2016.03.04'},
+                                    {name: 'Organization', value: 'Doubango Telecom'}
+                                ]
+                            }
+                        );
+                        if (oSipStack.start() != 0) {
+                            txtRegStatus.value = 'SIP bağlantısı gerçekleşmedi';
+                        } else return;
+                    } catch (e) {
+                        txtRegStatus.value = "2:" + e + "";
+                    }
+                    btnRegister.style.visibility = 'visible';
+
+
+                }
+            });
+
+
+        }
+
+        // sends SIP REGISTER (expires=0) to logout
+        function sipUnRegister() {
+            if (oSipStack) {
+                oSipStack.stop(); // shutdown all sessions
+                // $("#btnPause").css("display","block")
+                $("#btnRegister").css("display", "block");
+                $("#dahiliNo").html("");
+
+                $('#breakTextModal').modal({
+                    backdrop: 'static',
+                    keyboard: false,
+                    show: true,
+                    escapeClose: false,
+                    clickClose: false,
+                    showClose: false
+                });
+                $("#breakText").html("Çıkış Yaptınız");
+                $("#modalAnimation").css("display", "none");
+                $(".modal-content").css("background-color", "red");
+                $(".modal-content").css("color", "white");
+                setTimeout(
+                    function () {
+                        $('#breakTextModal').modal('hide');
+                        $("#breakText").html("");
+                        $("#modalAnimation").css("display", "block");
+                        $(".modal-content").css("background-color", "white");
+                        $(".modal-content").css("color", "black");
+                    }, 2000);
+
+                setTimeout(function () {
+                    sipRegister();
+                },5000);
+            }
+        }
+
+
+
+
+        // makes a call (SIP INVITE)
+
+        function outBoundFree() {
+
+            if (molaDisArama == 1){
+                $.ajax({
+                    type: 'GET',
+                    url: '{{ path('out_aound_acw_control') }}',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function(data) {
+                        if (data == 1) {
+                            molaDisArama = 0;
+                            $('#doneToCall').html('Hazır Duruma Geç');
+                            $('#doneToCall').css('display', 'none');
+                            doneToCall.disabled = true;
+                            doneToCall.hidden = true;
+                            btnUnRegister.hidden = false;
+                            $('#btnUnRegister').css('display', 'block');
+                        }
+                    }
+                });
+            }else {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/oudbound-call-pauser',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function(data) {
+                    }
+                });
+            }
+
+            number = txtPhoneNumber.value;
+            if(tbxDebug==true) console.log("number log == "+number);
+            var prefix=number.substr(0,1);
+            if(prefix==0) {number="+9"+number; }
+
+            if (isOutboundSRCall == false) {
+                toBeSentData.body = {
+                    Description: 'Giden Çağrı Araması: (' + number + ')', "Type": "Çağrı - Giden",
+                    "ActivitySubtype": "Çağrı - Giden"
+                };
+                isOutBoundFree = true;
+            }
+            outboundCall('call-audio');
+            outboundStopTimerCallBtn();
+        }
+
+        function outboundCall(s_type) {
+            callType = "outBound";
+            activeCall = true;
+            // alert(callType);
+
+            outBoundHangUpBtn.disabled = false;
+            outBoundHoldBtn.disabled = false;
+            outBoundMuteBtn.disabled = false;
+            btnSendSurvey.disabled = false;
+            ivrMenuOutbound.disabled = false;
+
+            var startDate = moment().format('M/D/Y H:mm:ss');
+            toBeSentData.body.Planned = startDate;
+            toBeSentData.body.Started = startDate;
+            toBeSentData.body.UserName = siebelUsername;
+            toBeSentData.body.CallId = callID;
+            toBeSentData.body.Status = callStatus;
+
+
+            if (oSipStack && !oSipSessionCall && !tsk_string_is_null_or_empty(txtPhoneNumber.value)) {
+                if (s_type == 'call-screenshare') {
+                    if (!SIPml.isScreenShareSupported()) {
+                        alert('Screen sharing not supported. Are you using chrome 26+?');
+                        return;
+                    }
+                    if (!location.protocol.match('https')) {
+                        if (confirm("Screen sharing requires https://. Do you want to be redirected?")) {
+                            sipUnRegister();
+                            window.location = 'https://ns313841.ovh.net/call.htm';
+                        }
+                        return;
+                    }
+                }
+                btnAra.disabled = true;
+                btnHangUp.disabled = false;
+                homeBtn.hidden = true;
+                $('#homeBtn').css('display', 'none');
+
+                // outBoundStartTimer();
+
+                // create call session
+                oSipSessionCall = oSipStack.newSession(s_type, oConfigCall);
+                // make call
+                if (oSipSessionCall.call(txtPhoneNumber.value) != 0) {
+                    oSipSessionCall = null;
+                    txtCallStatus.value = 'Çağrı Başarısız';
+                    txtCallStatusOut.value = 'Çağrı Başarısız';
+
+                    callStatus = "Yanıt Yok";
+
+                    btnAra.disabled = false;
+                    btnHangUp.disabled = true;
+                    return;
+                }
+                saveCallOptions();
+            } else if (oSipSessionCall) {
+                txtCallStatus.value = 'Bağlanıyor dış arama';
+                txtCallStatusOut.value = 'Bağlanıyor dışarama';
+                oSipSessionCall.accept(oConfigCall);
+                callStatus = "Tamamlandı";
+            }
+        }
+
+        // makes a call (SIP INVITE)
+        function sipCall(s_type) {
+
+            profileTab.hidden = true;
+            $('#profileTab').css('display', 'none');
+            if (incallNumber == "9341001") {}else {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/inbound-call-pauser',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+
+            stopTimerOwn();
+            var rehberNumara = (oSipSessionCall.getRemoteFriendlyName() || 'unknown');
+            rehberKayitBul(rehberNumara);
+            callType = "inBound";
+            activeCall = true;
+            // alert(callType);
+
+            txtCallStatus.value = 'Bağlanıyor gelen';
+            txtCallStatusOut.value = 'Bağlanıyor gelen';
+
+            if(tbxDebug==true) console.log("gelen cagrı");
+            if(tbxDebug==true) console.log(oConfigCall);
+
+
+            oSipSessionCall.accept(oConfigCall);
+            startTimer();
+
+        }
+
+        // Share entire desktop aor application using BFCP or WebRTC native implementation
+        function sipShareScreen() {
+            if (SIPml.getWebRtcType() === 'w4a') {
+                // Sharing using BFCP -> requires an active session
+                if (!oSipSessionCall) {
+                    txtCallStatus.value = 'Aktif Bağlantı Yok';
+                    txtCallStatusOut.value = 'Aktif Bağlantı Yok';
+                    return;
+                }
+                if (oSipSessionCall.bfcpSharing) {
+                    if (oSipSessionCall.stopBfcpShare(oConfigCall) != 0) {
+                        txtCallStatus.value = 'Hata Oluştu';
+                        txtCallStatusOut.value = 'Hata Oluştu';
+                    } else {
+                        oSipSessionCall.bfcpSharing = false;
+                    }
+                } else {
+                    oConfigCall.screencast_window_id = 0x00000000;
+                    if (oSipSessionCall.startBfcpShare(oConfigCall) != 0) {
+                        txtCallStatus.value = 'Hata Oluştu';
+                        txtCallStatusOut.value = 'Hata Oluştu';
+                    } else {
+                        oSipSessionCall.bfcpSharing = true;
+                    }
+                }
+            } else {
+                sipCall('call-screenshare');
+            }
+        }
+
+        // transfers the call
+        function sipTransfer() {
+            var s_prefix = '9341001';
+            s_destination = prompt('Transfer Edilecek Dahili', '');
+
+            if (s_destination.length <= 3) {
+                var aaa = "*2"+s_prefix+s_destination;
+                var bbb = aaa.split("");
+                // console.log(bbb);
+
+                $.each( bbb, function() {
+                    // console.log(this);
+                    oSipSessionCall.dtmf(this);
+                });
+
+            }else {
+                var aaa = "*2"+s_destination;
+                var bbb = aaa.split("");
+                if(tbxDebug==true) console.log(bbb);
+                $.each( bbb, function() {
+                    // console.log(this);
+                    oSipSessionCall.dtmf(this);
+                });
+            }
+
+
+            // if (oSipSessionCall) {
+
+            //     console.log(s_destination);
+            //     if (!tsk_string_is_null_or_empty(s_destination)) {
+            //         // btnTransfer.disabled = true;
+            //         s_destination = s_prefix + s_destination;
+            //         if (oSipSessionCall.transfer(s_destination) != 0) {
+            //             txtCallStatus.value = 'Transfer Başarısız';
+            //             txtCallStatusOut.value = 'Transfer Başarısız';
+            //             // btnTransfer.disabled = false;
+            //             return;
+            //         }
+            //         txtCallStatus.value = 'Transfer ediliyor...';
+            //         txtCallStatusOut.value = 'Transfer ediliyor...';
+            //     }
+            // }
+        }
+
+        $('#ivrMenu').on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+
+            IVRTransfer(id);
+        });
+
+        $('#ivrMenuOutbound').on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+
+            IVRTransfer(id);
+        });
+
+        function IVRTransfer(ivrNumber) {
+            if (ivrNumber == "IvrTransferSec") {
+                alert("Lütfen bir IVR menü seçiniz..")
+            } else {
+                ivrcon=ivrNumber.length;
+                if(ivrcon==1) {ivrNumber=800+ivrNumber;}
+                if(ivrcon==2) {ivrNumber=80+ivrNumber;}
+
+                if (oSipSessionCall) {
+                    // var s_destination = prompt('Enter destination number', '');
+                    if (!tsk_string_is_null_or_empty(ivrNumber)) {
+                        // btnTransfer.disabled = true;
+                        if (oSipSessionCall.transfer(ivrNumber) != 0) {
+                            txtCallStatus.value = 'Transfer Başarısız';
+                            txtCallStatusOut.value = 'Transfer Başarısız';
+                            // btnTransfer.disabled = false;
+                            return;
+                        }
+                        txtCallStatus.value = '<i>Çağrı Transfer Ediliyor...</i>';
+                        txtCallStatusOut.value = '<i>Çağrı Transfer Ediliyor...</i>';
+                    }
+                }
+                ivrListesiCek();
+            }
+        }
+
+        // holds or resumes the call
+        function sipToggleHoldResume() {
+            if (oSipSessionCall) {
+                var i_ret;
+                var pauser;
+                btnHoldResume.disabled = false;
+                txtCallStatus.value = oSipSessionCall.bHeld ? '<i>Çağrıya Devam Ediliyor</i>' : '<i>Cağrı Bekletiliyor...</i>';
+                txtCallStatusOut.value = oSipSessionCall.bHeld ? '<i>Çağrıya Devam Ediliyor</i>' : '<i>Cağrı Bekletiliyor...</i>';
+                pauser = oSipSessionCall.bHeld ? oSipSessionCall.bHeld = false : oSipSessionCall.bHeld = true;
+                if(tbxDebug==true) console.log(pauser);
+                if (pauser == true) {
+                    oSipSessionCall.hold();
+                    if (callType == "inBound") {
+                        $("#btnHoldResume").removeClass("btn-warning");
+                        $("#btnHoldResume").addClass("btn-danger");
+                        $("#btnSoru").css("display","block");
+                        btnSoru.disabled = false;
+                        holdLogStart(callID,callType);
+                        stopTimerOwn();
+                        startTimer();
+                    } else {
+                        if (callType == "outBound") {
+                            $("#outBoundHoldBtn").removeClass("btn-warning");
+                            $("#outBoundHoldBtn").addClass("btn-danger");
+                            $("#btnSoru").css("display","block");
+                            btnSoru.disabled = false;
+                            holdLogStart(callID,callType);
+                            outboundStopTimerOwn();
+                            outBoundStartTimer();
+                        }
+                    }
+                } else {
+                    if (pauser == false) {
+                        oSipSessionCall.resume();
+                        if (callType == "inBound") {
+                            $("#btnHoldResume").removeClass("btn-danger");
+                            $("#btnHoldResume").addClass("btn-warning");
+                            $("#btnSoru").css("display","none");
+                            btnSoru.disabled = true;
+                            callQuestion = 0;
+                            holdLogStop(callID,callType);
+                            stopTimerOwn();
+                            startTimer();
+                        } else {
+                            if (callType == "outBound") {
+                                $("#outBoundHoldBtn").removeClass("btn-danger");
+                                $("#outBoundHoldBtn").addClass("btn-warning");
+                                $("#btnSoru").css("display","none");
+                                btnSoru.disabled = true;
+                                callQuestion = 0;
+                                holdLogStop(callID,callType);
+                                outboundStopTimerOwn();
+                                outBoundStartTimer();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Mute or Unmute the call
+        function sipToggleMute() {
+
+            if (oSipSessionCall) {
+
+                if(tbxDebug==true) console.log("toggle mute da");
+
+                var i_ret;
+                var bMute = !oSipSessionCall.bMute;
+                txtCallStatus.value = bMute ? 'Çağrı Sessize Alındı' : 'Çağrı Sessizden çıkarıldı';
+                txtCallStatusOut.value = bMute ? 'Çağrı Sessize Alındı' : 'Çağrı Sessizden çıkarıldı';
+
+                btnMute.value = bMute ? "Sesi Aç" : "Sessize Al";
+
+                i_ret = oSipSessionCall.mute('audio'/*could be 'video'*/, bMute);
+                if (i_ret != 0) {
+                    txtCallStatus.value = 'Sessize alma Hatası';
+                    txtCallStatusOut.value = 'Sessize alma Hatası';
+                    return;
+                }
+                oSipSessionCall.bMute = bMute;
+                if (bMute == 1) {
+                    if (callType == "inBound"){
+                        $("#btnMute").removeClass("btn-warning");
+                        $("#btnMute").addClass("btn-danger");
+                    } else {
+                        if (callType == "outBound") {
+                            $("#outBoundMuteBtn").removeClass("btn-warning");
+                            $("#outBoundMuteBtn").addClass("btn-danger");
+                        }
+                    }
+                }else {
+                    if (bMute == 0) {
+                        if (callType == "inBound"){
+                            $("#btnMute").removeClass("btn-danger");
+                            $("#btnMute").addClass("btn-warning");
+                        } else {
+                            if (callType == "outBound") {
+                                $("#outBoundMuteBtn").removeClass("btn-danger");
+                                $("#outBoundMuteBtn").addClass("btn-warning");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // terminates the call (SIP BYE or CANCEL)
+        function sipHangUp() {
+            if (callQuestion == 1){
+                alert("Lütfen Bekletmeden Çıkınız");
+            }else {
+                if (oSipSessionCall) {
+
+                    oSipSessionCall.hangup({events_listener: {events: '*', listener: onSipEventSession}});
+
+                    txtCallStatus.value = 'Çağrı Kapatıldı';
+                    txtCallStatusOut.value = 'Çağrı Kapatıldı';
+                    toBeSentData.body.Status = "Temsilci Tarafından Kapatıldı";
+
+
+                    // var completeTime = moment().format('M/D/Y H:mm:ss');
+
+
+                    // toBeSentData.body.PlannedCompletion = completeTime.toLocaleString();
+
+
+                    //stopTimerOwn();
+                    callFlashingStop();
+
+                    //console.log("kapata basıldı");
+                }
+            }
+        }
+
+
+
+
+        function sipHangUpOutbound() {
+            if (oSipSessionCall) {
+                oSipSessionCall.hangup({events_listener: {events: '*', listener: onSipEventSession}});
+
+                txtCallStatus.value = 'Çağrı Kapatıldı';
+                txtCallStatusOut.value = 'Çağrı Kapatıldı';
+
+
+                var completeTime = moment().format('M/D/Y H:mm:ss');
+
+
+                toBeSentData.body.PlannedCompletion = completeTime.toLocaleString();
+
+                outboundStopTimerOwn();
+                stopOutbound();
+                homeBtn.hidden = false;
+                $('#homeBtn').css('display', 'block');
+
+                if(tbxDebug==true) console.log(toBeSentData);
+            }
+        }
+
+        function sipSendDTMF(c) {
+            if (oSipSessionCall && c) {
+                if (oSipSessionCall.dtmf(c) == 0) {
+                    try {
+                        dtmfTone.play();
+                    } catch (e) {
+                    }
+                }
+            }
+        }
+
+        function startRingTone() {
+            try {
+                ringtone.play();
+            } catch (e) {
+            }
+        }
+
+        function stopRingTone() {
+            try {
+                ringtone.pause();
+            } catch (e) {
+            }
+        }
+
+        function startRingbackTone() {
+            try {
+                ringbacktone.play();
+            } catch (e) {
+            }
+        }
+
+        function stopRingbackTone() {
+            try {
+                ringbacktone.pause();
+            } catch (e) {
+            }
+        }
+
+        function toggleFullScreen() {
+            if (videoRemote.webkitSupportsFullscreen) {
+                fullScreen(!videoRemote.webkitDisplayingFullscreen);
+            } else {
+                fullScreen(!bFullScreen);
+            }
+        }
+
+        function openKeyPad() {
+            divKeyPad.style.visibility = 'visible';
+            divKeyPad.style.left = document.getElementById("btnKeyPad").clientLeft;
+            divKeyPad.style.top = '70px';
+            divGlassPanel.style.visibility = 'visible';
+        }
+
+        function closeKeyPad() {
+            divKeyPad.style.left = '0px';
+            divKeyPad.style.top = '0px';
+            divKeyPad.style.visibility = 'hidden';
+            divGlassPanel.style.visibility = 'hidden';
+        }
+
+        function fullScreen(b_fs) {
+            bFullScreen = b_fs;
+            if (tsk_utils_have_webrtc4native() && bFullScreen && videoRemote.webkitSupportsFullscreen) {
+                if (bFullScreen) {
+                    videoRemote.webkitEnterFullScreen();
+                } else {
+                    videoRemote.webkitExitFullscreen();
+                }
+            } else {
+                if (tsk_utils_have_webrtc4npapi()) {
+                    try {
+                        if (window.__o_display_remote) window.__o_display_remote.setFullScreen(b_fs);
+                    } catch (e) {
+                        divVideo.setAttribute("class", b_fs ? "full-screen" : "normal-screen");
+                    }
+                } else {
+                    divVideo.setAttribute("class", b_fs ? "full-screen" : "normal-screen");
+                }
+            }
+        }
+
+        function showNotifICall(s_number) {
+            // permission already asked when we registered
+            var notification = new Notification('Gelen Çağrı Var', {
+                icon: 'tbx.jpeg',
+                body: s_number + " Seni Arıyor",
+                image: "/assets/images/call-recorder-unlimited.jpg"
+            });
+
+            notification.onclick = function () {
+                window.focus();
+                this.close();
+            }
+
+        }
+
+        function onKeyUp(evt) {
+            evt = (evt || window.event);
+            if (evt.keyCode == 27) {
+                fullScreen(false);
+            } else if (evt.ctrlKey && evt.shiftKey) { // CTRL + SHIFT
+                if (evt.keyCode == 65 || evt.keyCode == 86) { // A (65) or V (86)
+                    bDisableVideo = (evt.keyCode == 65);
+                    //txtCallStatus.value = 'Video ' + (bDisableVideo ? 'disabled' : 'enabled') + '</i>';
+                    window.localStorage.setItem('org.doubango.expert.disable_video', bDisableVideo);
+                }
+            }
+        }
+
+        /*function onDivCallCtrlMouseMove(evt) {
+          try { // IE: DOM not ready
+            if (tsk_utils_have_stream()) {
+              btnCall.disabled = (!tsk_utils_have_stream() || !oSipSessionRegister || !oSipSessionRegister.is_connected());
+              document.getElementById("divCallCtrl").onmousemove = null; // unsubscribe
+            }
+          }
+          catch (e) {
+          }
+        }*/
+
+        function uiOnConnectionEvent(b_connected, b_connecting) { // should be enum: connecting, connected, terminating, terminated
+            btnRegister.style.display = b_connected || b_connecting ? 'none' : 'block';
+            btnUnRegister.style.display = !b_connected && !b_connecting ? 'none' : 'block';
+            //btnAra.disabled = !(b_connected && tsk_utils_have_webrtc() && tsk_utils_have_stream());
+            btnHangUp.disabled = !oSipSessionCall;
+        }
+
+        function uiVideoDisplayEvent(b_local, b_added) {
+
+        }
+
+        function uiVideoDisplayShowHide(b_show) {
+            if (b_show) {
+                tdVideo.style.height = '340px';
+                divVideo.style.height = navigator.appName == 'Microsoft Internet Explorer' ? '100%' : '340px';
+            } else {
+                tdVideo.style.height = '0px';
+                divVideo.style.height = '0px';
+            }
+        }
+
+        function uiDisableCallOptions() {
+            if (window.localStorage) {
+                window.localStorage.setItem('org.doubango.expert.disable_callbtn_options', 'true');
+                uiBtnCallSetText('Ara');
+                alert('Use expert view to enable the options again (/!\\requires re-loading the page)');
+            }
+        }
+
+        function uiBtnCallSetText(s_text) {
+            switch (s_text) {
+                case "Ara": {
+                    var bDisableCallBtnOptions = (window.localStorage && window.localStorage.getItem('org.doubango.expert.disable_callbtn_options') == "true");
+                    btnAra.value = bDisableCallBtnOptions ? 'Ara' : 'Ara <span id="spanCaret" class="caret">';
+                    //btnCall.setAttribute("class", bDisableCallBtnOptions ? "btn btn-primary" : "btn btn-primary dropdown-toggle");
+                    btnAra.onclick = bDisableCallBtnOptions ? function () {
+                        sipCall(bDisableVideo ? 'call-audio' : 'call-audiovideo');
+                    } : null;
+                    // ulCallOptions.style.visibility = bDisableCallBtnOptions ? "hidden" : "visible";
+                    // if (!bDisableCallBtnOptions && ulCallOptions.parentNode != divBtnCallGroup) {
+                    //   divBtnCallGroup.appendChild(ulCallOptions);
+                    // }
+                    // else if (bDisableCallBtnOptions && ulCallOptions.parentNode == divBtnCallGroup) {
+                    //   document.body.appendChild(ulCallOptions);
+                    // }
+
+                    break;
+                }
+                default: {
+                    btnAra.value = btnAra.innerHTML = s_text;
+                    btnAra.setAttribute("class", "btn btn-primary");
+                    btnAra.onclick = function () {
+                        sipCall(bDisableVideo ? 'call-audio' : 'call-audiovideo');
+                    };
+                    //ulCallOptions.style.visibility = "hidden";
+                    //if (ulCallOptions.parentNode == divBtnCallGroup) {
+                    //document.body.appendChild(ulCallOptions);
+                    //}
+                    break;
+                }
+            }
+        }
+
+        function uiCallTerminated(s_description) {
+            // alert("Kapandı");
+
+            uiBtnCallSetText("Ara");
+            btnHangUp.value = 'Kapat';
+            btnHoldResume.value = 'Beklet';
+            btnMute.value = "Sessiz";
+            btnAra.disabled = false;
+            btnHangUp.disabled = true;
+            btnHoldResume.disabled = true;
+            btnMute.disabled = true;
+            btnTransfer.disabled = true;
+            ivrMenu.disabled = true;
+            ivrMenuOutbound.disabled = true;
+            molaBtn.disabled = false;
+            islevlerBtn.disabled = false;
+            txtPhoneNumber.disabled= false;
+            outBoundHangUpBtn.disabled= true;
+            outBoundHoldBtn.disabled= true;
+            outBoundMuteBtn.disabled= true;
+            btnSendSurvey.disabled= true;
+            labelRinging.innerHTML="";
+            if (window.btnBFCP) window.btnBFCP.disabled = true;
+
+            var completeTime = moment().format('M/D/Y H:mm:ss');
+            toBeSentData.body.PlannedCompletion = completeTime.toLocaleString();
+
+            ///cağrı suresini durdurrrrrr
+            stopTimerOwn();
+            callFlashingStop();
+            if (callType == "outBound") {
+                console.log("outbound Girdim");
+                toBeSentData.body.Status = callStatus;
+                activeCall = false;
+
+                if (callQuestion == 1){
+                    homeBtn.hidden = false;
+                    $('#homeBtn').css('display', 'block');
+                    callQuestionSave();
+                }else {
+                    if (molaDisArama == 1) {
+                        console.log("outbound ACW Girmedim");
+                        homeBtn.hidden = false;
+                        $('#homeBtn').css('display', 'block');
+                        outBoundHangUpBtn.disabled = true;
+                        outBoundHoldBtn.disabled = true;
+                        outBoundMuteBtn.disabled = true;
+                        $("#outBoundMuteBtn").removeClass("btn-danger");
+                        $("#outBoundMuteBtn").addClass("btn-warning");
+                        $("#outBoundHoldBtn").removeClass("btn-danger");
+                        $("#outBoundHoldBtn").addClass("btn-warning");
+                        callType = "";
+                    }else {
+                        console.log("outbound ACW Girdim");
+                        acwOutBound(20, 0); //20 sn saydır agenti pause yap
+                        homeBtn.hidden = false;
+                        $('#homeBtn').css('display', 'block');
+                        outBoundHangUpBtn.disabled = true;
+                        outBoundHoldBtn.disabled = true;
+                        outBoundMuteBtn.disabled = true;
+                        $("#outBoundMuteBtn").removeClass("btn-danger");
+                        $("#outBoundMuteBtn").addClass("btn-warning");
+                        $("#outBoundHoldBtn").removeClass("btn-danger");
+                        $("#outBoundHoldBtn").addClass("btn-warning");
+                        stopInterval();
+                        callType = "";
+                    }
+                }
+            }
+
+            if (incallNumber != "9341001") {
+                createActivity(toBeSentData);
+            }
+
+            if (callType == "inBound") {
+                profileTab.hidden = false;
+                $('#profileTab').css('display', 'block');
+                activeCall = false;
+                if (callQuestion == 1){
+                    callQuestionSave();
+                }else {
+                    if (incallNumber == "9341001") {}else {
+                        acw(20, 0); //20 sn saydır agenti pause yap
+                        $("#btnMute").removeClass("btn-danger");
+                        $("#btnMute").addClass("btn-warning");
+                        $("#btnHoldResume").removeClass("btn-danger");
+                        $("#btnHoldResume").addClass("btn-warning");
+                        stopInterval();
+                        callType = "";
+                    }
+                }
+            }
+
+            getlastCalls();
+
+            clearIvrValue();
+            oSipSessionCall = null;
+
+            stopRingbackTone();
+            stopRingTone();
+
+            txtCallStatus.value = "" + s_description + "";
+            txtCallStatusOut.value.value = "" + s_description + "";
+            uiVideoDisplayShowHide(false);
+            divCallOptions.style.opacity = 0;
+
+            if (oNotifICall) {
+                oNotifICall.cancel();
+                oNotifICall = null;
+            }
+
+            uiVideoDisplayEvent(false, false);
+            uiVideoDisplayEvent(true, false);
+
+            setTimeout(function () {
+                if (!oSipSessionCall) txtCallStatus.value = '';
+            }, 2500);
+
+
+        }
+
+        //yorum
+        // Callback function for SIP Stacks
+        function onSipEventStack(e /*SIPml.Stack.Event*/) {
+
+            tsk_utils_log_info('==stack event = ' + e.type);
+            if(tbxDebug==true) console.log(e)
+            switch (e.type) {
+                case 'started': {
+
+                    // catch exception for IE (DOM not ready)
+                    try {
+                        // LogIn (REGISTER) as soon as the stack finish starting
+                        oSipSessionRegister = this.newSession('register', {
+                            expires: 200,
+                            events_listener: {events: '*', listener: onSipEventSession},
+                            sip_caps: [
+                                {name: '+g.oma.sip-im', value: null},
+                                //{ name: '+sip.ice' }, // rfc5768: FIXME doesn't work with Polycom TelePresence
+                                {name: '+audio', value: null},
+                                {name: 'language', value: '\"en,fr\"'}
+                            ]
+                        });
+                        oSipSessionRegister.register();
+                    } catch (e) {
+                        txtRegStatus.value = txtRegStatus.value = "1:" + e + "";
+                        btnRegister.disabled = false;
+                    }
+
+                    callStatus = "Çağrı Başladı";
+                    break;
+                }
+                case 'st' : {
+
+                    if(tbxDebug==true) console.log('st**');
+                    getApiDataFromHeader(e.o_event.o_message.ao_headers);
+                    callStatus = "Çalıyor";
+                    labelRinging.innerHTML="Çalıyor";
+                    break;
+
+
+                }
+                case 'stopping':
+                case 'stopped':
+                case 'failed_to_start':
+                case 'failed_to_stop': {
+                    var bFailure = (e.type == 'failed_to_start') || (e.type == 'failed_to_stop');
+                    oSipStack = null;
+                    oSipSessionRegister = null;
+
+                    oSipSessionCall = null;
+
+                    uiOnConnectionEvent(false, false);
+
+                    stopRingbackTone();
+                    stopRingTone();
+
+                    uiVideoDisplayShowHide(false);
+                    divCallOptions.style.opacity = 0;
+
+                    txtCallStatus.value = '';
+                    txtCallStatusOut.value = '';
+                    txtRegStatus.value = bFailure ? "Bağlantı Kesildi: " + e.description + "" : "Bağlantı Kesildi";
+                    callStatus = "Bağlantı Kesildi";
+                    break;
+                }
+
+                case 'i_new_call': {
+
+
+                    if (!oSipSessionCall) {
+                        oSipSessionCall = e.newSession;
+                        // start listening for events
+                        oSipSessionCall.setConfiguration(oConfigCall);
+
+                        if(tbxDebug==true)  console.log(oSipSessionCall);
+
+                        //uiBtnCallSetText('Answer');
+                        //btnHangUp.value = 'Reject';
+                        //btnCall.disabled = false;
+                        //btnHangUp.disabled = false;
+
+                        startRingTone();
+
+                        var sRemoteNumber = (oSipSessionCall.getRemoteFriendlyName() || 'unknown');
+                        igdasTelefonNo = String(sRemoteNumber);
+                        //  var sRemoteName = (SIPml.Event.prototype.getContentString()|| 'unknown');
+
+                        getApiDataFromHeader(e.o_event.o_message.ao_headers);
+                        txtCallStatus.value = "Gelen Çağrı *" + sRemoteNumber + "";
+                        $("#txtInboundNumber").html("Gelen Çağrı * " + sRemoteNumber + "");
+                        txtInboundNumber.html = "Gelen Çağrı * " + sRemoteNumber + "";
+
+                        incallNumber = sRemoteNumber;
+                        incallNumber = incallNumber.substr(0,7);
+
+                        callFlashingStart();
+                        callStatus = "Tamamlandı";
+
+                        if (incallNumber == "9341001"){} else {
+                            siebelCreateSR("9"+sRemoteNumber, callID);
+                        }
+                        showNotifICall(sRemoteNumber);
+                        // rehberKayitBul(sRemoteNumber);
+
+                        setTimeout(function () {
+                            sipCall('call-audio');
+                            clearInterval(callFlashing);
+                            $("#myTabContent").css("background-color", "white");
+                        }, 3000);
+
+
+                        var startDate = moment().format('M/D/Y H:mm:ss');
+
+                        var ivrChoiceList = [];
+                        var dataIvrChoice = null;
+
+
+                        // 2. setter fonksiyon, ajax gelen datayı işliyor.
+                        function setIvrChoiceList(obj) {
+                            $(obj).each(function (index, val) {
+                                if (index === 0) {
+                                    ivrChoiceList["dt"] = val.dt;
+                                }
+                                if(tbxDebug==true) console.log(val.dt, val.choice);
+                                ivrChoiceList[index] = val.choice;
+                            });
+
+                            var result = {};
+                            result["ch"] = ivrChoiceList.join();
+                            result["dt"] = ivrChoiceList["dt"];
+
+                            // dışarıda kullanmak gerekirse dataIvrChoice
+                            dataIvrChoice = result;
+
+                            if(tbxDebug==true) console.log("%cData setter: " + JSON.stringify(result), "background: white; color: blue; font-size: large");
+                            if(tbxDebug==true) console.log(dataIvrChoice);
+                            toBeSentData = {
+                                "body": {
+                                    "Description": "+9" + sRemoteNumber + " - Gelen Çağrı",
+                                    "Planned": startDate,
+                                    "PlannedCompletion": "",
+                                    "Started": startDate,
+                                    "UserName": siebelUsername,
+                                    "Type": "Çağrı - Gelen",
+                                    "Status": "Tamamlandı",
+                                    "CallId": callID,
+                                    "SurveyFlg": surveyFlag,
+                                    "IVRKeys": dataIvrChoice["ch"]
+                                }
+                            };
+
+
+                            if(tbxDebug==true) console.log(toBeSentData);
+                            // işlem için buradan devam,
+
+
+                        }
+
+                        if(tbxDebug==true) console.log("%ctoBeSentData: " + JSON.stringify(toBeSentData.body), "background: white; color: red; font-size: large");
+
+                        // 1. ajax request return yok, üst setter fonksiyona atıyor.
+                        $.ajax({
+                            type: 'GET',
+                            url: '/api/ivr_logs?callId=' + xcallID + '',
+                            headers: {
+                                'Authorization': "Bearer " + window.localStorage.getItem('token'),
+                                'accept': "application/json",
+                                'Content-Type': "application/json",
+                            }
+                        })
+                            .done(function (response) {
+                                // set the response data in to global variable(dataIvrChoice)
+                                obj = JSON.parse(JSON.stringify(response));
+                                setIvrChoiceList(obj);
+
+                            });
+
+                        (sRemoteNumber);
+
+                    } else {
+                        // do not accept the incoming call if we're already 'in call'
+                        stopRingbackTone();
+                        stopRingTone();
+
+                        e.newSession.hangup(); // comment this line for multi-line support
+
+                    }
+                    break;
+                }
+
+                case 'm_permission_requested': {
+                    divGlassPanel.style.visibility = 'visible';
+                    callStatus = "Çağrı Tamamlanamadı";
+                    break;
+                }
+                case 'm_permission_accepted':
+                case 'm_permission_refused': {
+                    divGlassPanel.style.visibility = 'hidden';
+                    if (e.type == 'm_permission_refused') {
+                        uiCallTerminated('Mikrofona izin verilmedi');
+                    }
+                    callStatus = "Çağrı Tamamlanamadı";
+                    break;
+                }
+
+                case 'starting':
+                default:
+                    break;
+            }
+        };
+
+        function getApiDataFromHeader(headers) {
+            $("#surveyFlag").html("");
+            if(tbxDebug==true) console.log(headers);
+
+            $.each(headers, function (key, header) {
+
+                if (header.s_name == 'X-CALLID') {
+                    xcallID = header.s_value;
+                    //getIvrRoute(callID);
+                    //////////////  bi ara buda symfony ye gonderilecek
+
+                    getIvrRoute(xcallID);
+
+
+                    //console.log('CallID ile bilgileri çek CallID'+header.s_value)
+                } else if (header.s_name == 'X-UID') {
+                    callID = header.s_value;
+                    // console.log("Anket Katılımı Olmayacak CallID"+callID);
+
+                }
+                else if (header.s_name == 'X-NODEST') {
+                    queNumber = header.s_value;
+
+                }
+                else if (header.s_name == 'X-POLL') {
+                    if (header.s_value == "1") {
+                        surveyFlag = "Y";
+                        $("#surveyFlag").html("Ankete Katılacak");
+                        inboubdAnketCallIdValue = 1;
+                    }
+
+                } else if (header.s_name == 'Call-ID') {
+                    CallOrigCallID = header.s_value;
+
+
+                }
+                else if (header.s_name == 'X-IGDAS-TDCID'){
+                    igdasTDCID =String(header.s_value);
+                    if(tbxDebug==true) console.log("TDC ID:"+igdasTDCID);
+
+
+                }else if (header.s_name == 'X-IGDAS-TALEPTIPI'){
+                    igdasTalepTipi =String(header.s_value).replace(/\"/g, '');
+                    if(tbxDebug==true) console.log("TALEPTİPİ:"+igdasTalepTipi);
+
+
+                }
+
+                else if (header.s_name == 'X-IGDAS-DURUMKODU'){
+                    igdasIVRDurumKodu =header.s_value;
+                    if(tbxDebug==true) console.log("DURUM KODU:"+igdasIVRDurumKodu);
+
+
+                }
+            });
+
+            igdasCallID = String(callID);
+        }
+   function sendSurvey()
+
+        {
+            $.ajax({
+                type: 'GET',
+                url: '/softphone/getChannelId/'+toBeSentData.body.CallId,
+                success: function(data) {
+                    obj=JSON.parse(JSON.stringify(data));
+                    var channelID=obj.channelId;
+
+                    $.getJSON( "https://"+tbxSipServer+"/api/poll_ob.php?user=amiuser&pass=amiuser&chan="+channelID);
+                }
+            });
+
+
+        }
+
+
+
+        // Callback function for SIP sessions (INVITE, REGISTER, MESSAGE...)
+        function onSipEventSession(e /* SIPml.Session.Event */) {
+            tsk_utils_log_info('==session event = ' + e.type);
+
+            switch (e.type) {
+                case 'connecting':
+                case 'connected': {
+                    var bConnected = (e.type == 'connected');
+                    if (e.session == oSipSessionRegister) {
+                        uiOnConnectionEvent(bConnected, !bConnected);
+                        txtRegStatus.value = "" + e.description + "";
+                    } else if (e.session == oSipSessionCall) {
+                        btnHangUp.value = 'Kapat';
+                        btnAra.disabled = true;
+                        btnHangUp.disabled = false;
+                        btnHoldResume.disabled = false;
+                        btnMute.disabled = false;
+                        btnTransfer.disabled = false;
+                        ivrMenu.disabled = false;
+                        molaBtn.disabled = true;
+                        islevlerBtn.disabled = true;
+                        // pauseAgentOnQue();
+                        if (window.btnBFCP) window.btnBFCP.disabled = false;
+
+                        if (bConnected == true) {
+                            stopRingbackTone();
+                            stopRingTone();
+                            ///çağrı süresini saydır
+
+                            if (callType == "outBound") {
+                                callStatus = "Tamamlandı";
+                                labelRinging.innerHTML="";
+                                outboundStopTimerOwn();
+                                outBoundStartTimer();
+                            }
+                            if (oNotifICall) {
+                                oNotifICall.cancel();
+                                oNotifICall = null;
+                            }
+                        }
+
+                        txtCallStatus.value = "" + e.description + "";
+                        txtCallStatusOut.value = "" + e.description + "";
+                        divCallOptions.style.opacity = bConnected ? 1 : 0;
+                        callStatus = "Tamamlandı";
+
+                        if (SIPml.isWebRtc4AllSupported()) { // IE don't provide stream callback
+                            uiVideoDisplayEvent(false, true);
+                            uiVideoDisplayEvent(true, true);
+                        }
+                    }
+                    break;
+                } // 'connecting' | 'connected'
+                case 'terminating':
+                case 'terminated': {
+                    // labelRinging.innerHTML="";
+                    if (e.session == oSipSessionRegister) {
+                        uiOnConnectionEvent(false, false);
+
+                        oSipSessionCall = null;
+                        oSipSessionRegister = null;
+
+                        txtRegStatus.value = "" + e.description + "";
+                    } else if (e.session == oSipSessionCall) {
+                        uiCallTerminated(e.description);
+                    }
+                    break;
+                } // 'terminating' | 'terminated'
+
+                case 'm_stream_video_local_added': {
+                    if (e.session == oSipSessionCall) {
+                        uiVideoDisplayEvent(true, true);
+                    }
+                    break;
+                }
+                case 'm_stream_video_local_removed': {
+                    if (e.session == oSipSessionCall) {
+                        uiVideoDisplayEvent(true, false);
+                    }
+                    break;
+                }
+                case 'm_stream_video_remote_added': {
+                    if (e.session == oSipSessionCall) {
+                        uiVideoDisplayEvent(false, true);
+                    }
+                    break;
+                }
+                case 'm_stream_video_remote_removed': {
+                    if (e.session == oSipSessionCall) {
+                        uiVideoDisplayEvent(false, false);
+                    }
+                    break;
+                }
+
+                case 'm_stream_audio_local_added':
+                case 'm_stream_audio_local_removed':
+                case 'm_stream_audio_remote_added':
+                case 'm_stream_audio_remote_removed': {
+                    break;
+                }
+
+                case 'i_ect_new_call': {
+                    oSipSessionTransferCall = e.session;
+                    break;
+                }
+
+                case 'i_ao_request': {
+                    if (e.session == oSipSessionCall) {
+                        var iSipResponseCode = e.getSipResponseCode();
+                        if (iSipResponseCode == 180 || iSipResponseCode == 183) {
+
+                            // burada kaldım
+                            toBeSentData.body.CallId = e.o_event.o_message.o_hdr_Call_ID.s_value;
+
+                            if(tbxDebug==true) console.log("osip = "+e.o_event.o_message);
+
+                            if (isOutBoundFree == true) {
+                                if (incallNumber == "9341001") {}else {
+                                    siebelCreateSR(number, e.o_event.o_message.o_hdr_Call_ID.s_value);
+                                }
+                                isOutBoundFree = false;
+                                number = "";
+                            }
+
+                            startRingbackTone();
+                            txtCallStatus.value = 'Çalıyor...';
+                            txtCallStatusOut.value = 'Çalıyor...';
+
+                            labelRinging.innerHTML="Çalıyor";
+                            if (callType == "outBound") {
+                                callStatus = "Yanıt Yok";
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                case 'm_early_media': {
+                    if (e.session == oSipSessionCall) {
+                        stopRingbackTone();
+                        stopRingTone();
+                        txtCallStatus.value = 'Medya Aktif';
+                        txtCallStatusOut.value = 'Medya Aktif';
+                    }
+                    break;
+                }
+
+                case 'm_local_hold_ok': {
+                    if (e.session == oSipSessionCall) {
+                        if (oSipSessionCall.bTransfering) {
+                            oSipSessionCall.bTransfering = false;
+                            // this.AVSession.TransferCall(this.transferUri);
+                        }
+                        btnHoldResume.value = 'Geri Al';
+                        btnHoldResume.disabled = false;
+                        txtCallStatus.value = 'Bekletiliyor';
+                        txtCallStatusOut.value = 'Bekletiliyor';
+                        oSipSessionCall.bHeld = true;
+                    }
+                    break;
+                }
+                case 'm_local_hold_nok': {
+                    if (e.session == oSipSessionCall) {
+                        oSipSessionCall.bTransfering = false;
+                        btnHoldResume.value = 'Beklet';
+                        btnHoldResume.disabled = false;
+                        txtCallStatus.value = 'hata';
+                        txtCallStatusOut.value = 'hata';
+                    }
+                    break;
+                }
+                case 'm_local_resume_ok': {
+                    if (e.session == oSipSessionCall) {
+                        oSipSessionCall.bTransfering = false;
+                        btnHoldResume.value = 'Beklet';
+                        btnHoldResume.disabled = false;
+                        txtCallStatus.value = 'Bekletiliyor';
+                        txtCallStatusOut.value = 'Bekletiliyor';
+                        oSipSessionCall.bHeld = false;
+
+                        if (SIPml.isWebRtc4AllSupported()) { // IE don't provide stream callback yet
+                            uiVideoDisplayEvent(false, true);
+                            uiVideoDisplayEvent(true, true);
+                        }
+                    }
+                    break;
+                }
+                case 'm_local_resume_nok': {
+                    if (e.session == oSipSessionCall) {
+                        oSipSessionCall.bTransfering = false;
+                        btnHoldResume.disabled = false;
+                        txtCallStatus.value = 'Hata';
+                        txtCallStatusOut.value = 'Hata';
+                    }
+                    break;
+                }
+                case 'm_remote_hold': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = '';
+                        txtCallStatusOut.value = '';
+                    }
+                    break;
+                }
+                case 'm_remote_resume': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = '';
+                        txtCallStatusOut.value = '';
+                    }
+                    break;
+                }
+                case 'm_bfcp_info': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = '' + e.description + '';
+                        txtCallStatusOut.value = '' + e.description + '';
+                    }
+                    break;
+                }
+
+                case 'o_ect_trying': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = 'Çağrı Yönlendiriliyor';
+                        txtCallStatusOut.value = 'Çağrı Yönlendiriliyor';
+                    }
+                    break;
+                }
+                case 'o_ect_accepted': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = 'Çağrı Yönlendirme Başarılı';
+                        txtCallStatusOut.value = 'Çağrı Yönlendirme Başarılı';
+                    }
+                    break;
+                }
+                case 'o_ect_completed':
+                case 'i_ect_completed': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = 'Çağrı Yönlendirme Başarılı';
+                        txtCallStatusOut.value = 'Çağrı Yönlendirme Başarılı';
+                        btnTransfer.disabled = false;
+                        if (oSipSessionTransferCall) {
+                            oSipSessionCall = oSipSessionTransferCall;
+                        }
+                        oSipSessionTransferCall = null;
+                    }
+                    break;
+                }
+                case 'o_ect_failed':
+                case 'i_ect_failed': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = 'Çağrı Yönlendirme Başarısız';
+                        txtCallStatusOut.value = 'Çağrı Yönlendirme Başarısız';
+                        btnTransfer.disabled = false;
+                    }
+                    break;
+                }
+                case 'o_ect_notify':
+                case 'i_ect_notify': {
+                    if (e.session == oSipSessionCall) {
+                        txtCallStatus.value = "Çağrı Aktarma:" + e.getSipResponseCode() + " " + e.description + "";
+                        txtCallStatusOut.value = "Çağrı Aktarma:" + e.getSipResponseCode() + " " + e.description + "";
+                        if (e.getSipResponseCode() >= 300) {
+                            if (oSipSessionCall.bHeld) {
+                                oSipSessionCall.resume();
+                            }
+                            btnTransfer.disabled = false;
+                        }
+                    }
+                    break;
+                }
+                case 'i_ect_requested': {
+                    if (e.session == oSipSessionCall) {
+                        var s_message = "Çağrı şuraya yönlenecek" + e.getTransferDestinationFriendlyName() + "]?";//FIXME
+                        if (confirm(s_message)) {
+                            txtCallStatus.value = "Çağrı Aktarılıyor...";
+                            txtCallStatusOut.value = "Çağrı Aktarılıyor...";
+                            oSipSessionCall.acceptTransfer();
+                            break;
+                        }
+                        oSipSessionCall.rejectTransfer();
+                    }
+                    break;
+                }
+            }
+        }
+
+    </script>
+    <script>
+
+        // With JQuery
+        $('#ex1').slider({
+            formatter: function (value) {
+                return 'Ses: ' + value;
+            }
+        });
+
+    </script>
+
+    <script>
+        Date.prototype.toDateInputValue = (function () {
+            var local = new Date(this);
+            local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+            return local.toJSON().slice(0, 10);
+        });
+
+        $('#date').val(new Date().toDateInputValue());
+
+
+        $(function () {
+            var d = new Date(),
+                h = d.getHours(),
+                m = d.getMinutes();
+            if (h < 10) h = '0' + h;
+            if (m < 10) m = '0' + m;
+            $('input[type="time"][value="now"]').each(function () {
+                $(this).attr({'value': h + ':' + m});
+            });
+        });
+    </script>
+
+    <script>
+        function getCurrentDateTimeMySql() {
+            var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+            var localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 19).replace('T', ' ');
+            var mySqlDT = localISOTime;
+            return mySqlDT;
+        }
+    </script>
+
+
+
+
+
+    <script>
+        ivrListesiCek();
+        molaListesiCek();
+        acwMenuCek();
+        questionAdd();
+        iframeControl();
+        var siebelUsername = '{{ app.user.username }}';
+        // console.log("hede");
+        //console.log(siebelUsername[0]);
+        //siebelLogin(tokenUserName,'cCAGRIAGENT8',window.localStorage.getItem("token"));
+        function onMyFrameLoad() {
+            siebelLogin(siebelUsername, window.localStorage.getItem("token"), "{{ app.session.get('lp') }}");
+
+        }
+    </script>
+
+    <script src="/assets/softphoneAsset/js/select2.min.js"></script>
+    <script>
+
+
+        // $(document).ready(function() {
+        // $('.js-example-basic-single').select2();
+        $('#outBoundCallButton').click(function () {
+            outBoundFree();
+            disableAcw();
+        });
+        $("#outBoundSelect").change(function () {
+            txtPhoneNumber.disabled= true;
+            siebelFeedbackCall($(this).val());
+        });
+        // });
+    </script>
+
+
+    <script type="text/javascript">
+        jQuery(function () {
+            jQuery(window).bind('beforeunload', function () {
+                return 'Sayfadan ayrılmak istediğinizden eminmisiniz..';
+            });
+
+            // jQuery(window).bind('unload', function () {
+            //     $.get('');
+            //     return 'Sayfadan ayrılmak istediğinizden eminmisiniz..';
+            // });
+        });
+    </script>
+
+    <script type="text/javascript">
+        function startInterval(){
+            stopInterval();
+            setTimeout(function () {
+                molaVeAcwKontrol = setInterval(function(){
+                    molaKontrol();
+                    $("#dahiliNo").html(dahiliNo.substr(dahiliNo.length-3));
+                    lastRegister();
+                    // addUpdateRemove();
+                }, 10000);
+            },5000);
+        }
+        startInterval();
+        function stopInterval() {
+            clearInterval(molaVeAcwKontrol);
+        }
+    </script>
+
+    <script type="text/javascript">
+        $( "#numPadInbound" ).keyup(function(event) {
+            if(tbxDebug==true) console.log(event.key);
+            oSipSessionCall.dtmf(event.key);
+        });
+    </script>
+
+    <script type="text/javascript">
+        $( "#numPadOutbound" ).keyup(function() {
+            if(tbxDebug==true) console.log(event.key);
+            oSipSessionCall.dtmf(event.key);
+        });
+    </script>
+{% endblock %}

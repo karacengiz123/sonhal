@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IvrServiceLog{% endblock %}
+
+{% block body %}
+    <h1>IvrServiceLog</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ivr_service_log.id }}</td>
+            </tr>
+            <tr>
+                <th>CallId</th>
+                <td>{{ ivr_service_log.callId }}</td>
+            </tr>
+            <tr>
+                <th>Alias</th>
+                <td>{{ ivr_service_log.alias }}</td>
+            </tr>
+            <tr>
+                <th>Input</th>
+                <td>{{ ivr_service_log.input }}</td>
+            </tr>
+            <tr>
+                <th>Request</th>
+                <td>{{ ivr_service_log.request }}</td>
+            </tr>
+            <tr>
+                <th>Response</th>
+                <td>{{ ivr_service_log.response }}</td>
+            </tr>
+            <tr>
+                <th>CreatesAt</th>
+                <td>{{ ivr_service_log.createsAt ? ivr_service_log.createsAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('ivr_service_log_index') }}">back to list</a>
+
+    <a href="{{ path('ivr_service_log_edit', {'id': ivr_service_log.id}) }}">edit</a>
+
+    {{ include('ivr_service_log/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %} WebChat Listesi {% endblock %}
+
+
+{% block body %}
+
+    {{ sg_datatables_render(datatable) }}
+
+    <div id="chatHistoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="chatHistoryModalCitizenName" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chatHistoryModalCitizenName"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="p-3 b-b">
+                                                <span class="box-title"
+                                                      style="font-weight: bold!important;">Adı Soyadı:</span>
+                        <span class="box-title" id="historyCitizenName"></span>
+                        <br>
+                        <span class="box-title" style="font-weight: bold!important;">T.C. Kimlik:</span>
+                        <span class="box-title" id="historyCitizenTckn"></span>
+                        <br>
+                        <span class="box-title"
+                              style="font-weight: bold!important;">E-Posta:</span>
+                        <span class="box-title" id="historyCitizenMail"></span>
+                        <br>
+                        <span class="box-title"
+                              style="font-weight: bold!important;">Telefon:</span>
+                        <span class="box-title" id="historyCitizenPhone"></span>
+                        <br>
+                        <span class="box-title"
+                              style="font-weight: bold!important;">ActivityId:</span>
+                        <span class="box-title" id="historyCitizenActivityId"></span>
+                    </div>
+
+                    <ul class="chat-list p-3" id="chatMessageDetail" style="height: auto">
+
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+-                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block customScript %}
+<script>
+    function chatHistoryModalStart(chatId) {
+        $.ajax({
+            url: "/chat/history/detail/" + chatId,
+            method: "GET",
+            success: function (data) {
+                var user = '{{ user.userProfile.firstname }} {{ user.userProfile.lastName }}';
+                console.log(data);
+
+                var activityId = "";
+                if ([null, "", " ", "undefined"].indexOf(data.chat.activityId) > -1) {
+                    activityId = "Aktivite Kaydı Bulunamadı.";
+                } else {
+                    activityId = data.chat.activityId;
+                }
+
+                $("#chatHistoryModalCitizenName").html(data.citizen.Name + " " + data.citizen.Surname);
+                $("#historyCitizenName").html(data.citizen.Name + " " + data.citizen.Surname);
+                $("#historyCitizenTckn").html(data.citizen.Uid);
+                $("#historyCitizenMail").html(data.citizen.MailAddress);
+                $("#historyCitizenPhone").html(data.citizen.MobilePhoneNumber);
+                $("#historyCitizenActivityId").html(activityId);
+
+
+                var dataHistory = "";
+                $.each(data.chatMessage, function (index, value) {
+                    if (value.sender == 3) {
+                        dataHistory += "<li>\n" +
+                            "<div class=\"chat-content\">\n" +
+                            "<h5>Sistem</h5>\n" +
+                            "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                            "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                            "</div>\n" +
+                            "</li>" +
+                            "<br>"
+                    } else {
+                        if (value.sender == 2) {
+                            dataHistory += "<li>\n" +
+                                "<div class=\"chat-content\">\n" +
+                                "<h5>" + user + "</h5>\n" +
+                                "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                                "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                                "</div>\n" +
+                                "</li>" +
+                                "<br>"
+                        } else {
+                            if (value.sender == 1) {
+                                dataHistory += "<li class='reverse' >\n" +
+                                    "<div class=\"chat-content\">\n" +
+                                    "<h5>" + data.citizen.Name + " " + data.citizen.Surname + "</h5>\n" +
+                                    "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                                    "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                                    "</div>\n" +
+                                    "</li>" +
+                                    "<br>"
+                            }
+                        }
+                    }
+                });
+
+                $("#chatMessageDetail").html(dataHistory);
+
+                $("#chatHistoryModal").modal();
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    function chatHistoryModalStop() {
+        $("#chatHistoryModal").modal('hide');
+        wallMessageClear();
+    }
+
+</script>
+{% endblock %}

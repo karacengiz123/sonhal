@@ -1,0 +1,171 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}ACHT DETAY{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#achtListTableDiv").css("display","none");
+                $('#achtListTable').dataTable().fnDestroy();
+                $('#achtListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#achtListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#localAchtDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#localAchtDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#localAchtDetailText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#localAchtDetail").modal('hide');
+            $("#localAchtDetailText").html("");
+        }
+        function achtValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/achtdetails',
+                data:$('#achtIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#achtListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                { data: "tckn" , name: "tckn" , title: "TC No"},
+                                { data: "userName" , name: "userName" , title: "Temsilci"},
+                                { data: "queue" , name: "queue" , title: "Kuyruk"},
+                                { data: "callCount" , name: "callCount" , title: "Çağrı Sayısı"},
+                                { data: "acht" , name: "acht" , title: "ACHT"},
+                                { data: "avgACD" , name: "avgACD" , title: "AVG ACD"},
+                                { data: "avgACW" , name: "avgACW" , title: "AVG ACW"},
+                                { data: "avgHold" , name: "avgHold" , title: "AVG HOLD"},
+                                { data: "countHold" , name: "countHold" , title: "Hold Sayısı"},
+                                // { data: "sumAcw" , name: "sumAcw" , title: "sumAcw"},
+                                // { data: "sumHold" , name: "sumHold" , title: "sumHold"},
+
+
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>ACHT DETAY</h1>
+
+        {{ form_start(form, {'attr': {'id': 'achtIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="achtValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="achtListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="achtListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="localAchtDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="localAchtDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

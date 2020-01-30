@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormTemplate index{% endblock %}
+
+{% block body %}
+    <h1>FormTemplate index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_template in form_templates %}
+            <tr>
+                <td>{{ form_template.id }}</td>
+                <td>{{ form_template.title }}</td>
+                <td>{{ form_template.description }}</td>
+                <td>
+                    <a href="{{ path('form_template_show', {'id': form_template.id}) }}">show</a>
+                    <a href="{{ path('form_template_edit', {'id': form_template.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('form_template_new') }}">Create new</a>
+{% endblock %}

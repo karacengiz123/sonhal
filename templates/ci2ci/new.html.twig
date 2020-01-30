@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ci2ci{% endblock %}
+
+{% block body %}
+    <h1>Create new Ci2ci</h1>
+
+    {{ include('ci2ci/_form.html.twig') }}
+
+    <a href="{{ path('ci2ci_index') }}">back to list</a>
+{% endblock %}

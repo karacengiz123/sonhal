@@ -1,0 +1,166 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}0-7 Saniye Raporu{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#sevenSecondsListTableDiv").css("display","none");
+                $('#sevenSecondsListTable').dataTable().fnDestroy();
+                $('#sevenSecondsListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#sevenSecondsListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#loadsevenSeconds").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#loadsevenSecondsText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#loadsevenSecondsText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#loadsevenSeconds").modal('hide');
+            $("#loadsevenSecondsText").html("");
+        }
+        function sevenSecondsValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/sevenSecondsNew',
+                data:$('#formsevenSecondsIdSelect').serialize(),
+                success:function (data) {
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#sevenSecondsListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "Tarih 24/15 dklık<br/>veya Saatlik"},
+                                { data: "arayan" , name: "arayan" , title: "Arayan"},
+                                { data: "aranan" , name: "aranan" , title: "Aranan"},
+                                { data: "tckn" , name: "tckn" , title: "TC NUMARASI"},
+                                // { data: "username" , name: "username" , title: "Kullanıcı Adı"},
+                                { data: "name" , name: "name" , title: "İsim"},
+                                // { data: "surname" , name: "surname" , title: "Soy Ad"},
+                                { data: "konusmaSuresi" , name: "konusmaSuresi" , title: "Konusma Suresi <br> Saniye"},
+                                { data: "whoclosed" , name: "whoclosed" , title: "Kim Kapattı"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>0-7SN Raporu</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formsevenSecondsIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="sevenSecondsValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="sevenSecondsListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="sevenSecondsListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadsevenSeconds" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadsevenSecondsText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,141 @@
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: 'tr'
+services:
+  Symfony\Bridge\Doctrine\RegistryInterface:
+    class: Symfony\Bridge\Doctrine\RegistryInterface
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false       # Allows optimizing the container by removing unused services; this also means
+      # fetching services directly from the container via $container->get() won't work.
+    # The best practice is to be explicit about your dependencies anyway.
+  app.ldap.guard:
+    class: 'App\Security\Guard\LdapGuardAuthenticator'
+    arguments:
+        - "%security.authentication.hide_user_not_found%"
+        - "@ldap_tools.security.user.ldap_user_checker"
+        - "@ldap_tools.ldap_manager"
+        - "@ldap_tools.security.authentication.form_entry_point"
+        - "@event_dispatcher"
+        - "@ldap_tools.security.auth_success_handler"
+        - "@ldap_tools.security.auth_failure_handler"
+        - "%ldap_tools.security.guard.options%"
+        - "@ldap_tools.security.user.ldap_user_provider"
+        - "@security.password_encoder"
+        - '@doctrine'
+  app.ldapwithjwt.guard:
+    class: 'App\Security\Guard\LdapWithJWTGuard'
+    arguments:
+      - "%security.authentication.hide_user_not_found%"
+      - "@ldap_tools.security.user.ldap_user_checker"
+      - "@ldap_tools.ldap_manager"
+      - "@ldap_tools.security.authentication.form_entry_point"
+      - "@event_dispatcher"
+      - "@ldap_tools.security.auth_success_handler"
+      - "@ldap_tools.security.auth_failure_handler"
+      - "%ldap_tools.security.guard.options%"
+      - "@ldap_tools.security.user.ldap_user_provider"
+  app.security.event.login_listener:
+    class: App\Security\Event\LdapLoginListener
+    arguments:
+    - '@service_container'
+    - '@fos_user.util.user_manipulator'
+    - '@doctrine'
+    tags:
+    - { name: kernel.event_listener, event: ldap_tools_bundle.login.success, method: onLdapLoginSuccess }
+    - { name: test, event: }
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: '../src/*'
+    exclude: '../src/{Entity,Migrations,Tests}'
+  # controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  App\Controller\:
+    resource: '../src/Controller'
+    tags: ['controller.service_arguments']
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+  # app.eventlistener.agentbreaklistener:
+  App\EventListener\AgentBreakListener:
+    public: true
+    class: App\EventListener\AgentBreakListener
+    arguments:
+      - "@security.token_storage"
+      - "@service_container"
+  security.logout.handler.session:
+    class: App\EventListener\SessionLogoutHandler
+    arguments:
+      - "@fos_user.user_manager"
+      - "@doctrine"
+  App\Command\WebsocketStartCommand:
+    arguments:
+      - "@service_container"
+  api.jwt_creating.listener:
+    class: App\EventListener\JWTCreatedListener
+    arguments: [ '@request_stack', '@security.token_storage' ]
+    tags:
+    - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+  doctrine.orm.container_aware_entity_listener_resolver:
+    class: App\EntityListenerResolver\ContainerAwareEntityListenerResolver
+    arguments: ['@service_container']
+  app.jwt_manager:
+    public: true
+    alias: lexik_jwt_authentication.jwt_manager
+  Sg\DatatablesBundle\Datatable\DatatableFactory:
+    class: Sg\DatatablesBundle\Datatable\DatatableFactory
+    public: true
+    arguments:
+      - '@security.authorization_checker'
+      - '@security.token_storage'
+      - '@translator'
+      - '@router'
+      - '@doctrine.orm.entity_manager'
+      - '@twig'
+  Sg\DatatablesBundle\Response\DatatableResponse:
+    class: Sg\DatatablesBundle\Response\DatatableResponse
+    public: true
+    arguments:
+      - '@request_stack'
+  App\Rethink\Service:
+    public: true
+    arguments:
+      - '%env(RETHINK_HOST)%'
+      - '%env(RETHINK_PORT)%'
+      - '%env(RETHINK_DB)%'
+  Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+    arguments:
+      - '%env(SESSION_DATABASE_URL)%'
+
+  Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+    arguments:
+      - '@Redis'
+
+  App\ChatStrategy\ChatStrategyInterFace:
+    class: App\ChatStrategy\FirstClosedFirst
+  Gedmo\Loggable\Entity\LogEntry:
+    class: Gedmo\Loggable\Entity\LogEntry
+  App\Services\SipServerService:
+    arguments: ['@doctrine.orm.entity_manager','%tbxSipServer%','%tbxSipServerTwo%']
+  app.agent_status_service:
+    class: App\Services\AgentStatusService
+    arguments: ['@doctrine.orm.entity_manager']
+
+  gos_web_socket_server.client_event.listener:
+    class: App\WebSocket\GosEvents
+    tags:
+      - { name: kernel.event_listener, event: 'gos_web_socket.client_connected', method: onClientConnect }
+      - { name: kernel.event_listener, event: 'gos_web_socket.client_disconnected', method: onClientDisconnect }
+      - { name: kernel.event_listener, event: 'gos_web_socket.client_error', method: onClientError }
+      - { name: kernel.event_listener, event: 'gos_web_socket.server_launched', method: onServerStart }
+      - { name: kernel.event_listener, event: 'gos_web_socket.client_rejected', method: onClientRejected }
+  Redis:
+    class: Redis
+    calls:
+      - method: connect
+        arguments:
+          - '%env(REDIS_HOST)%'
+          - '%env(int:REDIS_PORT)%'

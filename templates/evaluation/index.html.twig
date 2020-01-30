@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evaluation index{% endblock %}
+
+{% block body %}
+    <h1>Evaluation index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>SourceDestID</th>
+                <th>Score</th>
+                <th>Comment</th>
+                <th>EvaluatorComment</th>
+                <th>EvaluativeComment</th>
+                <th>Duration</th>
+                <th>PhoneNumber</th>
+                <th>CallDate</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>DeletedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation in evaluations %}
+            <tr>
+                <td>{{ evaluation.id }}</td>
+                <td>{{ evaluation.sourceDestID }}</td>
+                <td>{{ evaluation.score }}</td>
+                <td>{{ evaluation.comment }}</td>
+                <td>{{ evaluation.evaluatorComment }}</td>
+                <td>{{ evaluation.evaluativeComment }}</td>
+                <td>{{ evaluation.duration }}</td>
+                <td>{{ evaluation.phoneNumber }}</td>
+                <td>{{ evaluation.callDate ? evaluation.callDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation.createdAt ? evaluation.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation.updatedAt ? evaluation.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ evaluation.deletedAt ? evaluation.deletedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('evaluation_show', {'id': evaluation.id}) }}">show</a>
+                    <a href="{{ path('evaluation_edit', {'id': evaluation.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('evaluation_new') }}">Create new</a>
+{% endblock %}

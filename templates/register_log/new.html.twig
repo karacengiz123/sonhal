@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New RegisterLog{% endblock %}
+
+{% block body %}
+    <h1>Create new RegisterLog</h1>
+
+    {{ include('register_log/_form.html.twig') }}
+
+    <a href="{{ path('register_log_index') }}">back to list</a>
+{% endblock %}

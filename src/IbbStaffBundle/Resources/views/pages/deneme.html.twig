@@ -1,0 +1,33 @@
+{% block customScript %}
+<script src="assets/dist/js/require.js"></script>
+
+<script type="text/javascript">
+    // function aaa(){
+    //  require(['rethinkdb'], function() {
+    //         console.log("util");
+    //     });
+    //     // var r = require(['rethinkdbdash'])();
+    //     // r.connect({host: '10.5.95.151', port: 28015}).then(function(connection) {
+    //     //     connection.on('error', handleError);
+    //     //     query.run(connection).then(function(result) {
+    //     //         console.log(result);
+    //     //         connection.close();
+    //     //     });
+    //     // });
+    //     // console.log(r);
+    //
+    // }
+    var   r = require('rethinkdbdash')();
+
+    function  bb() {
+        r.connect({host:'10.5.95.151', port: 28015}).then(function(connection) {
+            connection.on('error', handleError);
+
+            query.run(connection).then(function(result) {
+                console.log(result);
+                connection.close();
+            });
+        });
+    }
+</script>
+{% endblock%}

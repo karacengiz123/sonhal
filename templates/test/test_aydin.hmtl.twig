@@ -1,0 +1,15 @@
+{% extends "layout/base.html.twig" %}
+{% block title %} Aydin Test {% endblock %}
+{% block customCss %}
+{% endblock %}
+{% block customScript %}
+{% endblock %}
+
+{% block body %}
+    <div class="col-lg-12">
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-sm btn-cyan">Kaydet</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

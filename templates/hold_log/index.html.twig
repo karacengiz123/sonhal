@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}HoldLog index{% endblock %}
+
+{% block body %}
+    <h1>HoldLog index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>StartTime</th>
+                <th>EndTime</th>
+                <th>UniqueId</th>
+                <th>CallType</th>
+                <th>Duration</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for hold_log in hold_logs %}
+            <tr>
+                <td>{{ hold_log.id }}</td>
+                <td>{{ hold_log.startTime ? hold_log.startTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ hold_log.endTime ? hold_log.endTime|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ hold_log.uniqueId }}</td>
+                <td>{{ hold_log.callType }}</td>
+                <td>{{ hold_log.duration }}</td>
+                <td>
+                    <a href="{{ path('hold_log_show', {'id': hold_log.id}) }}">show</a>
+                    <a href="{{ path('hold_log_edit', {'id': hold_log.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('hold_log_new') }}">Create new</a>
+{% endblock %}

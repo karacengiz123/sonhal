@@ -1,0 +1,11 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}New FormQuestion{% endblock %}
+
+{% block body %}
+    <h1>Create new FormQuestion</h1>
+
+    {{ include('form_question/_form.html.twig') }}
+
+    <a href="{{ path('form_question_index') }}">back to list</a>
+{% endblock %}

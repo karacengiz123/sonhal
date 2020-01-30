@@ -1,0 +1,333 @@
+{% extends 'layout/login_base.html.twig' %}
+
+{% block body %}
+    <style type="text/css">
+        body {
+            zoom: 100%!important;
+        }
+        table {
+            width: 100%;
+        }
+        th {
+            background: navy;
+            color: white;
+            font-weight: bold;
+            font-size: 25px;
+            padding: 5px;
+            text-align: center;
+            font-family: "Nimbus Roman No9 L";
+        }
+        td {
+            font-weight: 500;
+            font-size: 14px;
+            padding: 2px;
+            text-align: center;
+        }
+        .left-column {
+            position: relative;
+        }
+        .left-column table td:nth-child(2) {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .mid-column {
+            position: relative;
+        }
+        .right-column {
+            position: relative;
+        }
+        .ibb-logo {
+            height: 150px;
+            width: auto;
+        }
+        .mid-logo {
+            position: relative;
+        }
+        .alo-153 {
+            position: absolute;
+            height: 80px;
+            width: auto;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 5px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .big-text {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 4em;
+            font-weight: bold;
+        }
+    </style>
+    {# Banner Row #}
+    <div class="container-fluid" >
+        <div class="banner row text-md-center col-sm-12">
+            <div class="col-md-3">
+                <img class="ibb-logo img-responsive" src="{{ asset('assets/images/ibb-logo.png') }}">
+            </div>
+            <div class="mid-logo col-md-6">
+                <img class="alo-153 img-responsive" src="{{ asset('assets/images/beyazmasa_logo.png') }}">
+            </div>
+            <div class="col-md-3">
+                <img class="ibb-logo img-responsive" src="{{ asset('assets/images/ibb-logo.png') }}">
+            </div>
+        </div>
+
+        {# Content Row #}
+        <div class="row center-align" id="MotherDiv">
+            {# Left Column #}
+            <div class="left-column col-md-3">
+                <div class="col-md-12">
+                    <table class="tableTdFontSize table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Canlı Durum
+                                </th>
+                                <th>
+                                    Sayı
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hazır</td>
+                                <td id="avail">{{ leftTop.avail }}</td>
+                            </tr>
+                            <tr>
+                                <td> Çağrıda</td>
+                                <td id="outboundCaller">{{ leftTop.inCalls }}</td>
+                            </tr>
+                            <tr>
+                                <td>Mola</td>
+                                <td id="agentBreaks">{{ leftTop.agentBreaks }}</td>
+                            </tr>
+
+                            {% for key, count in leftTop.acw %}
+                                <tr id="acwData-{{ key }}">
+                                    <td>{{ key }} TUSLAMASI</td>
+                                    <td>{{ count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <p style="line-height: 2em;">&nbsp;</p>
+                </div>
+
+                <div class="col-md-12">
+                    <table class="tableTdFontSize table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Günlük Durum
+                                </th>
+                                <th>
+                                    Sayı
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr >
+                                <td>Dış Arama</td>
+                                <td id="outbound">{{ leftBottom.outbound }}</td>
+                            </tr>
+                            <tr>
+                                <td>Gelen</td>
+                                <td id="calls">{{ leftBottom.calls }}</td>
+                            </tr>
+                            <tr>
+                                <td>IVR da tamamlanan</td>
+                                <td id="toIvr">{{ leftBottom.toIvrEnded }}</td>
+                            </tr>
+                            <tr>
+                                <td>Karşılanan</td>
+                                <td id="completed">{{ leftBottom.completed }}</td>
+                            </tr>
+                            <tr>
+                                <td>Kaçan</td>
+                                <td id="abandoned">{{ leftBottom.abandoned }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Mid Column #}
+            <div class="mid-column col-md-6">
+                <table class="tableTdFontSize servis-seviye table-bordered table-striped text-md-center">
+                    <thead>
+                        <tr>
+                            <th>Servis Seviyesi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p id="serviceLevel" class="big-text">{{ midColumn.serviceLevel }}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div>
+                    <p style="line-height: 1em;">&nbsp;</p>
+                </div>
+
+                <table class="tableTdFontSize table-bordered table-striped text-md-center">
+                    <thead>
+                        <tr>
+                            <th>Hatta Bekleyen Çağrı Sayısı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p id="inwaiting" class="big-text">{{ midColumn.inwaiting }}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div>
+                    <p style="line-height: 2em;">&nbsp;</p>
+                </div>
+
+                <table class="tableTdFontSize table-bordered table-striped text-md-center">
+                    <thead>
+                        <tr>
+                            <th>En Uzun Bekleyen Çağrı Süresi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p id="longestHoldTime" class="big-text">{{ midColumn.longestHoldTime }}</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# Right Column #}
+            <div class="right-column col-md-3">
+                <table class="tableTdFontSize table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Karşılanan<br>Çağrı</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queueLogAgent">
+                        {% for key, info in rightColumn %}
+                            <tr>
+                                <td>{{ info.firstName }} {{ info.lastName }}</td>
+                                <td>{{ info.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Content Row #}
+        <div class="row center-align" id="wallMessages">
+            <div class="col-sm-12" id="wallMessagesText">
+                {% for wallMessage in  leftBottom.wallMessage%}
+                    {{ wallMessage|raw }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tableTdFontSize thead th, .tableTdFontSize tbody td{
+            font-size: 200%!important;
+
+        }
+    </style>
+{% endblock %}
+{% block customScript %}
+    <script type="text/javascript">
+        var changeDiv = 0;
+
+        function reload() {
+            if (changeDiv === 0){
+                changeDiv = 1;
+                $("#MotherDiv").show();
+                $("#wallMessages").hide();
+            }else {
+                if (changeDiv === 1){
+                    $.ajax({
+                        url:"{{ path('old_message') }}",
+                        method:"GET",
+                        success:function (data) {
+                            $("#wallMessagesText").html(data.oldMessage);
+                            changeDiv = 2;
+                            $("#MotherDiv").hide();
+                            $("#wallMessages").show();
+                        }
+                    });
+                }else {
+                    if (changeDiv === 2){
+                        changeDiv = 1;
+                        $("#MotherDiv").show();
+                        $("#wallMessages").hide();
+                    }
+                }
+            }
+
+            // reloadDisable();
+            $.ajax({
+                url: '{{ url('dashboard') }}',
+                success: function (result) {
+                    $('#agentBreaks').html(result.leftTop.agentBreaks);
+
+                    $.each(result.leftTop.acw, function (index, value) {
+                        $('#acwData-' + index).html('<td>' + index + ' TUŞLAMASI</td><td>' + value + '</td>');
+                    });
+
+                    $('#outboundCaller').text(result.leftTop.inCalls);
+                    $('#avail').text(result.leftTop.avail);
+
+                    // left bottom
+                    $('#calls').text(result.leftBottom.calls);
+                    $('#completed').text(result.leftBottom.completed);
+                    $('#abandoned').text(result.leftBottom.abandoned);
+                    $('#active').text(result.leftBottom.active);
+                    $('#toIvr').text(result.leftBottom.toIvrEnded);
+                    $('#outbound').text(result.leftBottom.outbound);
+
+                    // mid column
+                    $('#serviceLevel').text(result.midColumn.serviceLevel);
+                    $('#inwaiting').text(result.midColumn.inwaiting);
+                    $('#longestHoldTime').text(result.midColumn.longestHoldTime);
+
+                    // right column
+                    $text="";
+                    $.each(result.rightColumn, function (index, value) {
+                       $text +='' +
+                           '<tr>' +
+                                '<td>' + value.firstName + " " + value.lastName + '</td>' +
+                                '<td>' +  value.count + '</td>' +
+                           '</tr>' ;
+                    });
+                    $('#queueLogAgent').html($text);
+                },
+                error: function (result) {
+                }
+            });
+        }
+
+        function reloadDisable() {
+            clearInterval(interval);
+        }
+
+        reload();
+        var interval = setInterval(reload, 10000);
+    </script>
+
+{% endblock %}

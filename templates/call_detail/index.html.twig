@@ -1,0 +1,171 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Arama Detay{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#callDetailListTableDiv").css("display","none");
+                $('#callDetailListTable').dataTable().fnDestroy();
+                $('#callDetailListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#callDetailListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#loadcallDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#loadcallDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#loadcallDetailText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#loadcallDetail").modal('hide');
+            $("#loadcallDetailText").html("");
+        }
+        function callDetailValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/calldetails',
+                data:$('#formcallDetailIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#callDetailListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "24/15 dklık<br/>veya Saatlik"},
+                                { data: "arayannumara" , name: "arayannumara" , title: "Arayan"},
+                                { data: "kuyruk" , name: "kuyruk" , title: "Kuyruk"},
+                                { data: "callType" , name: "callType" , title: "Çağrı Tipi"},
+                                { data: "temsilci" , name: "temsilci" , title: "Temsilci"},
+                                { data: "temsilciTc" , name: "temsilciTc" , title: "TC"},
+                                { data: "konusmasuresi" , name: "konusmasuresi" , title: "Konuşma Süresi Saniye"},
+                                { data: "kuyrukBeklemeSuresi" , name: "kuyrukBeklemeSuresi" , title: "Kuyruk Bekleme Süresi Saniye"},
+                                { data: "ivrSüresi" , name: "ivrSüresi" , title: "IVR Bekleme Süresi Saniye"},
+                                { data: "aramaZamani" , name: "aramaZamani" , title: "Arama Zamani"},
+                                { data: "kuyrugaGirmeZamani" , name: "kuyrugaGirmeZamani" , title: "Kuyruga Girme Zamani"},
+                                { data: "baslangicZamani" , name: "baslangicZamani" , title: "Baslangıç Zamanı"},
+                                { data: "kapanmaZamani" , name: "kapanmaZamani" , title: "Kapanma Zamanı"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Arama  Detay</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formcallDetailIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="callDetailValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="callDetailListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="callDetailListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadcallDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadcallDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+
+    <h1 style="padding: 20px">Kullanıcı Düzenle</h1>
+
+
+<div class="col-lg-12" style="background-color: white;margin: auto; padding: 25px;">
+    <a class="btn btn-info" style="padding: 10px;float: right;margin-right: 10px;margin-bottom: 20px" href="{{ path('user_index') }}">Listeye Geri Gön</a>
+
+    {{ include('user/_formEdit.html.twig', {'button_label': 'Kaydet'}) }}
+    {{ include('user/_delete_form.html.twig') }}
+
+    <br/>
+    <br/>
+</div>
+
+
+{% endblock %}

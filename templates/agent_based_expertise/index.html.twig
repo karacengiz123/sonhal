@@ -1,0 +1,176 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Temsilci Bazlı Uzmanlık{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling = false;
+
+        function displayNoneTableDiv() {
+            if (tableFilling == true) {
+                $("#agentBaseExpListTableDiv").css("display", "none");
+                $('#agentBaseExpListTable').dataTable().fnDestroy();
+                $('#agentBaseExpListTable').html("");
+                tableFilling = false;
+            }
+
+        }
+
+        function displayBlockTableDiv() {
+            $("#agentBaseExpListTableDiv").css("display", "block");
+        }
+
+        function ModalStart(modalText = null) {
+            $("#loadagentBaseExp").modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if (modalText == null) {
+                $("#loadagentBaseExpText").html("Lütfen Bekleyiniz");
+            } else {
+                $("#loadagentBaseExpText").html(modalText);
+            }
+        }
+
+        function ModalFinish() {
+            $("#loadagentBaseExp").modal('hide');
+            $("#loadagentBaseExplText").html("");
+        }
+
+        function agentBaseExpValidateForm() {
+            ModalStart();
+            //
+            // $('#table').on('error.dt', function (e, settings, techNote, message) {
+            //     console.log('An error has been reported by DataTables: ', message);
+            // });
+            $.ajax({
+                type: 'POST',
+                url: '/BaseExpertise',
+                data: $('#formagentBaseExpIdSelect').serialize(),
+
+                success: function (data) {
+                    obj=JSON.parse(JSON.stringify(data));
+                    console.log(obj);
+                    var colums = obj.column;
+                    var datas = obj.row;
+                    if ($.isArray(datas) == true) {
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $.fn.dataTable.ext.errMode = 'throw';
+
+                        $('#agentBaseExpListTable').DataTable({
+
+                            dom: 'lBfrtip',
+                            "language": {
+                                url: '/assets/Turkish.json'
+                            },
+                            columns: colums,
+                            order: [],
+                            data: datas
+                        });
+                        tableFilling = true;
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                    } else {
+                        ModalStart(datas);
+                        $("#loadModalAnimation").css("display", "none");
+                        $(".modal-content").css("background-color", "red");
+                        $(".modal-content").css("color", "white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display", "block");
+                                $(".modal-content").css("background-color", "white");
+                                $(".modal-content").css("color", "black");
+                            }, 2000);
+                    }
+                },
+                error:function (datas) {
+                    console.log(datas);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+
+        <h1>Temsilci Bazlı Uzmanlık</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formagentBaseExpIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="agentBaseExpValidateForm()" class="btn" value="Listele"
+               style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="agentBaseExpListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="agentBaseExpListTable"
+                           class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadagentBaseExp" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadagentBaseExpText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

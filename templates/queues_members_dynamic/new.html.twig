@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New QueuesMembersDynamic{% endblock %}
+
+{% block body %}
+    <h1>Create new QueuesMembersDynamic</h1>
+
+    {{ include('queues_members_dynamic/_form.html.twig') }}
+
+    <a href="{{ path('queues_members_dynamic_index') }}">back to list</a>
+{% endblock %}

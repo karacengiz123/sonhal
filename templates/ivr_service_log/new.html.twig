@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New IvrServiceLog{% endblock %}
+
+{% block body %}
+    <h1>Create new IvrServiceLog</h1>
+
+    {{ include('ivr_service_log/_form.html.twig') }}
+
+    <a href="{{ path('ivr_service_log_index') }}">back to list</a>
+{% endblock %}

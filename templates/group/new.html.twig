@@ -1,0 +1,42 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}New Group{% endblock %}
+{% block customScript %}
+    <script type="text/javascript">
+        $("#checkAll").click(function(){
+            $('input:checkbox').not(this).prop('checked', 'checked');
+        });
+
+
+        $(".form-check").addClass("col-lg-3");
+    </script>
+{% endblock %}
+{% block body %}
+    <style>
+        .aaa form button {
+            float: right;
+            margin: 5px;
+        }
+
+        .form-check {
+            float: left;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".successBtn form button").attr('class', 'btn btn-success');
+        });
+    </script>
+    <h1 style="padding: 20px">Yeni Rol Oluştur</h1>
+    <div class="col-lg-12 aaa" style="padding: 20px; background-color: white">
+        <a class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('group_index') }}">Listeye Geri
+            Dön</a>
+
+        <div class="successBtn">
+            {{ include('group/_form.html.twig') }}
+            <button id="checkAll" type="button" class=" btn btn-success">Hepsini Seç</button>
+        </div>
+        <br/>
+        <br/>
+    </div>
+{% endblock %}

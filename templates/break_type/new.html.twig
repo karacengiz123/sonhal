@@ -1,0 +1,39 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Yeni Mola Türü{% endblock %}
+
+{% block body %}
+
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".successBtn form button").attr('class', 'btn btn-success');
+        });
+    </script>
+
+    <h1 style="text-align: left;padding: 20px">Yeni Mola Türü Kur</h1>
+
+    <div class="col-lg-12 aaa" style=" background-color: white;  padding: 20px">
+        <a class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('break_type_index') }}">  Listeye Geri Dön </a>
+
+
+            <div class="successBtn">
+
+            {{ include('break_type/_form.html.twig') }}
+            </div>
+            <br/>
+            <br/>
+
+    </div>
+
+
+{% endblock %}
+
+
+

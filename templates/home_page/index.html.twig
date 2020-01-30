@@ -1,0 +1,715 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block customScript %}
+    {% if is_granted("ROLE_TAKIM_LIDREEE") %}
+
+        <script src="{{ asset('assets/js/vue.min.js') }}"></script>
+        <script src="/assets/dist/js/easy.timer.js"></script>
+
+        <script>
+            var token = $.ajax({
+                async: false,
+                url: "{{ path('jwt') }}"
+            }).responseJSON;
+            window.localStorage.setItem('token', token.token);
+
+            function getTokenStorage() {
+                return window.localStorage.getItem('token')
+            }
+
+            var stateCheckInterval;
+            var tbxDebug = false;
+
+            var homeTimer = new easytimer.Timer();
+
+            let homeVue = new Vue({
+                    delimiters: ['${', '}'],
+                    el: '#homePage',
+                    data: {
+                        breakList: {{ breakTypesList | raw }},
+                        acwTypesList: {{ acwTypesList | raw }},
+                        stateDetailText: '',
+                        stateDetailTimeStamp: 0,
+                        agentStatus: 9999,
+                        agentStatusText: 'Hazır Değil',
+                        agentStatusColor: "#ff0000",
+                        proccessStatus: 0,
+                        extensionNo: {{ app.user.userProfile.extension | raw }},
+                        agentStates: {
+                            0: {
+                                title: "Hazır Değil",
+                                color: "#ff0000",
+                                availableStatusses: [1, 4, 5, 6, 7],
+                            },
+                            1: {
+                                title: "Hazır",
+                                color: "#00ff00",
+                                availableStatusses: [0, 4, 5, 6, 7, 8],
+                            },
+                            4: {
+                                title: "Mola",
+                                color: "#f78243",
+                                availableStatusses: [1, 4, 5, 6, 7],
+                            },
+                            5: {
+                                title: "Soru",
+                                color: "#ffff00",
+                                availableStatusses: [1, 4, 6, 7],
+                            },
+                            13: {
+                                title: "Bağlantı Yok",
+                                color: "#ffa500",
+                                availableStatusses: [1, 2, 4, 5],
+                            },
+                            15: {
+                                title: "Bağlantı Var - Db Server Gitti",
+                                color: "#ffa500",
+                                availableStatusses: [1, 2, 4, 5],
+                            },
+                            18: {
+                                title: "İnternet Bağlantınız Kesildi",
+                                color: "#ffa500",
+                                availableStatusses: [1, 2, 4, 5],
+                            },
+                            9999: {
+                                title: "",
+                                color: "",
+                                availableStatusses: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 99, 1007, 999],
+                            },
+                            1007: {
+                                title: "",
+                                color: "",
+                                availableStatusses: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 99, 1007, 999],
+                            },
+                        }
+                    },
+                    methods: {
+                        acwStart: function (typeId) {
+                            if (this.proccessStatus == 1) {
+                                Swal.fire({
+                                    title: '!!! -DİKKAT- !!!',
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    html: '' +
+                                        '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                        '',
+                                    confirmButtonText: 'Kapat',
+                                }).then(function (result) {
+                                    if (result.dismiss == Swal.DismissReason.cancel) {
+                                    } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                    } else if (result.value) {
+                                    }
+                                });
+                                return false;
+                            } else {
+                                this.proccessStatus = 1;
+                            }
+                            if (this.agentStatus == 3) {
+                                typeId = 2;
+                            }
+                            acw(typeId);
+                        },
+                        acwStop: function () {
+                            chronoTimer();
+                            this.proccessStatus = 1;
+                            acwStop();
+                        },
+                        breakStart: function (breakTypeId) {
+                            if (this.proccessStatus == 1) {
+                                Swal.fire({
+                                    title: '!!! -DİKKAT- !!!',
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    html: '' +
+                                        '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                        '',
+                                    confirmButtonText: 'Kapat',
+                                }).then(function (result) {
+                                    if (result.dismiss == Swal.DismissReason.cancel) {
+                                    } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                    } else if (result.value) {
+                                    }
+                                });
+                                return false;
+                            } else {
+                                this.proccessStatus = 1;
+                            }
+                            chronoTimer();
+                            if (this.agentStates[this.agentStatus].availableStatusses.indexOf(4) == -1) {
+                                alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                                return false;
+                            }
+                            breakStart(breakTypeId);
+                        },
+                        breakStop: function () {
+                            chronoTimer();
+                            if (this.agentStatus != 4) {
+                                alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                            }
+                            this.proccessStatus = 1;
+                            breakStop();
+                        },
+                    },
+                    watch: {
+                        agentStatus: function (newState) {
+                            // if ([13, 15, 16, 18].indexOf(newState) > -1) {
+                            //
+                            // }
+
+                            if (newState == 13) {
+                                Swal.fire({
+                                    title: '!!! -DİKKAT- !!!',
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    html: '' +
+                                        '<h3 style="float: left!important; font-weight: bold!important;">Durum Erişiminiz Anlık Olarak Reddedilmiştir. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                        '',
+                                    confirmButtonText: 'Yenile',
+                                }).then(function (result) {
+                                    if (result.dismiss == Swal.DismissReason.cancel) {
+                                    } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                    } else if (result.value) {
+                                        location.reload();
+                                    }
+                                })
+                            }
+
+                            if (newState == 15) {
+                                Swal.fire({
+                                    title: '!!! -DİKKAT- !!!',
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    html: '' +
+                                        '<h3 style="float: left!important; font-weight: bold!important;">Veritabanı Erişiminiz Anlık Olarak Zaman Aşımına Uğramıştır. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                        '',
+                                    confirmButtonText: 'Yenile',
+                                }).then(function (result) {
+                                    if (result.dismiss == Swal.DismissReason.cancel) {
+                                    } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                    } else if (result.value) {
+                                        location.reload();
+                                    }
+                                })
+                            }
+
+                            if (newState == 18) {
+                                Swal.fire({
+                                    title: '!!! -DİKKAT- !!!',
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    html: '' +
+                                        '<h3 style="float: left!important; font-weight: bold!important;">İnternet Bağlantınız Kesildi Lütfen Kablonuzu Veya Bağlantı Ayarlarınızı Kontrol Ediniz. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                        '',
+                                    confirmButtonText: 'Yenile',
+                                }).then(function (result) {
+                                    if (result.dismiss == Swal.DismissReason.cancel) {
+                                    } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                    } else if (result.value) {
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        },
+                    },
+                },
+            );
+
+            function stateCheck() {
+                if (homeVue.proccessStatus == 1) {
+                    return false;
+                }
+
+                if ([13,15,18].indexOf(parseInt(homeVue.agentStatus)) > -1){
+                    return false;
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/homepage/state',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        if (tbxDebug == true) console.log(data);
+                        if (data.hasOwnProperty('state')) {
+                            homeVue.agentStatus = data.state;
+                            homeVue.stateDetailText = data.text;
+                            homeVue.stateDetailTimeStamp = data.timeStamp;
+
+                            chronoTimer(data.timeStamp);
+                        }
+                    },
+                    complete: function (data) {
+                        if (data.status == 500) {
+                            homeVue.agentStatus = 13;
+                        }
+                        if (data.status == 0) {
+                            homeVue.agentStatus = 18;
+                        }
+                        if (data.status != 200){
+                            homeVue.agentStatus = 15;
+                        }
+                    }
+                });
+
+            }
+
+            function acw(acwTypeId) {
+                setTimeout(function () {
+                    if ([1,3].indexOf(parseInt(acwTypeId)) > -1){
+                        return false;
+                    }
+
+                    $.ajax({
+                        type: 'GET',
+                        url: '/api/homepage/acwLogStart/' + acwTypeId,
+                        async: false,
+                        headers: {
+                            'Authorization': "Bearer " + getTokenStorage(),
+                            'accept': "application/json",
+                            'Content-Type': "application/json",
+                        },
+                        success: function (data) {
+                            homeVue.agentStatus = data.state;
+                            homeVue.stateDetailText = data.text;
+                            homeVue.proccessStatus = 0;
+                        }
+                    });
+                }, 500);
+            }
+
+            function acwStop() {
+                if (tbxDebug == true) console.log("Acw Stop Function");
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/homepage/acwLogStop',
+                    async: false,
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        homeVue.agentStatus = data.state;
+                        homeVue.stateDetailText = data.text;
+                        homeVue.proccessStatus = 0;
+                    }
+                });
+            }
+
+            function breakStart(breakTypeId) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/homepage/breakStart/' + breakTypeId,
+                    async: false,
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        homeVue.agentStatus = data.state;
+                        homeVue.stateDetailText = data.text;
+                        homeVue.proccessStatus = 0;
+                    }
+                });
+            }
+
+            function breakStop() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/homepage/breakStop',
+                    async: false,
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        homeVue.agentStatus = data.state;
+                        homeVue.stateDetailText = data.text;
+                        homeVue.proccessStatus = 0;
+                    }
+                });
+            }
+
+            function chronoTimer(timeStamp) {
+                var time = 0;
+
+                if (timeStamp != 0) {
+                    time = Math.round((Date.now() / 1000) - timeStamp)
+                }
+                if (tbxDebug == true) console.log(time);
+                homeTimer.stop();
+                homeTimer = null;
+                homeTimer = new easytimer.Timer();
+                setTimeout(function () {
+                    homeTimer.start({countdown: false, startValues: {seconds: time}});
+
+                    homeTimer.addEventListener('secondsUpdated', function (e) {
+                        $('#homeTimer').html(homeTimer.getTimeValues().toString());
+                    });
+                }, 100);
+            }
+
+            $(document).ready(function () {
+                stateCheckInterval = setInterval(function () {
+                    stateCheck();
+                    chronoTimer();
+                },5000);
+            })
+        </script>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block body %}
+    <div id="homePage">
+
+        <div class="row">
+            <!-- Column -->
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 m-b-30 text-center" style="margin-right: auto"><small>Başarılı
+                                    Arama</small>
+                                <h2><i class="ti-arrow-up text-success"></i> {{ completedCalls }}</h2>
+                                <div id="sparklinedash">
+                                    <canvas width="144" height="30"
+                                            style="display: inline-block; width: 144px; height: 30px; vertical-align: top;"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 m-b-30 text-center" style="margin: auto"><small>Toplam
+                                    Arama</small>
+                                <h2><i class="ti-arrow-up text-purple"></i> {{ totalCalls }}</h2>
+                                <div id="sparklinedash2">
+                                    <canvas width="144" height="30"
+                                            style="display: inline-block; width: 144px; height: 30px; vertical-align: top;"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 m-b-30 text-center" style="margin-right:auto"><small>Kaçan
+                                    Arama</small>
+                                <h2><i class="ti-arrow-up text-info"></i>{{ missedCalls }}</h2>
+                                <div id="sparklinedash3">
+                                    <canvas width="144" height="30"
+                                            style="display: inline-block; width: 144px; height: 30px; vertical-align: top;"></canvas>
+                                </div>
+                            </div>
+                            {#                        <div class="col-lg-3 col-md-6 m-b-30 text-center"> <small>Ulaşım Oranı</small>#}
+                            {#                            <h2><i class="ti-arrow-down text-danger"></i> 50%</h2>#}
+                            {#                            <div id="sparklinedash4"><canvas width="144" height="30" style="display: inline-block; width: 144px; height: 30px; vertical-align: top;"></canvas></div>#}
+                            {#                        </div>#}
+                        </div>
+                        <ul class="list-inline font-12 text-center">
+                            <li><i class="fa fa-circle text-cyan"></i> Kaçan Arama</li>
+                            <li><i class="fa fa-circle text-primary"></i> Ulaşım Oranı</li>
+                            <li><i class="fa fa-circle text-purple"></i> Toplam Arama</li>
+                        </ul>
+                        {#                    <div class="report-container">#}
+                        {#                        <div class="text-center">#}
+                        {#                            {{ dashboard|raw }}#}
+                        {#                        </div>#}
+                        {#                        <div style="margin-bottom:50px;">#}
+
+                        {#                        </div>#}
+                        {#                    </div>#}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-lg-6" style="background-color: #edf1f5;">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <h1 style="text-align:center">GENEL</h1>
+
+                <div class="row">
+                    {% if is_granted("ROLE_TAKIM_LIDREEE") %}
+                        <!-- Kullanıcı Durumu -->
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">Kullanıcı Durumu</h5>
+                                    <div class="col-md-12">
+
+                                        <div class="col-sm-8" style="float: left!important;">
+                                            <span class="timer" id="homeTimer" style="margin-left: 0px!important; color: red!important; font-weight: bold!important; font-size: 25px!important;">00:00:00</span>
+                                            <span style="font-weight: bold!important; font-size: 20px!important;">( ${ agentStates[agentStatus].title } )</span>
+
+                                            <div class="col-sm-3">
+                                                <button type="button" id="doneToCall" class="btn btn-sm btn-success"
+                                                      v-if="(agentStatus == 2 || agentStatus == 5 || agentStatus ==6 || agentStatus ==11)"
+                                                        v-on:click='acwStop();'>
+                                                    <i class="fa fa-ok"></i> ${ stateDetailText } ÇIK
+                                                </button>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button class="btn btn-warning" id="btnPause"
+                                                        v-on:click="breakStop()"
+                                                      v-if="agentStatus == 4"
+                                                >
+                                                    ${ stateDetailText } ÇIK
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" style="float: right!important;">
+                                            <div v-if="agentStatus != 17">
+                                                <div v-if="agentStatus != 16"
+                                                     v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                                     class="btn-group dropup">
+                                                    <button type="button" id="molaBtn"
+                                                            class="btn btn-secondary dropdown-toggle btn-sm"
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="fa fa-times"></i> MOLA
+                                                    </button>
+                                                    <div class="dropdown-menu" id="breakMenu"
+                                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+
+                                                        <a v-for="item in breakList" class="dropdown-item"
+                                                           v-on:click="breakStart(item.id)">
+                                                            ${item.name}</a>
+
+                                                    </div>
+                                                </div>
+                                                <div class="btn-group dropup">
+                                                    <button v-if="agentStatus != 16"
+                                                            v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                                            type="button" id="islevlerBtn"
+                                                            class="btn btn-secondary dropdown-toggle btn-sm btn-cyan"
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="fas fa-play"></i> İŞLEMLER
+                                                    </button>
+
+                                                    <div class="dropdown-menu" id="acwMenu"
+                                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+                                                        <a v-for="item in acwTypesList" class="dropdown-item"
+                                                           v-on:click="acwStart(item.id)">${item.name}</a>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Kullanıcı Durumu -->
+                    {% endif %}
+
+                    <!-- column -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-info">MOLADAKİ AGENT SAYISI</h5>
+                                <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                    <span class="display-5 text-info"><i class="icon-people"></i></span>
+                                    <a href="javscript:void(0)" class="link display-5 ml-auto">{{ agentBreaks }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- column -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title text-purple">HATTAKİ AGENT</h5>
+                                <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                    <span class="display-5 text-purple"><i class="icon-call-end"></i></span>
+                                    <a href="javscript:void(0)" class="link display-5 ml-auto">{{ inboundCaller }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- column -->
+                    {#                <div class="col-md-6">#}
+                    {#                    <div class="card">#}
+                    {#                        <div class="card-body">#}
+                    {#                            <h5 class="card-title text-primary">CEVAPLANAN</h5>#}
+                    {#                            <div class="d-flex m-t-30 m-b-20 no-block align-items-center">#}
+                    {#                                <span class="display-5 text-primary"><i class="icon-call-in"></i></span>#}
+                    {#                                <a href="javscript:void(0)" class="link display-5 ml-auto">{{ answerCall }}</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                </div>#}
+                    <!-- column -->
+                    {#                <div class="col-md-6">#}
+                    {#                    <div class="card">#}
+                    {#                        <div class="card-body">#}
+                    {#                            <h5 class="card-title">YENİ</h5>#}
+                    {#                            <div class="d-flex m-t-30 m-b-20 no-block align-items-center">#}
+                    {#                                <span class="display-5 text-success"><i class="icon-wallet"></i></span>#}
+                    {#                                <a href="javscript:void(0)" class="link display-5 ml-auto">66</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                </div>#}
+                    <!-- column -->
+                </div>
+            </div>
+            <!-- right tap -->
+            <div class="col-lg-6">
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <h1 style="text-align:center">KULLANICI BİLGİLERİ</h1>
+
+                <div class="news-slide m-b-15">
+                    <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+                        <!-- Carousel items -->
+                        <div class="row">
+                            <!-- column cengiz-->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info">TOPLAM MOLA SÜRESİ</h5>
+                                        <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                            <span class="display-5 text-info"><i class="icon-people"></i></span>
+                                            <a href="javscript:void(0)"
+                                               class="link display-5 ml-auto">{{ totalBreakResult }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- column -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-purple">TOPLAM ACW SÜRESİ </h5>
+                                        <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                            <span class="display-5 text-purple"><i class="icon-people"></i></span>
+                                            <a href="javscript:void(0)"
+                                               class="link display-5 ml-auto">{{ totalAcwResult }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- column -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">TOPLAM ÇAĞRI SÜRESİ</h5>
+                                        <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                            <span class="display-5 text-info"><i class="icon-people"></i></span>
+                                            <a href="javscript:void(0)"
+                                               class="link display-5 ml-auto">{{ totalCallTimeResult }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- column -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">TOPLAM ÇAĞRI ADEDİ</h5>
+                                        <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                            <span class="display-5 text-info"><i class="icon-people"></i></span>
+                                            <a href="javscript:void(0)"
+                                               class="link display-5 ml-auto">{{ totalCallsPersonals }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- column -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">SORU SÜRESİ</h5>
+                                        <div class="d-flex m-t-30 m-b-20 no-block align-items-center">
+                                            <span class="display-5 text-info"><i class="icon-people"></i></span>
+                                            <a href="javscript:void(0)"
+                                               class="link display-5 ml-auto">{{ totalquestions }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- column -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {#    <div class="row">#}
+
+        {#        <div class="col-lg-6 col-md-12">#}
+        {#            <div class="row">#}
+        {#                <!-- Column -->#}
+        {#                <div class="col-md-12">#}
+        {#                    <div class="card">#}
+        {#                        <div class="card-body">#}
+        {#                            <h5 class="card-title">Gelen Çağrılar </h5>#}
+        {#                            <div class="row">#}
+        {#                                <div class="col-6  m-t-30">#}
+        {#                                    <h2 class="text-primary" style="display: flex">Cevaplanan &nbsp;<p style="color: black!important;">{{ completedCalls }}</p></h2>#}
+        {#                                    <hr/>#}
+        {#                                    <h2 class="text-primary" style="display: flex">Kaçan &nbsp;<p style="color: black!important;">{{ missedCalls }}</p></h2>#}
+        {#                                    <br/>#}
+        {#                                    <b>{{ date|date('d-m-Y') }}</b></div>#}
+        {#                                <div class="col-6">#}
+        {#                                   {{ answerCallsChart|raw }}#}
+        {#                                </div>#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {#        <div class="col-lg-6 col-md-12">#}
+        {#            <div class="row">#}
+        {#                <!-- Column -->#}
+        {#                <div class="col-md-12">#}
+        {#                    <div class="card">#}
+        {#                        <div class="card-body">#}
+        {#                            <h5 class="card-title">Gelen Çağrılar</h5>#}
+        {#                            <div class="row">#}
+        {#                                <div class="col-6  m-t-30">#}
+        {#                                    <h2 class="text-primary" style="display: flex">Cevaplanan &nbsp;<p style="color: black!important;">{{ completedCalls }}</p></h2>#}
+        {#                                    <hr/>#}
+        {#                                    <h2 class="text-primary" style="display: flex">Kaçan &nbsp;<p style="color: black!important;">{{ missedCalls }}</p></h2>#}
+        {#                                    <br/>#}
+        {#                                    <b>{{ date|date('d-m-Y') }}</b> </div>#}
+        {#                                <div class="col-6">#}
+        {#                                    <div id="chartContainer" style="height: 300px; width: 100%;"></div>#}
+        {#                                </div>#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+        {#    </div>#}
+
+        <a href="{{ path('fos_user_security_logout') }}"></a>
+
+        <script type="text/javascript">
+            $(window).on('load', function () {
+                window.onbeforeunload = function () {
+                    return true;
+                };
+                $lastLogin = setInterval(function () {
+                    $.ajax({
+                        type: 'GET',
+                        url: '{{ path('last_online_control') }}',
+                        success: function (data) {
+                            console.log("LastOnline " + data);
+                        },
+                    });
+                }, 10000);
+            });
+        </script>
+
+    </div>
+{% endblock %}

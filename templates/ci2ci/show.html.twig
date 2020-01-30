@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ci2ci{% endblock %}
+
+{% block body %}
+    <h1>Ci2ci</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ci2ci.id }}</td>
+            </tr>
+            <tr>
+                <th>CallId</th>
+                <td>{{ ci2ci.callId }}</td>
+            </tr>
+            <tr>
+                <th>ChannelId</th>
+                <td>{{ ci2ci.channelId }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('ci2ci_index') }}">back to list</a>
+
+    <a href="{{ path('ci2ci_edit', {'id': ci2ci.id}) }}">edit</a>
+
+    {{ include('ci2ci/_delete_form.html.twig') }}
+{% endblock %}

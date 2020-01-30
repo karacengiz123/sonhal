@@ -1,0 +1,167 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Kaçan Çağrı Detay{% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#abandonFromQueueListTableDiv").css("display","none");
+                $('#abandonFromQueueListTable').dataTable().fnDestroy();
+                $('#abandonFromQueueListTable').html("");
+                tableFilling=false;
+            }
+
+        }
+        function displayBlockTableDiv() {
+            $("#abandonFromQueueListTableDiv").css("display","block");
+        }
+        function ModalStart(modalText=null) {
+            $("#localAbandonFromQueueDetail").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#localAbandonFromQueueDetailText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#localAbandonFromQueueDetailText").html(modalText);
+            }
+        }
+        function ModalFinish() {
+            $("#localAbandonFromQueueDetail").modal('hide');
+            $("#localAbandonFromQueueDetailText").html("");
+        }
+        function abandonFromQueueValidateForm() {
+            ModalStart();
+            $.ajax({
+                type:'POST',
+                url:'/abandonfromdetails',
+                data:$('#fromAbandonIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#abandonFromQueueListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "aramaZamani" , name: "aramaZamani" , title: "Gelen Arama Tarihi"},
+                                { data: "kapanmaZamani" , name: "kapanmaZamani" , title: "Gelen Arama Kapanma Tarihi"},
+                                { data: "kuyruk" , name: "kuyruk" , title: "Kuyruk"},
+                                { data: "arayannumara" , name: "arayannumara" , title: "Arayan"},
+                                { data: "kuyrukGiris" , name: "kuyrukGiris" , title: "kuyrukGiris"},
+                                { data: "kuyrukCikis" , name: "kuyrukCikis" , title: "kuyrukCikis"},
+                                { data: "kuyrukSüresi" , name: "kuyrukSüresi" , title: "kuyrukSüresi"},
+                                { data: "ivrSüresi" , name: "ivrSüresi" , title: "ivrSüresi"},
+
+
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        ModalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                ModalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    ModalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            ModalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group col-md-4">
+        <h1>Kaçan Çağrı Detay</h1>
+
+        {{ form_start(form, {'attr': {'id': 'fromAbandonIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="abandonFromQueueValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="abandonFromQueueListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="abandonFromQueueListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="localAbandonFromQueueDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="localAbandonFromQueueDetailText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

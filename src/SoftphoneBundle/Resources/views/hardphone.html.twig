@@ -1,0 +1,914 @@
+{% extends 'layout/hardphone_base.html.twig' %}
+{% block title %}Arama Ekranı{% endblock %}
+{% block customCss %}
+    <title>IBB HardPhone Screen</title>
+
+    <script src="{{ asset('/assets/screen/popper.min.js') }}"></script>
+
+    <link rel="stylesheet" href="/assets/softphoneAsset/css/style.css">
+
+    <link rel="stylesheet" href="/assets/softphoneAsset/css/select2.min.css">
+
+    <style>
+        .nav-tabs .nav-link {
+            border: none !important;
+            padding: 0px !important;
+            width: 100% !important;
+        }
+
+        .nav-tabs .nav-item {
+            margin-top: 5px !important;
+            width: 100% !important;
+        }
+
+        #lastCallsMenu {
+            width: 300px !important;
+            min-width: 300px !important;
+            max-width: 300px !important;
+            left: 0px !important;
+        }
+
+        #lastCallsMenu div table tr td {
+            max-height: 30px !important;
+            margin: 0px !important;
+            padding: 5px 0px 5px 5px !important;
+        }
+
+        #lastCallsMenu div h5 {
+            margin-left: 5px !important;
+        }
+
+        #softphone {
+            min-height: 150px !important;
+            height: 150px !important;
+        }
+
+        .select2-container {
+            width: 400px !important;
+        }
+
+         .div_input input{
+             background-color: white!important;
+             color: black!important;
+             font-size: 15px;!important;
+             font-weight: bold!important;
+         }
+    </style>
+
+
+{% endblock %}
+{% block body %}
+    <audio id="audioRemote"></audio>
+    <audio id="ringtone" loop src="/assets/softphoneAsset/sounds/ringtone.wav"></audio>
+    <audio id="ringbacktone" loop src="/assets/softphoneAsset/sounds/ringbacktone.wav"></audio>
+    <audio id="dtmfTone" src="/assets/softphoneAsset/sounds/dtmf.wav"></audio>
+    <style>
+        #crmRefresh {
+            position: fixed;
+            top: 50px;
+            right: 5px;
+        }
+        #micErrorDiv{
+            position: fixed;
+            top: 0!important;
+            right: 0!important;
+            z-index: 999999999!important;
+            border: 5px solid black!important;
+            text-align: center!important;
+            padding: 15px 10px!important;
+            background-color: red!important;
+            opacity: 0.7!important;
+            color: white!important;
+            border-bottom-left-radius: 15px!important;
+        }
+    </style>
+    <button type="button" class="btn btn-sm btn-warning" id="crmRefresh"
+            onclick='iframeControl();onMyFrameLoad();'>
+        CRM YENİLE &nbsp;<i class="fas fa-sync-alt"></i>
+    </button>
+    <div id="iFrameDiv">
+    </div>
+    <div v-bind:style="{backgroundColor: agentStates[agentStatus].color}" id="softphone" class="row fixed-bottom"
+         style="border-top: 1px solid black!important; padding: 5px 20px 20px 20px!important; background-color: white!important; bottom: 0px!important;">
+        <div v-if="micErrorDivControl" class="col-sm-3" id="micErrorDiv">
+            <div class="col-sm-12">
+                <h1>-- Dikkat!! --</h1>
+                <h3>Mikrofon hatası alıyorsunuz..</h3>
+                <h3>lütfen yetkili birine haber veriniz..</h3>
+            </div>
+        </div>
+        <ul class="nav nav-tabs col-lg-1" id="myTab" role="tablist" style="border: none!important;">
+            <div>
+                <img src="/assets/images/tbxProLogo.png" class="img-responsive" style="width: 100%!important;">
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="getlastCalls(1);">Son Çağrı</button>
+            </div>
+{#            <li>#}
+{#                <div class="col-lg-1"#}
+{#                     style="float: left!important; margin: 0px!important; padding: 0px!important; margin-top: 10px!important;">#}
+{#                    <input type="button" class="btn btn-success" id="btnRegister" value="Giriş" onclick='sipRegister();'#}
+{#                           style="display: none; float:right!important;"/>&nbsp;#}
+{#                    <input type="button" class="btn btn-danger" id="btnUnRegister" value="Çıkış"#}
+{#                           onclick='sipUnRegister();'#}
+{#                           style="display: none; float:right!important;"/>#}
+{#                </div>#}
+{#            </li>#}
+        </ul>
+
+        <div class="col-lg-10" style="width: 100%!important; padding-top: 10px!important;">
+
+            <div class="content" style="width: 100%!important;">
+
+                <div class="bd-example bd-example-tabs"
+                     style="max-height: 50px!important; min-height: 50px!important; width: 100%!important;">
+
+
+                    <div class="tab-content" id="myTabContent">
+                        <!-- INBOUND TAB -->
+                        <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="inbound-grup col-lg-12">
+                                <div id='divCallOptions' class='call-options'
+                                     style='opacity: 0; margin-top: 0px; display: none;'></div>
+                                <div id="tdVideo" style="display: none;"></div>
+
+                                <div class="inputs row" style="margin-left: 0px!important;">
+                                    <div class="col-lg-2">
+                                        <input type="text" name="" disabled class="form-control form-control-sm"
+                                               id="txtRegStatus"
+                                               placeholder="Durum" width="100px" style="display:none!important;">
+                                        <input type="text" name="" disabled class="form-control form-control-sm "
+                                               id="txtCallStatus"
+                                               placeholder=""
+                                               style="margin-top: 5px!important; display: none!important;">
+                                        <div class="col-lg-12">
+                                            <span class="timer" id="inboundTimer" style="margin-left: 0px!important;">00:00:00</span>
+                                            <span>( ${ agentStates[agentStatus].title } )</span>
+                                            <p id="surveyStatus" style="font-size: 25px!important; color: white!important;"></p>
+                                        </div>
+
+                                        <div class="col-lg-12">
+                                            <button type="button" id="doneToCall" class="btn btn-sm btn-success"
+                                                    v-show="(agentStatus == 2 || agentStatus == 5 || agentStatus ==6 || agentStatus ==11)"
+                                                    v-on:click='acwStop();'>
+                                                <i class="fa fa-ok"></i> ${ stateDetailText } ÇIK
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <button class="btn btn-warning" id="btnPause"
+                                                    v-on:click="breakStop()"
+                                                    v-if="agentStatus == 4">
+                                                ${ stateDetailText } ÇIK
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-12" style="margin-top: 5px!important;">
+
+                                            <label id="txtInboundNumber"></label>
+                                            <label id="surveyFlag"></label>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <style>
+                                            .buttonsUp button {
+                                                padding: 4px 7px 3px 7px !important;
+
+                                            }
+
+                                            .buttonsDown button {
+                                                padding: 4px 7px 3px 7px !important;
+                                            }
+
+                                            .buttonsDown {
+                                                margin-top: 5px !important;
+                                            }
+
+                                            .div_input input {
+                                                margin-top: 5px !important;
+                                            }
+
+                                            .buttonsUp button, .buttonsUp div {
+                                                margin-right: 5px !important;
+                                            }
+                                        </style>
+{#                                        <div class="buttonsUp" style="margin-bottom: 5px!important;">#}
+{#                                            <span>Tuşlama Alanı</span>#}
+{#                                            <input @keyup="dtmfFromInput" type="text"#}
+{#                                                   class="form-control form-control-sm col-lg-6"#}
+{#                                                   placeholder="" name="" id="numPadInbound"#}
+{#                                                   style="width:395px!important; border: 1px solid orange">#}
+{#                                        </div>#}
+                                        <div class="buttonsUp" style="display: flex!important;">
+                                            <div v-if="agentStatus != 17">
+                                                <div v-if="agentStatus != 16"
+                                                     v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                                     class="btn-group dropup">
+                                                    <button type="button" id="molaBtn"
+                                                            class="btn btn-secondary dropdown-toggle btn-sm"
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="fa fa-times"></i> MOLA
+                                                    </button>
+                                                    <div class="dropdown-menu" id="breakMenu"
+                                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+
+                                                        <a v-for="item in breakList" class="dropdown-item"
+                                                           v-on:click="breakStart(item.id)">
+                                                            ${item.name}</a>
+
+                                                    </div>
+                                                </div>
+                                                <div class="btn-group dropup">
+                                                    <button v-if="agentStatus != 16"
+                                                            v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                                            type="button" id="islevlerBtn"
+                                                            class="btn btn-secondary dropdown-toggle btn-sm btn-cyan"
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="fas fa-play"></i> İŞLEMLER
+                                                    </button>
+
+                                                    <div class="dropdown-menu" id="acwMenu"
+                                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+                                                        <a v-for="item in acwTypesList" class="dropdown-item"
+                                                           v-on:click="acwStart(item.id)">${item.name}</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+{#                                            <button v-show="(agentStatus==9)" type="button" class="btn btn-sm btn-cyan"#}
+{#                                                    v-on:click="questionStart()"#}
+{#                                                    id="btnSoru"> SORU#}
+{#                                            </button>#}
+{#                                            <button v-show="(agentStates[agentStatus].availableStatusses.indexOf(9) != -1 || agentStatus == 9)"#}
+{#                                                    type="button" class="btn btn-sm btn-warning" id="btnHoldResume"#}
+{#                                                    onclick='tbxPro.phoneHoldButtonPressed();'>#}
+{#                                                <i class="fa fa-pause-circle"></i> ${btnHoldText}#}
+{#                                            </button>#}
+{#                                            <button v-show="(agentStatus==9 || agentStatus == 3)" type="button"#}
+{#                                                    class="btn btn-sm btn-info"#}
+{#                                                    id="btnTransfer"#}
+{#                                                    onclick='sipTransfer();'>#}
+{#                                                <i class="fa fa-exchange-alt"></i> TRANSFER#}
+{#                                            </button>#}
+                                        </div>
+{#                                        <div class="buttonsDown">#}
+{#                                            <button v-show="(agentStatus==12)" type="button"#}
+{#                                                    class="btn btn-sm btn-success" id="btnHangUp"#}
+{#                                                    onclick='tbxPro.phoneCallButtonPressed();'>#}
+{#                                                <i class="fa fa-phone-slash"></i> CEVAPLA#}
+{#                                            </button>#}
+
+{#                                            <button v-show="(agentStatus==8 || agentStatus==17)" type="button"#}
+{#                                                    class="btn btn-sm btn-danger" id="btnHangUp"#}
+{#                                                    onclick='tbxPro.sipHangUp();'>#}
+{#                                                <i class="fa fa-phone-slash"></i> KAPAT#}
+{#                                            </button>#}
+{#                                            <button v-show="(agentStatus==8 || agentStatus==17)" type="button"#}
+{#                                                    class="btn btn-sm btn-warning" id="btnMute"#}
+{#                                                    onclick='tbxPro.phoneMuteButtonPressed();'>#}
+{#                                                <i class="fa fa-microphone-slash"></i> <span id="btnMuteSpan">${btnMuteSpanText}</span>#}
+{#                                            </button>#}
+{#                                            <div v-show="(agentStatus==9 || agentStatus==8)" class="btn-group dropup"#}
+{#                                                 style="width:50%!important;">#}
+{#                                                <label for="ivrMenu"></label>#}
+{#                                                <select class="select2 form-control ivr-menu" name="ivr-manu"#}
+{#                                                        id="ivr-manu"#}
+{#                                                        style="padding: 0px!important; min-height: 30px!important; height: 30px!important;">#}
+{#                                                    <option v-for="(ivr,id) in ivrList" v-bind:value="id"> ${ivr}#}
+{#                                                    </option>#}
+{#                                                </select>#}
+{#                                            </div>#}
+{#                                        </div>#}
+                                    </div>
+{#                                    {% if is_granted('ROLE_OUTBOUND') %}#}
+{#                                        <div class="col-lg-2" style="float: left">#}
+{#                                            <div class="col-lg-12">#}
+{#                                                <div style="text-align: -webkit-center;"><label>SONUÇ SEÇ</label></div>#}
+{#                                                <select name="" class="form-control form-control-sm" id="outBoundSelect"#}
+{#                                                        onchange="siebelFeedbackCall(this.value);">#}
+{#                                                    <option selected value="pleaseSelect">Seçiniz..</option>#}
+{#                                                    <option value="All">TÜMÜ</option>#}
+{#                                                    <option value="Female">FEMALE</option>#}
+{#                                                    <option value="Anket">ANKET</option>#}
+{#                                                </select>#}
+{#                                                <div class="col-lg-12"#}
+{#                                                     style="padding: 0px!important; margin: 0px!important;">#}
+{#                                                    <button v-show="agentStatus==8" id="btnSendSurvey" type="button"#}
+{#                                                            class="btn btn-sm btn-purple" v-on:click="sendSurvey"#}
+{#                                                            style="width: 100%!important;"> Ankete Yönlendir#}
+{#                                                    </button>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    {% else %}#}
+{#                                        <div class="col-lg-2" style="float: left">#}
+{#                                            <div class="col-lg-12">#}
+{#                                                <button v-show="agentStatus==8" id="btnSendSurvey" type="button"#}
+{#                                                        class="btn btn-sm btn-purple" v-on:click="sendSurvey"#}
+{#                                                        style="width: 100%!important;"> Ankete Yönlendir#}
+{#                                                </button>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    {% endif %}#}
+                                    <div class="col-lg-4">
+                                        <div class="col-lg-6 div_input" style="float: left!important;">
+                                            <input type="text" id="dahiliNo" class="form-control form-control-sm" :value="extensionNo"
+                                                   disabled>
+{#                                            <input type="text" name="ivr1" id="ivr1"#}
+{#                                                   v-bind:value="ivr1Title" class="form-control form-control-sm"#}
+{#                                                   disabled placeholder="">#}
+{#                                            <input type="text" name="ivr2" id="ivr2"#}
+{#                                                   v-bind:value="ivr2Title" class="form-control form-control-sm"#}
+{#                                                   disabled placeholder="">#}
+                                        </div>
+{#                                        <div class="col-lg-6 div_input" style="float: left!important;">#}
+{#                                            <input type="text" id="arayanNo" class="form-control form-control-sm"#}
+{#                                                   disabled>#}
+{#                                            <input type="text" name="ivr3" id="ivr3"#}
+{#                                                   v-bind:value="ivr3Title" class="form-control form-control-sm"#}
+{#                                                   disabled placeholder="">#}
+{#                                            <input type="text" name="lastQue" id="lastQue"#}
+{#                                                   v-bind:value="queueDescription"#}
+{#                                                   class="form-control form-control-sm" disabled placeholder="">#}
+{#                                            <input type="text" id="arayanNoCopy" class="form-control form-control-sm" style="margin-top: 200%!important;">#}
+{#                                        </div>#}
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='divGlassPanel' class='glass-panel' style='visibility:hidden'></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Son Aramalar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="lastCallsMenu">
+                        <div>
+                            <h5>Gelen</h5>
+                            <table id="inboundlastCalls" class="table table-bordered col-md-4"></table>
+                        </div>
+                        <div>
+                            <h5>Giden</h5>
+                            <table id="outboundlastCalls" class="table table-bordered col-md-4"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block customScript %}
+    <script>
+        function sleep(time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+    </script>
+    <script src="/assets/dist/js/bootstrap-slider/bootstrap-slider.js"></script>
+    <script src="{{ asset('assets/js/vue.min.js') }}"></script>
+{#    <script src="{{ asset('assets/hardphone/hardphoneSip.js') }}"></script>#}
+    <script src="/assets/hardphone/hardphoneigdas.js"></script>
+    <script>
+
+        //Screen.html.twig den alınanlar
+        var tokenArray;
+        var tbxDebug = false;
+        var tokenVariableArray;
+        var tokenUserName;
+        var token = $.ajax({
+            async: false,
+            url: "{{ path('jwt') }}"
+        }).responseJSON;
+
+        window.localStorage.setItem('token', token.token);
+        tokenArray = window.localStorage.getItem("token").split(".");
+        tokenVariableArray = JSON.parse(atob(tokenArray[1]));
+        var siebelUsername = tokenUserName = tokenVariableArray["username"];
+
+        var igdasIframe = false;
+        var igdasState = "Active";
+        var igdasTDCID = "";//= "66b90e0d-dcde-44f8-a914-1493a81255c6";
+        var igdasTalepTipi = "";//= "Talep";
+        var igdasIVRDurumKodu = 0;//= 311;
+        var igdasAgent = String(siebelUsername);//= "salih.inci";// mail adresinin @ işaretinden önceki bölmü yazılacak.
+        var igdasCallID = "";//= "A2BB501F-464A11E9-BFF99A66-73656183@10.5.95.149";
+        var igdasTelefonNo = "";
+        var igdasAciklama = "";//= "İGDAŞ CREATECASE TEST";
+        // İGDAŞ PARAMETRELER = "
+
+        var toBeSentData;
+        var inboubdAnketCallIdValue = 0;
+        var stateCheckInterval;
+        var agent;
+        var setTimeOutCallAccept;
+
+        //Screen.html.twig den alınanlar sonu
+
+        function getTokenStorage() {
+            return window.localStorage.getItem('token')
+        }
+    </script>
+
+    <script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
+    <script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
+
+    <script src="{{ asset('assets/hardphone/hardphone.js') }}"></script>
+    <script src="{{ asset('assets/hardphone/hardphone-integration.js') }}"></script>
+
+    <script>
+        iframeControl();
+        var siebelUsername = '{{ app.user.username }}';
+        var ldapLp = "{{ app.session.get('lp') }}";
+        var ldapLocalStorage = window.localStorage.getItem("token");
+        var outboundSRCallPromt;
+
+        function onMyFrameLoad() {
+            siebelLogin(siebelUsername, ldapLocalStorage, ldapLp);
+        }
+
+        function stateCheckIntervalFunction() {
+            clearInterval(stateCheckInterval);
+            stateCheckInterval = setInterval(function () {
+                stateCheck();
+            }, 5000);
+        }
+
+        stateCheckIntervalFunction();
+
+        function stateCheckIntervalFunctionStop() {
+            clearInterval(stateCheckInterval);
+        }
+        let softVue = new Vue({
+                delimiters: ['${', '}'],
+                el: '#softphone',
+                data: {
+                    queueList: {{ queues | raw }},
+                    ivrList: {{ ivrList | raw }},
+                    breakList: {{ breakTypesList | raw }},
+                    acwTypesList: {{ acwTypesList | raw }},
+                    exten: {{ app.user.userProfile.extension | raw }},
+                    callId: '',
+                    ChannelId: "",
+                    btnMuteSpanText: "SESSİZ",
+                    btnHoldText: "BEKLET",
+                    callQueue: null,
+                    stateDetailText: '',
+                    stateDetailTimeStamp: 0,
+                    callIvrs: null,
+                    agentStatus: 9999,
+                    agentStatusText: 'Hazır Değil',
+                    agentStatusColor: "#ff0000",
+                    proccessStatus: 0,
+                    siebelFeedBackCallValid: false,
+                    siebelFeedBackCallData:null,
+                    localOutGouing:false,
+                    micErrorDivControl: false,
+                    extensionNo: "",
+                    countDownStates: {
+                        2: {
+                            countdownStart: 20,
+                            countDownCallBack: function () {
+                                if (tbxDebug == true) console.log("callBack 2");
+                                this.acwStop();
+                            },
+                        },
+                        6: {
+                            countdownStart: 20,
+                            countDownCallBack: function () {
+                                if (tbxDebug == true) console.log("callBack 6");
+                                this.acwStop();
+                                swal.clickCancel();
+                            },
+                        },
+                        99: {
+                            countdownStart: 20,
+                            countDownCallBack: function () {
+                                if (tbxDebug == true) console.log("callBack 99");
+                                swal.clickConfirm();
+                            },
+                        }
+                    },
+                    agentStates: {
+                        0: {
+                            title: "Hazır Değil",
+                            color: "#ff0000",
+                            availableStatusses: [1, 4, 5, 6, 7],
+                        },
+                        1: {
+                            title: "Hazır",
+                            color: "#00ff00",
+                            availableStatusses: [0, 4, 5, 6, 7, 8],
+                        },
+                        2: {
+                            title: "Acw",
+                            color: "#ff00ff",
+                            availableStatusses: [1, 4, 5, 6, 7],
+                        },
+                        3: {
+                            title: "Soru (Çağrıda)",
+                            color: "#f0f0ff",
+                            availableStatusses: [9, 5],
+                        },
+                        4: {
+                            title: "Mola",
+                            color: "#f78243",
+                            availableStatusses: [1, 4, 5, 6, 7],
+                        },
+                        5: {
+                            title: "Çağrı Dışında Soru",
+                            color: "#ffff00",
+                            availableStatusses: [1, 4, 6, 7],
+                        },
+                        6: {
+                            title: "Dış Arama",
+                            color: "#f0f0ff",
+                            availableStatusses: [1, 4, 6, 7],
+                        },
+                        7: {
+                            title: "Outbound",
+                            color: "#f0f0ff",
+                            availableStatusses: [2, 4, 8],
+                        },
+                        8: {
+                            title: "Çağrıda",
+                            color: "#0000ff",
+                            availableStatusses: [1, 2, 9],
+                        },
+                        9: {
+                            title: "Beklet",
+                            color: "#e84454",
+                            availableStatusses: [1, 2, 3, 8, 10],
+                        },
+                        10: {
+                            title: "Transfer",
+                            color: "#12Fed3",
+                            availableStatusses: [1, 2, 4, 9],
+                        },
+                        11: {
+                            title: "Mola Harici Ara",
+                            color: "#ffa500",
+                            availableStatusses: [0, 4, 5, 6, 7, 8],
+                        },
+                        12: {
+                            title: "Gelen Arama",
+                            color: "#ffb1a2",
+                            availableStatusses: [1, 2, 8],
+                        },
+                        13: {
+                            title: "Bağlantı Yok",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        14: {
+                            title: "Bağlantı Var - Sip Server Gitti",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        15: {
+                            title: "Bağlantı Var - Db Server Gitti",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        16: {
+                            title: "Bağlantı Var - Yeniden Bağlan",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        18: {
+                            title: "İnternet Bağlantınız Kesildi",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        17: {
+                            title: "Local Çağrı",
+                            color: "#91b8ff",
+                            availableStatusses: [1, 4, 11, 5],
+                        },
+                        99: {
+                            title: "Anket Araması",
+                            color: "#aff200",
+                            availableStatusses: [1, 8],
+                        },
+                        19: {
+                            title: "Dahili Bağlantınız Koptu",
+                            color: "#ffa500",
+                            availableStatusses: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,99,1007,999],
+                        },
+                        20: {
+                            title: "Mikrofon Bağlantınızı Kontrol Ediniz",
+                            color: "#ffa500",
+                            availableStatusses: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,99,1007,999],
+                        },
+                        9999: {
+                            title: "",
+                            color: "",
+                            availableStatusses: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,99,1007,999],
+                        },
+                        1007: {
+                            title: "",
+                            color: "",
+                            availableStatusses: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,99,1007,999],
+                        },
+                    }
+                },
+                methods: {
+                    dtmfFromInput: function (e) {
+                        if (e.key.toString().match(/^[0-9A-D#*,]+$/i)) {
+                            tbxPro.sipSendDTMF(e.key);
+                            if (tbxDebug == true) console.log(e.key);
+                        } else {
+                            return false;
+                        }
+                    },
+                    acwStart: function (typeId) {
+                        if(this.proccessStatus == 1){
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                    '',
+                                confirmButtonText: 'Kapat',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                }
+                            });
+                            return false;
+                        }else {
+                            this.proccessStatus = 1;
+                        }
+                        if (this.agentStatus == 3) {
+                            typeId = 2;
+                        }
+                        acw(typeId);
+                    },
+                    questionStart: function () {
+                        if (parseInt(this.agentStatus) == 9) {
+                            this.agentStatus = 3;
+                        }
+                    },
+                    acwStop: function () {
+                        chronoTimer();
+                        this.proccessStatus = 1;
+                        acwStop();
+                    },
+                    breakStart: function (breakTypeId) {
+                        if(this.proccessStatus == 1){
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                    '',
+                                confirmButtonText: 'Kapat',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                }
+                            });
+                            return false;
+                        }else {
+                            this.proccessStatus = 1;
+                        }
+                        chronoTimer();
+                        if (this.agentStates[this.agentStatus].availableStatusses.indexOf(4) == -1) {
+                            alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                            return false;
+                        }
+                        breakStart(breakTypeId);
+                    },
+                    breakStop: function () {
+                        chronoTimer();
+                        if (this.agentStatus != 4) {
+                            alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                        }
+                        this.proccessStatus = 1;
+                        breakStop();
+                    },
+                    getIvrRoute: function (call_id) {
+                        vi = this;
+                        $.ajax({
+                            type: 'GET',
+                            url: '/api/ivr_logs?callId=' + call_id,
+                            headers: {
+                                'Authorization': "Bearer " + getTokenStorage(),
+                                'accept': "application/json",
+                                'Content-Type': "application/json",
+                            },
+                            success: function (data) {
+                                obj = JSON.parse(JSON.stringify(data));
+                                if (obj.length >= 3) {
+                                    vi.callIvrs = obj;
+                                }
+
+                            },
+                        });
+                    },
+                    sendSurvey: function () {
+                        var callDirection = tbxPro.Sessions[tbxPro.callActiveID].callDirection;
+
+                        if ((callDirection == 'Inbound') || (callDirection == 'Transfer')) {
+                            $.ajax({
+                                type: 'GET',
+                                url: '/api/softphone-send-inbound-survey/'+tbxSipServer+'/'+this.ChannelId.substr(4, this.ChannelId.length),
+                                async: false,
+                                headers: {
+                                    'Authorization': "Bearer " + getTokenStorage(),
+                                    'accept': "application/json",
+                                    'Content-Type': "application/json",
+                                },
+                                success: function (data) {
+                                    if (tbxDebug == true) console.log(data);
+                                }
+                            });
+                        } else {
+
+                                _this = this;
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/api/softphone/get-channel-id/'+this.callId,
+                                    async: false,
+                                    headers: {
+                                        'Authorization': "Bearer " + getTokenStorage(),
+                                        'accept': "application/json",
+                                        'Content-Type': "application/json",
+                                    },
+                                    success: function (data) {
+                                        if (tbxDebug == true) console.log(data);
+                                        _this.ChannelId = data.channelId;
+
+                                        $.ajax({
+                                            type: 'GET',
+                                            url: '/api/softphone-send-survey/'+tbxSipServer+'/'+_this.ChannelId.substr(4, _this.ChannelId.length),
+                                            async: false,
+                                            headers: {
+                                                'Authorization': "Bearer " + getTokenStorage(),
+                                                'accept': "application/json",
+                                                'Content-Type': "application/json",
+                                            },
+                                            success: function (data) {
+                                                if (tbxDebug == true) console.log(data);
+                                            }
+                                        });
+                                    }
+                                });
+
+                        }
+                    }
+                },
+                watch: {
+                    stateDetailTimeStamp: function (newTime) {
+                        if (this.countDownStates.hasOwnProperty(this.agentStatus)) {
+                            countDownTimer(this.countDownStates[this.agentStatus].countDownCallBack, this.countDownStates[this.agentStatus].countdownStart)
+                        } else {
+                            chronoTimer(newTime);
+                        }
+                    },
+                    agentStatus: function (newState) {
+                        if (newState == 14) {
+                            Swal.fire({
+                                title: 'Dahili Numaranızı Giriniz',
+                                input: 'text',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                confirmButtonText: 'Bağlan',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                    onRegisterSipEvent(result.value);
+                                }
+                            })
+                        }
+                        if (newState == 9999) {
+                            Swal.fire({
+                                title: 'Dahili Numaranızı Giriniz',
+                                input: 'text',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                confirmButtonText: 'Bağlan',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                    onRegisterSipEvent(result.value);
+                                }
+                            })
+                        }
+                        if (newState == 13) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Durum Erişiminiz Anlık Olarak Reddedilmiştir. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                    '',
+                                confirmButtonText: 'Tekrar Dene',
+                                showCancelButton: false,
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                    stateCheck();
+                                }
+                            })
+                        }
+
+                        if (newState == 18) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">İnternet Bağlantınız Kesildi Lütfen Kablonuzu Veya Bağlantı Ayarlarınızı Kontrol Ediniz. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                    '',
+                                confirmButtonText: 'Tekrar Dene',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                }else if (result.dismiss == Swal.DismissReason.backdrop){
+                                }else if (result.value) {
+                                    stateCheck();
+                                }
+                            });
+                        }
+                    }
+                },
+                computed: {
+                    ivrListForVselect: function () {
+                        var ivrListForVSelectReturn = [];
+                        v = this;
+                        $.each(v.ivrList, function (i, v) {
+                            var ivrItem = {'ivrId': null, 'ivrName': null};
+
+                            ivrItem['ivrId'] = i;
+                            ivrItem['ivrName'] = v;
+
+                            ivrListForVSelectReturn.push(ivrItem);
+                        });
+                        return ivrListForVSelectReturn;
+                    },
+                    ivr1Title: function () {
+                        return this.callIvrs != null ? this.ivrList[this.callIvrs[0].ivrId] : null
+                    },
+                    ivr3Title: function () {
+                        return this.callIvrs != null ? this.ivrList[this.callIvrs[1].ivrId] : null
+                    },
+                    ivr2Title: function () {
+                        return this.callIvrs != null ? this.ivrList[this.callIvrs[2].ivrId] : null
+                    },
+                    queueDescription: function () {
+                        return this.callQueue != null ? this.queueList[this.callQueue] : null;
+                    }
+                },
+                mounted: function () {
+
+                    this.$nextTick(function () {
+                        $("#ivr-manu").on("change", function () {
+                            console.log(this);
+                            if ($(this).val()) {
+                                IVRTransfer($(this).val());
+                            }
+                            $(this).select2("close");
+                            $(this).select2('val', '0');
+                        })
+
+                    })
+                }
+            }
+        );
+    </script>
+    <script type="text/javascript">
+        $(function () {
+
+            $("#lastCalls").click(function () {
+                Swal.fire({
+                    getPopup: document.getElementById('lastCallsMenu')
+                })
+            })
+        })
+    </script>
+{% endblock %}

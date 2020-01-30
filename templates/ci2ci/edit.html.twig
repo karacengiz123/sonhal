@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Ci2ci{% endblock %}
+
+{% block body %}
+    <h1>Edit Ci2ci</h1>
+
+    {{ include('ci2ci/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('ci2ci_index') }}">back to list</a>
+
+    {{ include('ci2ci/_delete_form.html.twig') }}
+{% endblock %}

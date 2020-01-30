@@ -1,0 +1,28 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Rehberi Düzenle{% endblock %}
+
+{% block body %}
+
+    <h1 style="padding: 20px">Rehberi Düzenle</h1>
+
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+
+    </style>
+
+<div class="col-lg-12 aaa" style=" background-color: white;  margin: auto; padding: 25px;">
+    <a class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('guide_index') }}">Listeye Geri Dön</a>
+
+    {{ include('guide/_form.html.twig', {'button_label': 'Güncelle'}) }}
+
+    {{ include('guide/_delete_form.html.twig') }}
+
+    <br/>
+    <br/>
+</div>
+
+{% endblock %}

@@ -1,0 +1,1151 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %} WebChat {% endblock %}
+
+{% block customCss %}
+    <link href="/assets/dist/css/pages/chat-app-page.css" rel="stylesheet">
+
+{% endblock %}
+{% block customScript %}
+    <script src="/assets/node_modules/moment/moment.js"></script>
+    <script src="/assets/dist/js/custom.min.js"></script>
+    <script src="/assets/dist/js/pages/chat.js"></script>
+    <script src="{{ asset('assets/js/vue.min.js') }}"></script>
+
+    <script>
+        var token = $.ajax({
+            async: false,
+            url: "{{ path('jwt') }}"
+        }).responseJSON;
+        window.localStorage.setItem('token', token.token);
+
+        function getTokenStorage() {
+            return window.localStorage.getItem('token')
+        }
+
+        var stateCheckInterval;
+        var tbxDebug = false;
+    </script>
+
+    <script>
+        var fetchDataTimer, checkDataTimer, reject;
+        var chat = new Vue({
+            delimiters: ['${', '}'],
+            el: '#chat',
+            data: {
+                you: '{{ user.userProfile.firstname }} {{ user.userProfile.lastName }}',
+                citizen: {{ chat.citizen | default("''") | raw }},
+                message: '',
+                messageCount: 0,
+                userStatus: {{ user.chatStatus }},
+                statusList: ['Çevrim Dışı', 'Çevrim İçi', 'Görüşmede', "Uzakta"],
+                chats: [],
+                chatStartTime: moment().format('M/D/Y H:mm:ss'),
+                chatPlanedTime: moment().format('M/D/Y H:mm:ss'),
+                chatCallId: "",
+                chatId: "",
+                procces: false
+            },
+            computed: {
+                chatStatus: function () {
+                    return this.statusList[this.userStatus]
+                }
+            },
+            mounted: function () {
+                if (this.userStatus === 2) {
+                    this.fetchData();
+                    this.fetchDataTimerFunction();
+                } else {
+                    if (this.userStatus !== 3) {
+                        this.checkDataTimerFunction();
+                    }
+                }
+            },
+            created: function () {
+
+            },
+            methods: {
+                fetchDataTimerFunction: function () {
+                    clearInterval(fetchDataTimer);
+                    fetchDataTimer = setInterval(this.fetchData, 2000);
+                },
+                checkDataTimerFunction: function () {
+                    clearInterval(checkDataTimer);
+                    checkDataTimer = setInterval(this.checkData, 2000);
+                },
+                showNotify: function (messageType, message) {
+                    if (!window.Notification) {
+                        console.log('Browser does not support notifications.');
+                    } else {
+                        // check if permission is already granted
+                        if (Notification.permission === 'granted') {
+                            // permission already asked when we registered
+                            var notification = new Notification(messageType, {
+                                body: message,
+                            });
+
+                            notification.onclick = function () {
+                                window.focus();
+                                this.close();
+                            }
+                        } else {
+                            // request permission from user
+                            Notification.requestPermission().then(function (p) {
+                                if (p === 'granted') {
+                                    // permission already asked when we registered
+                                    var notification = new Notification(messageType, {
+                                        body: message,
+                                    });
+
+                                    notification.onclick = function () {
+                                        window.focus();
+                                        this.close();
+                                    }
+                                } else {
+                                    console.log('User blocked notifications.');
+                                }
+                            }).catch(function (err) {
+                                console.error(err);
+                            });
+                        }
+                    }
+                },
+                reverse: function (chatMessage) {
+                    classObject = {reverse: false};
+                    if (chatMessage === 2) {
+                        classObject.reverse = true;
+                    }
+                    return classObject;
+                },
+                sendMessage: function () {
+                    $.post('{{ path('agent_send_message') }}', {'message': this.message}, function () {
+                    });
+                    this.message = '';
+                },
+                leaveChat: function () {
+                    let areYouSure = confirm('Sohbeti Kapatmak İstediğinize Emin misiniz?');
+                    if (areYouSure === true) {
+                        leaveChat(1);
+                    }
+                },
+                toUnAvail: function () {
+                    let areYouSure = confirm('Çevrim Dışı Olmak İstediğinize Emin misiniz?');
+                    if (areYouSure === true) {
+                        toUnAvail();
+                    }
+                },
+                scrollToEnd: function () {
+                    $('.chat-rbox').animate({
+                        scrollTop: $('.chat-rbox ').get(0).scrollHeight
+                    }, 'slow');
+                },
+                fetchData: function () {
+                    _this = this;
+                    $.get('{{ path('chat_agent_ajax') }}', function (data) {
+                        if (data.error == 1) {
+                            if (chat.userStatus == 2) {
+                                clearInterval(fetchDataTimer);
+                                _this.checkDataTimerFunction();
+                                leaveChat(1);
+                            }
+                            return false;
+                        }
+                        _this.chats = data.messageData;
+                        _this.messageCount = data.messageCount;
+                    });
+                }, // End Of Fetch Data
+                toOnline: function () {
+                    toOnline();
+                },
+                reject: function () {
+                    Swal.close();
+                    rejectChat();
+                    $('#ringToneSound').trigger('pause');
+
+                },
+                checkData: function () {
+                    if (this.userStatus == 1) {
+                        _this = this;
+                        $.get('{{ path('agent_chat_control') }}', function (data) {
+                            if (data.chatStatus == 0) {
+                                clearInterval(checkDataTimer);
+                                _this.chats = [];
+                                chat.citizen = "";
+                                $('#ringToneSound').trigger('play');
+                                $('#ringToneSound').trigger('play');
+                                $('#ringToneSound').trigger('play');
+
+                                reject = setTimeout(_this.reject, 30000);
+
+                                _this.showNotify("Gelen Aramanız War", JSON.parse(data.citizen).Name + " " + JSON.parse(data.citizen).Surname);
+
+                                Swal.fire({
+                                    title: 'Chat Aramanız Var..!',
+                                    // text: "You won't be able to revert this!",
+                                    type: 'warning',
+                                    showCancelButton: false,
+                                    allowOutsideClick: false,
+                                    closeOnClickOutside: false,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Kabul Et'
+                                }).then((result) => {
+                                    if (result.value) {
+                                        clearTimeout(reject);
+                                        $('#ringToneSound').trigger('pause');
+                                        _this.citizen = JSON.parse(data.citizen);
+                                        _this.chatPlanedTime = data.chatPlanedTime;
+                                        _this.chatCallId = data.chatCallId;
+                                        _this.chatId = data.chatId;
+                                        _this.fetchDataTimerFunction();
+                                        acceptChat();
+                                    }
+                                })
+
+                            }
+                        });
+                    }
+                },
+            },
+            watch: {
+                userStatus: function (newStatus) {
+                    if (newStatus != 2){
+                        chatPageVue.chatPageStatus = 0;
+                    }
+                    if (newStatus === 1) {
+                        this.checkDataTimerFunction();
+                    }
+                    if (newStatus === 2) {
+                        this.chatStartTime = moment().format('M/D/Y H:mm:ss');
+                        chatPageVue.chatPageStatus = 1;
+                    }
+                },
+                messageCount: function (newCount) {
+                    if (this.chats[newCount - 1].sender == 1) {
+                        this.showNotify("Yeni Mesaj - " + this.citizen.Name + " " + this.citizen.Surname, this.chats[newCount - 1].message);
+                        if (tbxDebug == true) console.log("Yeni Mesaj");
+                    }
+                    this.$nextTick(function () {
+                        this.scrollToEnd();
+                    })
+                }
+            }
+        });
+
+        function acceptChat() {
+            if (chat.procces == false) {
+                chat.procces = true;
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/accept-chat',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        if (data.stateChange == true) {
+                            chat.procces = false;
+                            chat.userStatus = 2;
+                        }
+                    }
+                });
+            }
+        }
+
+        function rejectChat() {
+            if (chat.procces == false) {
+                chat.procces = true;
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/reject-chat',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        if (data.stateChange == true) {
+                            chat.procces = false;
+                            chat.userStatus = 3;
+                        }
+                    }
+                });
+            }
+        }
+
+        function leaveChat(citizenPush = 0) {
+            if (tbxDebug == true) console.log(citizenPush);
+            if (chat.procces == false) {
+                chat.procces = true;
+                $.ajax({
+                    type: 'POST',
+                    url: '/siebelCrm/createChatActivity/'+chat.chatId,
+                    data: {
+                        "body": {
+                            "body": {
+                                "Description": "Sohbet Gelen Aktivitesi - " + chat.chatPlanedTime,
+                                "Planned": chat.chatPlanedTime,
+                                "PlannedCompletion": chat.chatStartTime,
+                                "Started": chat.chatStartTime,
+                                "UserName": "{{ user.username }}",
+                                "Type": "Sohbet - Gelen",
+                                "ActivitySubtype": "Genel",
+                                "Status": "Tamamlandı",
+                                "WebChatHistory": $(".chatTextMessage").text().substr(0, 3999),
+                                "ContactTckn": chat.citizen.Uid,
+                                "CallId": chat.chatCallId
+                            }
+                        },
+                        "citizenName": chat.citizen.Name + " " + chat.citizen.Surname,
+                    },
+                    success: function (data) {
+                        if (tbxDebug == true) console.log(data);
+                        $.ajax({
+                            type: 'GET',
+                            url: '/api/leave-chat',
+                            headers: {
+                                'Authorization': "Bearer " + getTokenStorage(),
+                                'accept': "application/json",
+                                'Content-Type': "application/json",
+                            },
+                            success: function (data) {
+                                if (tbxDebug == true) console.log(data);
+                                if (data.stateChange == true) {
+                                    chat.procces = false;
+                                    _this.chats = [];
+                                    chat.citizen = "";
+                                    if (citizenPush == 1) {
+                                        toUnAvail();
+                                    } else {
+                                        chat.userStatus = 1;
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    error: function (data) {
+                        if (tbxDebug == true) console.log(data);
+                        $.ajax({
+                            type: 'GET',
+                            url: '/api/leave-chat',
+                            headers: {
+                                'Authorization': "Bearer " + getTokenStorage(),
+                                'accept': "application/json",
+                                'Content-Type': "application/json",
+                            },
+                            success: function (data) {
+                                if (tbxDebug == true) console.log(data);
+                                if (data.stateChange == true) {
+                                    chat.procces = false;
+                                    _this.chats = [];
+                                    chat.citizen = "";
+                                    if (citizenPush == 1) {
+                                        toUnAvail();
+                                    } else {
+                                        chat.userStatus = 1;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function toOnline() {
+            if (chat.procces == false) {
+                chat.procces = true;
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/to-online',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        if (data.stateChange == true) {
+                            chat.procces = false;
+                            chat.userStatus = 1;
+                            stateCheck();
+                        }
+                    }
+                });
+            }
+        }
+
+        function toUnAvail() {
+            if (chat.procces == false) {
+                chat.procces = true;
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/to-unavail',
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        if (data.stateChange == true) {
+                            chat.procces = false;
+                            chat.userStatus = 3;
+                        }
+                    }
+                });
+            }
+        }
+
+        $(".chat-rbox").addClass("chatTextMessage");
+    </script>
+
+    <script>
+        // topbar stickey on scroll for fix header
+        $(".fix-header .topbar").stick_in_parent({});
+
+        // ==============================================================
+        // Theme options for sidebar toggler and logo text show hide
+        // ==============================================================
+        $(".sidebartoggler").on('click', function () {
+            if ($("body").hasClass("mini-sidebar")) {
+                $("body").trigger("resize");
+                $("body").removeClass("mini-sidebar");
+                $('.navbar-brand span').show();
+            } else {
+                $("body").trigger("resize");
+                $("body").addClass("mini-sidebar");
+                $('.navbar-brand span').hide();
+            }
+        });
+        // this is for close icon when navigation open in mobile view
+        $(".nav-toggler").click(function () {
+            $("body").toggleClass("show-sidebar");
+            $(".nav-toggler i").toggleClass("ti-menu");
+            $(".nav-toggler i").addClass("ti-close");
+        });
+        $(".search-box a, .search-box .app-search .srh-btn").on('click', function () {
+            $(".app-search").toggle(200);
+        });
+
+        // ==============================================================
+        // This is for Right sidebar options
+        // ==============================================================
+        $(".right-side-toggle").click(function () {
+            $(".right-sidebar").slideDown(50);
+            $(".right-sidebar").toggleClass("shw-rside");
+        });
+
+        function chatHistoryModalStart(chatId) {
+            $.ajax({
+                url: "/chat/history/detail/" + chatId,
+                method: "GET",
+                success: function (data) {
+                    var user = '{{ user.userProfile.firstname }} {{ user.userProfile.lastName }}';
+                    console.log(data);
+
+                    var activityId = "";
+                    if ([null, "", " ", "undefined"].indexOf(data.chat.activityId) > -1) {
+                        activityId = "Aktivite Kaydı Bulunamadı.";
+                    } else {
+                        activityId = data.chat.activityId;
+                    }
+
+                    $("#chatHistoryModalCitizenName").html(data.citizen.Name + " " + data.citizen.Surname);
+                    $("#historyCitizenName").html(data.citizen.Name + " " + data.citizen.Surname);
+                    $("#historyCitizenTckn").html(data.citizen.Uid);
+                    $("#historyCitizenMail").html(data.citizen.MailAddress);
+                    $("#historyCitizenPhone").html(data.citizen.MobilePhoneNumber);
+                    $("#historyCitizenActivityId").html(activityId);
+
+
+                    var dataHistory = "";
+                    $.each(data.chatMessage, function (index, value) {
+                        if (value.sender == 3) {
+                            dataHistory += "<li>\n" +
+                                "<div class=\"chat-content\">\n" +
+                                "<h5>Sistem</h5>\n" +
+                                "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                                "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                                "</div>\n" +
+                                "</li>" +
+                                "<br>"
+                        } else {
+                            if (value.sender == 2) {
+                                dataHistory += "<li>\n" +
+                                    "<div class=\"chat-content\">\n" +
+                                    "<h5>" + user + "</h5>\n" +
+                                    "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                                    "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                                    "</div>\n" +
+                                    "</li>" +
+                                    "<br>"
+                            } else {
+                                if (value.sender == 1) {
+                                    dataHistory += "<li class='reverse' >\n" +
+                                        "<div class=\"chat-content\">\n" +
+                                        "<h5>" + data.citizen.Name + " " + data.citizen.Surname + "</h5>\n" +
+                                        "<div class=\"box bg-light-info\">" + value.message + "</div>\n" +
+                                        "<div class=\"chat-time\">" + value.createdAt + "</div>\n" +
+                                        "</div>\n" +
+                                        "</li>" +
+                                        "<br>"
+                                }
+                            }
+                        }
+                    });
+
+                    $("#chatMessageDetail").html(dataHistory);
+
+                    $("#chatHistoryModal").modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                        show: true,
+                        escapeClose: false,
+                        clickClose: false,
+                        showClose: false
+                    });
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function chatHistoryModalStop() {
+            $("#chatHistoryModal").modal('hide');
+            wallMessageClear();
+        }
+
+        function modalReverseChat(sender) {
+            classObject = {reverse: false};
+            if (sender === 1) {
+                classObject.reverse = true;
+            }
+            return classObject;
+        }
+
+    </script>
+
+
+    <script src="/assets/dist/js/easy.timer.js"></script>
+
+    <script>
+        var homeTimer = new easytimer.Timer();
+
+        let chatPageVue = new Vue({
+                delimiters: ['${', '}'],
+                el: '#chatPage',
+                data: {
+                    breakList: {{ breakTypesList | raw }},
+                    acwTypesList: {{ acwTypesList | raw }},
+                    stateDetailText: '',
+                    stateDetailTimeStamp: 0,
+                    agentStatus: 9999,
+                    agentStatusText: 'Hazır Değil',
+                    agentStatusColor: "#ff0000",
+                    proccessStatus: 0,
+                    chatPageStatus:0,
+                    extensionNo: {{ app.user.userProfile.extension | raw }},
+                    agentStates: {
+                        0: {
+                            title: "Hazır Değil",
+                            color: "#ff0000",
+                            availableStatusses: [1, 4, 5, 6, 7],
+                        },
+                        1: {
+                            title: "Hazır",
+                            color: "#00ff00",
+                            availableStatusses: [0, 4, 5, 6, 7, 8],
+                        },
+                        4: {
+                            title: "Mola",
+                            color: "#f78243",
+                            availableStatusses: [1, 4, 5, 6, 7],
+                        },
+                        5: {
+                            title: "Soru",
+                            color: "#ffff00",
+                            availableStatusses: [1, 4, 6, 7],
+                        },
+                        13: {
+                            title: "Bağlantı Yok",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        15: {
+                            title: "Bağlantı Var - Db Server Gitti",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        18: {
+                            title: "İnternet Bağlantınız Kesildi",
+                            color: "#ffa500",
+                            availableStatusses: [1, 2, 4, 5],
+                        },
+                        9999: {
+                            title: "",
+                            color: "",
+                            availableStatusses: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 99, 1007, 999],
+                        },
+                        1007: {
+                            title: "",
+                            color: "",
+                            availableStatusses: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 99, 1007, 999],
+                        },
+                    }
+                },
+                methods: {
+                    acwStart: function (typeId) {
+                        chronoTimer();
+                        if (this.proccessStatus == 1) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                    '',
+                                confirmButtonText: 'Kapat',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                } else if (result.value) {
+                                }
+                            });
+                            return false;
+                        } else {
+                            this.proccessStatus = 1;
+                        }
+                        if (this.agentStatus == 3) {
+                            typeId = 2;
+                        }
+                        acw(typeId);
+                    },
+                    acwStop: function () {
+                        chronoTimer();
+                        this.proccessStatus = 1;
+                        acwStop();
+                    },
+                    breakStart: function (breakTypeId) {
+                        if (this.proccessStatus == 1) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Lütfen Bir Önceki İşlemin Bitmesini Bekleyiniz.</h3>' +
+                                    '',
+                                confirmButtonText: 'Kapat',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                } else if (result.value) {
+                                }
+                            });
+                            return false;
+                        } else {
+                            this.proccessStatus = 1;
+                        }
+                        chronoTimer();
+                        if (this.agentStates[this.agentStatus].availableStatusses.indexOf(4) == -1) {
+                            alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                            return false;
+                        }
+                        breakStart(breakTypeId);
+                    },
+                    breakStop: function () {
+                        chronoTimer();
+                        if (this.agentStatus != 4) {
+                            alert(this.agentStates[this.agentStatus].title + " Durumundan Molaya Geçemezsiniz. Bu işlem talebiniz Loglanmıştır");
+                        }
+                        this.proccessStatus = 1;
+                        breakStop();
+                    },
+                },
+                watch: {
+                    agentStatus: function (newState) {
+                        if (newState == 13) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Durum Erişiminiz Anlık Olarak Reddedilmiştir. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                    '',
+                                confirmButtonText: 'Yenile',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                } else if (result.value) {
+                                    location.reload();
+                                }
+                            })
+                        }
+
+                        if (newState == 15) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">Veritabanı Erişiminiz Anlık Olarak Zaman Aşımına Uğramıştır. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                    '',
+                                confirmButtonText: 'Yenile',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                } else if (result.value) {
+                                    location.reload();
+                                }
+                            })
+                        }
+
+                        if (newState == 18) {
+                            Swal.fire({
+                                title: '!!! -DİKKAT- !!!',
+                                allowOutsideClick: false,
+                                closeOnClickOutside: false,
+                                html: '' +
+                                    '<h3 style="float: left!important; font-weight: bold!important;">İnternet Bağlantınız Kesildi Lütfen Kablonuzu Veya Bağlantı Ayarlarınızı Kontrol Ediniz. <br> Lütfen Sayfayı Yenileyin</h3>' +
+                                    '',
+                                confirmButtonText: 'Yenile',
+                            }).then(function (result) {
+                                if (result.dismiss == Swal.DismissReason.cancel) {
+                                } else if (result.dismiss == Swal.DismissReason.backdrop) {
+                                } else if (result.value) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    },
+                },
+            },
+        );
+
+        function stateCheck() {
+            if (chatPageVue.proccessStatus == 1) {
+                return false;
+            }
+
+            if ([13, 15, 18].indexOf(parseInt(chatPageVue.agentStatus)) > -1) {
+                return false;
+            }
+
+            if (chat.agentStatus == 2) {
+                return false;
+            }
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/chatpage/state',
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function (data) {
+                    if (tbxDebug == true) console.log(data);
+                    if (data.hasOwnProperty('state')) {
+                        if (chat.agentStatus != 2) {
+                            if (data.text != chatPageVue.stateDetailText){
+                                chatPageVue.agentStatus = data.state;
+                                chatPageVue.stateDetailText = data.text;
+                                chatPageVue.stateDetailTimeStamp = data.timeStamp;
+                                chat.userStatus = data.chatState;
+
+                                chronoTimer(data.timeStamp);
+                            }
+                        }
+                    }
+                },
+                complete: function (data) {
+                    if (data.status == 500) {
+                        chatPageVue.agentStatus = 13;
+                    }
+                    if (data.status == 0) {
+                        chatPageVue.agentStatus = 18;
+                    }
+                    if (data.status != 200) {
+                        chatPageVue.agentStatus = 15;
+                    }
+                }
+            });
+
+        }
+
+        function acw(acwTypeId) {
+            setTimeout(function () {
+                if ([1, 3].indexOf(parseInt(acwTypeId)) > -1) {
+                    return false;
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/chatpage/acwLogStart/' + acwTypeId,
+                    async: false,
+                    headers: {
+                        'Authorization': "Bearer " + getTokenStorage(),
+                        'accept': "application/json",
+                        'Content-Type': "application/json",
+                    },
+                    success: function (data) {
+                        chatPageVue.agentStatus = data.state;
+                        chatPageVue.stateDetailText = data.text;
+                        chatPageVue.proccessStatus = 0;
+                        chat.userStatus = 3;
+                    }
+                });
+            }, 500);
+        }
+
+        function acwStop() {
+            if (tbxDebug == true) console.log("Acw Stop Function");
+            $.ajax({
+                type: 'GET',
+                url: '/api/chatpage/acwLogStop',
+                async: false,
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function (data) {
+                    chatPageVue.agentStatus = data.state;
+                    chatPageVue.stateDetailText = data.text;
+                    chatPageVue.proccessStatus = 0;
+                    chat.userStatus = 1;
+                }
+            });
+        }
+
+        function breakStart(breakTypeId) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/chatpage/breakStart/' + breakTypeId,
+                async: false,
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function (data) {
+                    chatPageVue.agentStatus = data.state;
+                    chatPageVue.stateDetailText = data.text;
+                    chatPageVue.proccessStatus = 0;
+                    chat.userStatus = 3;
+                }
+            });
+        }
+
+        function breakStop() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/chatpage/breakStop',
+                async: false,
+                headers: {
+                    'Authorization': "Bearer " + getTokenStorage(),
+                    'accept': "application/json",
+                    'Content-Type': "application/json",
+                },
+                success: function (data) {
+                    chatPageVue.agentStatus = data.state;
+                    chatPageVue.stateDetailText = data.text;
+                    chatPageVue.proccessStatus = 0;
+                    chat.userStatus = 1;
+                }
+            });
+        }
+
+        function chronoTimer(timeStamp) {
+            var time = 0;
+
+            if (timeStamp != 0) {
+                time = Math.round((Date.now() / 1000) - timeStamp)
+            }
+            if (tbxDebug == true) console.log(time);
+            homeTimer.stop();
+            homeTimer = null;
+            homeTimer = new easytimer.Timer();
+            setTimeout(function () {
+                homeTimer.start({countdown: false, startValues: {seconds: time}});
+
+                homeTimer.addEventListener('secondsUpdated', function (e) {
+                    $('#homeTimer').html(homeTimer.getTimeValues().toString());
+                });
+            }, 100);
+        }
+
+        $(document).ready(function () {
+            stateCheckInterval = setInterval(function () {
+                stateCheck();
+            }, 5000);
+        })
+    </script>
+
+{% endblock %}
+
+{% block body %}
+    <audio id="ringToneSound" loop src="/assets/ringtone.wav"></audio>
+    <div id="chatPage">
+        <!-- Kullanıcı Durumu -->
+        <div class="col-md-12" v-if="chatPageStatus != 1" style="margin: 0px!important; padding: 0px!important;">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Kullanıcı Durumu</h5>
+                    <div class="col-md-12">
+                        <div class="col-md-2" style="float: left!important;">
+                            <div v-if="agentStatus != 17">
+                                <div v-if="agentStatus != 16"
+                                     v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                     class="btn-group dropup">
+                                    <button type="button" id="molaBtn"
+                                            class="btn btn-secondary dropdown-toggle btn-sm"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                        <i class="fa fa-times"></i> MOLA
+                                    </button>
+                                    <div class="dropdown-menu" id="breakMenu"
+                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+
+                                        <a v-for="item in breakList" class="dropdown-item"
+                                           v-on:click="breakStart(item.id)">
+                                            ${item.name}</a>
+
+                                    </div>
+                                </div>
+                                <div class="btn-group dropup">
+                                    <button v-if="agentStatus != 16"
+                                            v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1"
+                                            type="button" id="islevlerBtn"
+                                            class="btn btn-secondary dropdown-toggle btn-sm btn-cyan"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                        <i class="fas fa-play"></i> İŞLEMLER
+                                    </button>
+
+                                    <div class="dropdown-menu" id="acwMenu"
+                                         v-show="agentStates[agentStatus].availableStatusses.indexOf(4) != -1">
+                                        <a v-for="item in acwTypesList" class="dropdown-item"
+                                           v-on:click="acwStart(item.id)">${item.name}</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10" style="float: right!important;">
+                            <span class="timer" id="homeTimer"
+                                  style="margin-left: 0px!important; color: red!important; font-weight: bold!important; font-size: 25px!important;">00:00:00</span>
+                            <span style="font-weight: bold!important; font-size: 20px!important;">( ${ agentStates[agentStatus].title } )</span>
+
+                            <div class="col-sm-3">
+                                <button type="button" id="doneToCall" class="btn btn-sm btn-success"
+                                        v-if="(agentStatus == 2 || agentStatus == 5 || agentStatus ==6 || agentStatus ==11)"
+                                        v-on:click='acwStop();'>
+                                    <i class="fa fa-ok"></i> ${ stateDetailText } ÇIK
+                                </button>
+                            </div>
+                            <div class="col-sm-3">
+                                <button class="btn btn-warning" id="btnPause"
+                                        v-on:click="breakStop()"
+                                        v-if="agentStatus == 4"
+                                >
+                                    ${ stateDetailText } ÇIK
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Kullanıcı Durumu -->
+    </div>
+    <div class="row" id="chat">
+        <div class="col-12">
+            <div class="card m-b-0">
+                <!-- .chat-row -->
+                <div class="chat-main-box">
+                    <div class="chat-right-aside" style="width: calc(100%)">
+                        <div class="chat-main-header">
+                            <div class="p-3 b-b">
+                                <h4 class="box-title">Temsilci Durumu - ${chatStatus}</h4>
+                                <button class="btn btn-purple float-right" v-on:click="leaveChat()" id="leaveChat"
+                                        v-show="(userStatus == 2)">Görüşmeyi Sonlandır
+                                </button>
+                                <button class="btn btn-success float-right" v-on:click="toUnAvail()" id="toUnAvail"
+                                        v-show="(userStatus == 1)">Çevrim Dışı Görün
+                                </button>
+                                <button class="btn btn-purple float-right" v-on:click="toOnline()" id="loginIn"
+                                        v-show="(userStatus == 3)">Çevrim İçi Ol
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chat-main-header">
+                            <div class="p-3 b-b">
+                                <span class="box-title">Adı Soyadı:</span>
+                                <span class="box-title">${ citizen.Name } ${ citizen.Surname }</span>
+                                <br>
+                                <span class="box-title">T.C. Kimlik:</span>
+                                <span class="box-title">${ citizen.Uid }</span>
+                                <br>
+                                <span class="box-title">E-Posta:</span>
+                                <span class="box-title">${ citizen.MailAddress }</span>
+                                <br>
+                                <span class="box-title">Telefon:</span>
+                                <span class="box-title">${ citizen.MobilePhoneNumber }</span>
+                            </div>
+                        </div>
+                        <div class="chat-rbox ps ps--theme_default ps--active-y"
+                             style="height: 725px; overflow-x: auto">
+                            <ul class="chat-list p-3" style="height: auto">
+                                <li v-for="chatMessage in chats" class="xmessages" :class="reverse(chatMessage.sender)">
+                                    <div class="chat-content">
+                                        <h5 v-show="chatMessage.sender == 2">${ you }</h5>
+                                        <h5 v-show="chatMessage.sender == 1">${ citizen.Name } ${ citizen.Surname }</h5>
+                                        <h5 v-show="chatMessage.sender == 3">Sistem</h5>
+                                        <div class="box bg-light-info">${chatMessage.message}</div>
+                                        <div class="chat-time">${chatMessage.createdAt.date}</div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="ps__scrollbar-x-rail" style="left: 0px; bottom: -506px;">
+                                <div class="ps__scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps__scrollbar-y-rail" style="top: 506px; right: 0px; height: 175px;">
+                                <div class="ps__scrollbar-y" tabindex="0" style="top: 131px; height: 44px;"></div>
+                            </div>
+                        </div>
+                        <div class="card-body border-top">
+                            <div class="row">
+                                <div class="col-8">
+                                    <textarea v-on:keyup.enter="sendMessage()" v-model="message"
+                                              placeholder="Mesajınızı Buraya Yazınız"
+                                              class="form-control border-0"></textarea>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <button v-on:click="sendMessage()" type="button"
+                                            class="btn btn-info btn-circle btn-lg"><i
+                                                class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- .chat-right-panel -->
+                </div>
+                <!-- /.chat-row -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block rightSideBar %}
+    <style>
+        .shw-rside {
+            width: 30% !important;
+        }
+    </style>
+    <!-- ============================================================== -->
+    <!-- Right sidebar -->
+    <!-- ============================================================== -->
+    <!-- .right-sidebar -->
+    <div class="right-sidebar">
+        <div class="slimscrollright">
+            <div class="rpanel-title"><i class="ti-close right-side-toggle"> KAPAT</i></div>
+            <div class="r-panel-body">
+                <ul class="m-t-20 chatonline">
+                    <li><b style="font-size: 30px!important;">Sohbet Geçmişi</b></li>
+                    <li>
+                        {% for historyChatData in historyChat %}
+                            <a href="javascript:void(0)" style="vertical-align: center!important;"
+                               onclick="chatHistoryModalStart({{ historyChatData.chat.id }})">
+                                <img src="../assets/images/users/1.jpg" alt="user-img" class="img-circle"
+                                     style="max-width: 50px!important; max-height: 50px!important;">
+                                <span style="font-size: 25px!important; vertical-align: center!important; margin-left: 15px!important;">{{ historyChatData.citizen.Name }} {{ historyChatData.citizen.Surname }} -- {{ historyChatData.chat.createdAt|date("d-m-Y H:i:s") }}</span>
+                            </a>
+                            <br>
+                        {% else %}
+                            <a href="javascript:void(0)" style="vertical-align: center!important;">
+                                <span style="font-size: 25px!important; vertical-align: center!important; margin-left: 15px!important;">Sohbet Geçmişi Bulunamadı.</span>
+                            </a>
+                            <br>
+                        {% endfor %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Right sidebar -->
+    <!-- ============================================================== -->
+
+    <div id="chatHistoryModal" style="z-index: 99999999" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="max-width: 80%!important;">
+            <!-- Modal content-->
+            <div class="modal-content col-sm-12">
+                <div class="modal-header col-sm-12">
+                    <h1 id="chatHistoryModalCitizenName"></h1>
+                    <button type="button" class="btn btn-danger" onclick="chatHistoryModalStop()"
+                            style="float: right!important;">Kapat
+                    </button>
+                </div>
+                <div class="modal-body col-sm-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card m-b-0">
+                                <!-- .chat-row -->
+                                <div class="chat-main-box">
+                                    <div class="chat-right-aside" style="width: calc(100%)">
+                                        <div class="chat-main-header">
+                                            <div class="p-3 b-b">
+                                                <span class="box-title"
+                                                      style="font-weight: bold!important;">Adı Soyadı:</span>
+                                                <span class="box-title" id="historyCitizenName"></span>
+                                                <br>
+                                                <span class="box-title" style="font-weight: bold!important;">T.C. Kimlik:</span>
+                                                <span class="box-title" id="historyCitizenTckn"></span>
+                                                <br>
+                                                <span class="box-title"
+                                                      style="font-weight: bold!important;">E-Posta:</span>
+                                                <span class="box-title" id="historyCitizenMail"></span>
+                                                <br>
+                                                <span class="box-title"
+                                                      style="font-weight: bold!important;">Telefon:</span>
+                                                <span class="box-title" id="historyCitizenPhone"></span>
+                                                <br>
+                                                <span class="box-title"
+                                                      style="font-weight: bold!important;">ActivityId:</span>
+                                                <span class="box-title" id="historyCitizenActivityId"></span>
+                                            </div>
+                                        </div>
+                                        <div class="chat-rbox ps ps--theme_default ps--active-y"
+                                             style="height: 725px; overflow-x: auto">
+                                            <ul class="chat-list p-3" id="chatMessageDetail" style="height: auto">
+
+                                            </ul>
+                                            <div class="ps__scrollbar-x-rail" style="left: 0px; bottom: -506px;">
+                                                <div class="ps__scrollbar-x" tabindex="0"
+                                                     style="left: 0px; width: 0px;"></div>
+                                            </div>
+                                            <div class="ps__scrollbar-y-rail"
+                                                 style="top: 506px; right: 0px; height: 175px;">
+                                                <div class="ps__scrollbar-y" tabindex="0"
+                                                     style="top: 131px; height: 44px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- .chat-right-panel -->
+                                </div>
+                                <!-- /.chat-row -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer col-sm-12">
+                    <button type="button" class="btn btn-danger" onclick="chatHistoryModalStop()">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

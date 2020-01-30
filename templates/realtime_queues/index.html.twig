@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RealtimeQueues index{% endblock %}
+
+{% block body %}
+    <h1>RealtimeQueues index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Musiconhold</th>
+                <th>Announce</th>
+                <th>Context</th>
+                <th>Timeout</th>
+                <th>Ringinuse</th>
+                <th>Setinterfacevar</th>
+                <th>Setqueuevar</th>
+                <th>Setqueueentryvar</th>
+                <th>MonitorFormat</th>
+                <th>Membermacro</th>
+                <th>Membergosub</th>
+                <th>QueueYouarenext</th>
+                <th>QueueThereare</th>
+                <th>QueueCallswaiting</th>
+                <th>QueueQuantity1</th>
+                <th>QueueQuantity2</th>
+                <th>QueueHoldtime</th>
+                <th>QueueMinutes</th>
+                <th>QueueMinute</th>
+                <th>QueueSeconds</th>
+                <th>QueueThankyou</th>
+                <th>QueueCallerannounce</th>
+                <th>QueueReporthold</th>
+                <th>AnnounceFrequency</th>
+                <th>AnnounceToFirstUser</th>
+                <th>MinAnnounceFrequency</th>
+                <th>AnnounceRoundSeconds</th>
+                <th>AnnounceHoldtime</th>
+                <th>AnnouncePosition</th>
+                <th>AnnouncePositionLimit</th>
+                <th>PeriodicAnnounce</th>
+                <th>PeriodicAnnounceFrequency</th>
+                <th>RelativePeriodicAnnounce</th>
+                <th>RandomPeriodicAnnounce</th>
+                <th>Retry</th>
+                <th>Wrapuptime</th>
+                <th>Penaltymemberslimit</th>
+                <th>Autofill</th>
+                <th>MonitorType</th>
+                <th>Autopause</th>
+                <th>Autopausedelay</th>
+                <th>Autopausebusy</th>
+                <th>Autopauseunavail</th>
+                <th>Maxlen</th>
+                <th>Servicelevel</th>
+                <th>Strategy</th>
+                <th>Joinempty</th>
+                <th>Leavewhenempty</th>
+                <th>Reportholdtime</th>
+                <th>Memberdelay</th>
+                <th>Weight</th>
+                <th>Timeoutrestart</th>
+                <th>Defaultrule</th>
+                <th>Timeoutpriority</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for realtime_queue in realtime_queues %}
+            <tr>
+                <td>{{ realtime_queue.name }}</td>
+                <td>{{ realtime_queue.musiconhold }}</td>
+                <td>{{ realtime_queue.announce }}</td>
+                <td>{{ realtime_queue.context }}</td>
+                <td>{{ realtime_queue.timeout }}</td>
+                <td>{{ realtime_queue.ringinuse }}</td>
+                <td>{{ realtime_queue.setinterfacevar }}</td>
+                <td>{{ realtime_queue.setqueuevar }}</td>
+                <td>{{ realtime_queue.setqueueentryvar }}</td>
+                <td>{{ realtime_queue.monitorFormat }}</td>
+                <td>{{ realtime_queue.membermacro }}</td>
+                <td>{{ realtime_queue.membergosub }}</td>
+                <td>{{ realtime_queue.queueYouarenext }}</td>
+                <td>{{ realtime_queue.queueThereare }}</td>
+                <td>{{ realtime_queue.queueCallswaiting }}</td>
+                <td>{{ realtime_queue.queueQuantity1 }}</td>
+                <td>{{ realtime_queue.queueQuantity2 }}</td>
+                <td>{{ realtime_queue.queueHoldtime }}</td>
+                <td>{{ realtime_queue.queueMinutes }}</td>
+                <td>{{ realtime_queue.queueMinute }}</td>
+                <td>{{ realtime_queue.queueSeconds }}</td>
+                <td>{{ realtime_queue.queueThankyou }}</td>
+                <td>{{ realtime_queue.queueCallerannounce }}</td>
+                <td>{{ realtime_queue.queueReporthold }}</td>
+                <td>{{ realtime_queue.announceFrequency }}</td>
+                <td>{{ realtime_queue.announceToFirstUser }}</td>
+                <td>{{ realtime_queue.minAnnounceFrequency }}</td>
+                <td>{{ realtime_queue.announceRoundSeconds }}</td>
+                <td>{{ realtime_queue.announceHoldtime }}</td>
+                <td>{{ realtime_queue.announcePosition }}</td>
+                <td>{{ realtime_queue.announcePositionLimit }}</td>
+                <td>{{ realtime_queue.periodicAnnounce }}</td>
+                <td>{{ realtime_queue.periodicAnnounceFrequency }}</td>
+                <td>{{ realtime_queue.relativePeriodicAnnounce }}</td>
+                <td>{{ realtime_queue.randomPeriodicAnnounce }}</td>
+                <td>{{ realtime_queue.retry }}</td>
+                <td>{{ realtime_queue.wrapuptime }}</td>
+                <td>{{ realtime_queue.penaltymemberslimit }}</td>
+                <td>{{ realtime_queue.autofill }}</td>
+                <td>{{ realtime_queue.monitorType }}</td>
+                <td>{{ realtime_queue.autopause }}</td>
+                <td>{{ realtime_queue.autopausedelay }}</td>
+                <td>{{ realtime_queue.autopausebusy }}</td>
+                <td>{{ realtime_queue.autopauseunavail }}</td>
+                <td>{{ realtime_queue.maxlen }}</td>
+                <td>{{ realtime_queue.servicelevel }}</td>
+                <td>{{ realtime_queue.strategy }}</td>
+                <td>{{ realtime_queue.joinempty }}</td>
+                <td>{{ realtime_queue.leavewhenempty }}</td>
+                <td>{{ realtime_queue.reportholdtime }}</td>
+                <td>{{ realtime_queue.memberdelay }}</td>
+                <td>{{ realtime_queue.weight }}</td>
+                <td>{{ realtime_queue.timeoutrestart }}</td>
+                <td>{{ realtime_queue.defaultrule }}</td>
+                <td>{{ realtime_queue.timeoutpriority }}</td>
+                <td>
+                    <a href="{{ path('realtime_queues_show', {'name': realtime_queue.name}) }}">show</a>
+                    <a href="{{ path('realtime_queues_edit', {'name': realtime_queue.name}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="56">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('realtime_queues_new') }}">Create new</a>
+{% endblock %}

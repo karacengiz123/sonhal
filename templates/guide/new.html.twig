@@ -1,0 +1,31 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Yeni Rehber Kaydı{% endblock %}
+
+{% block body %}
+
+    <style>
+        .aaa form button{
+            float: right;
+            margin: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".successBtn form button").attr('class', 'btn btn-success');
+        });
+    </script>
+
+    <h1 style="padding: 20px;">Yeni Kayıt Oluştur</h1>
+
+
+    <div class="col-lg-12 aaa" style="background-color: white!important; padding: 20px!important; padding-bottom: 50px!important;">
+        <a class="btn btn-info" style="float: right;margin-bottom: 20px;" href="{{ path('guide_index') }}">Listeye Geri Dön</a>
+        <div class="successBtn">
+
+        {{ include('guide/_form.html.twig') }}
+        </div>
+        <br/>
+        <br/>
+    </div>
+{% endblock %}

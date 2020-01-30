@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit HoldLog{% endblock %}
+
+{% block body %}
+    <h1>Edit HoldLog</h1>
+
+    {{ include('hold_log/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('hold_log_index') }}">back to list</a>
+
+    {{ include('hold_log/_delete_form.html.twig') }}
+{% endblock %}

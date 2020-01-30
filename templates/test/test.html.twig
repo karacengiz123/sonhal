@@ -1,0 +1,122 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block body %}
+    <h1>Test</h1>
+
+    <script>
+        $("#btnQueuesAsCall").click(function () {
+            var descriptionText = [];
+            $.get("{{ path('r_queue_select') }}",
+                function (queue) {
+                    console.log(queue);
+                    for (var i=0; i<queue.length; i++){
+                        descriptionText[i]={id:queue[i].queue,text:queue[i].description};
+                    }
+                    $('#queueListAsCall').select2({
+                        data:descriptionText
+                    });
+                },
+            );
+            $("#queueListAsCall").css("display","block");
+
+
+        });
+
+
+        $('#queueListAsCall').on('select2:select', function (e) {
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+
+            $.ajax({
+                type:'POST',
+                url:'/ccPulse/r-quue-get-select-all',
+                data:'queueName='+id+'&description='+text,
+                success:function(data){
+                    // console.log(data);
+                    obj=JSON.parse(JSON.stringify(data));
+                    // console.log(obj);
+
+
+                }
+            });
+            $("#queueAsCallDiv").css("display","block");
+
+        });
+
+        // KUYRUK RAPOR SORGULARI BİTİŞ
+    </script>
+
+
+
+
+
+
+    <div id="queueAsCallDiv" class="tabcontent">
+        <div class="table-responsive m-t-40">
+            <table id="queueAsCallTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+                <thead>
+                    <tr id="tableTh">
+                        <th>Kullanıcı</th>
+                        <th>Durumu</th>
+                        <th>ACW</th>
+                        {% for acw in acws %}
+                            <th>{{ acw.name }}</th>
+                        {% endfor %}
+                        {% for break in breaks %}
+                            <th>{{ break.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="tableTbody">
+                    {% for data in datas %}
+                        <tr>
+                            <td>{{ data.userName }}</td>
+                            <td>{{ data.status }}</td>
+                            <td>
+                                {% for acw in acws %}
+                                    {% for userKeyAcw, userAcw in data.usersApi %}
+                                        {% if "acw0" == userKeyAcw %}
+                                            {{ userAcw }}
+                                        {% else %}
+                                            {% set space = " " %}
+                                            {{ space }}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </td>
+
+
+                            {% for acw in acws %}
+                                <td>
+                                    {% for userKey, user in data.usersApi %}
+                                        {% if "acw"~acw.id == userKey %}
+                                            {{ user }}
+                                        {% else %}
+                                            {% set space = " " %}
+                                            {{ space }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+
+                            {% for break in breaks %}
+                                <td>
+                                    {% for userKey, user in data.usersApi %}
+                                        {% if "break"~break.id == userKey %}
+                                            {{ user }}
+                                        {% else %}
+                                            {% set space = " " %}
+                                            {{ space }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            {% endfor %}
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}

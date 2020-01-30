@@ -1,0 +1,183 @@
+    .ayarla {
+    position: absolute;
+    width: 500px;
+    right: 160px;
+    top: 150px;
+    z-index: 10040;
+    } 
+    .pagination{
+    justify-content: center!important;
+
+    }
+    .page-link{
+
+    background-color: unset!important;
+    color:black!important;
+    border: 1px solid #ebebeb!important;
+    }
+    .uyari{
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+    }
+    .small-input{
+    height: 25px;
+    }
+    .dark-link{
+    color:#000;
+    padding-bottom: 3px;
+    }
+    .form-group{
+    margin-bottom:15px!important;
+    }
+    .genislik{
+    width:100px!important;
+    }
+    .genislik2{
+    min-width: unset!important;
+    width:25px!important;
+
+    }
+    table{
+    font-size:15px!important;
+    }
+    table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:after {
+    top: 0px;
+    }
+    table.dataTable thead .sorting:before, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_desc_disabled:before {
+    top: 0px;
+    }
+    table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {
+    padding-right: unset!important;
+    }
+    .greenSelect{
+    color:#fff!important;
+    background-color: #00c292;
+    }
+    .blueSelect{
+    color:#fff!important;
+    background-color: skyblue;
+    }
+    .darkSelect{
+    color:#fff!important;
+    background-color: darkcyan;
+    }
+
+    .modal-dialog {
+    position: absolute;
+    width: 500px;
+    right: 160px;
+    top: 150px;
+    z-index: 10040;
+    } 
+    .pagination{
+    justify-content: center!important;
+
+    }
+    .page-link{
+
+    background-color: unset!important;
+    color:black!important;
+    border: 1px solid #ebebeb!important;
+    }
+    .uyari{
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+    }
+    .small-input{
+    height: 25px;
+    }
+    .dark-link{
+    color:#000;
+    padding-bottom: 3px;
+    }
+    .form-group{
+    margin-bottom:15px!important;
+    }
+
+    .ayarla {
+    position: absolute;
+    width: 500px;
+    right: 160px;
+    top: 150px;
+    z-index: 10040;
+    } 
+    .pagination{
+    /* justify-content: center!important; */
+
+    }
+    .page-link{
+
+    background-color: unset!important;
+    color:black!important;
+    border: 1px solid #ebebeb!important;
+    }
+    .uyari{
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+    }
+    .small-input{
+    height: 25px;
+    }
+    .dark-link{
+    color:#000;
+    padding-bottom: 3px;
+    }
+    .form-group{
+    margin-bottom:15px!important;
+    }
+    .genislik{
+    width:100px!important;
+    }
+    .genislik2{
+    min-width: unset!important;
+    width:25px!important;
+
+    }
+    table{
+    font-size:15px!important;
+    }
+    table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:after {
+    top: 0px;
+    }
+    table.dataTable thead .sorting:before, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_desc_disabled:before {
+    top: 0px;
+    }
+    table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting, table.dataTable thead > tr > td.sorting_asc, table.dataTable thead > tr > td.sorting_desc, table.dataTable thead > tr > td.sorting {
+    padding-right: unset!important;
+    }
+    .greenSelect{
+    color:#fff!important;
+    background-color: #00c292;
+    }
+    .blueSelect{
+    color:#fff!important;
+    background-color: skyblue;
+    }
+    .darkSelect{
+    color:#fff!important;
+    background-color: darkcyan;
+    }
+    .renkli {
+    background-color: #5372c6!important;
+    padding: 6px!important;
+    } 
+    .renkliTh{
+    background-color: #9eccff;
+    width: 120px;
+    }
+    .card-body{
+    padding:0px!important;
+    border:1px solid #5372c6!important;
+
+    }
+    .border-info {
+    margin-bottom:3px!important;
+
+    }
+    .small-select{
+    height: 25px!important;
+    }
+

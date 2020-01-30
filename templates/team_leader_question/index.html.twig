@@ -1,0 +1,163 @@
+{% extends 'layout/base.html.twig' %}
+{% block title %}Takım Lideri Soru Bazlı {% endblock %}
+{%  block customCss %}
+    <style>
+        .dt-buttons{
+            margin-left: 20px;
+        }
+    </style>
+{%  endblock %}
+{% block customScript %}
+    <script>
+        var tableFilling=false;
+        function displayNoneTableDiv() {
+            if (tableFilling==true){
+                $("#teamLeaderCategoryListTableDiv").css("display","none");
+                $('#teamLeaderCategoryListTable').dataTable().fnDestroy();
+                $('#teamLeaderCategoryListTable').html("");
+                tableFilling=false;
+            }
+        }
+        function displayBlockTableDiv() {
+            $("#teamLeaderCategoryListTableDiv").css("display","block");
+        }
+        function modalStart(modalText=null) {
+            $("#loadteamLeaderCategory").modal({
+                backdrop:'static',
+                keyboard: false,
+                show: true,
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+            if(modalText==null){
+                $("#loadteamLeaderCategoryText").html("Lütfen Bekleyiniz");
+            }else {
+                $("#loadteamLeaderCategoryText").html(modalText);
+            }
+        }
+        function modalFinish() {
+            $("#loadteamLeaderCategory").modal('hide');
+            $("#loadteamLeaderCategoryText").html("");
+        }
+        function teamLeaderCategoryValidateForm() {
+            modalStart();
+            $.ajax({
+                type:'POST',
+                url:'/teamleadercategory',
+                data:$('#formteamLeaderCategoryIdSelect').serialize(),
+                success:function (data) {
+                    console.log(data);
+                    if ($.isArray(data)==true){
+                        displayNoneTableDiv();
+                        displayBlockTableDiv();
+                        $('#teamLeaderCategoryListTable').DataTable({
+                            dom:'lBfrtip',
+                            "language":{
+                                url:'/assets/Turkish.json'
+                            },
+                            columns: [
+                                { data: "dateRange" , name: "dateRange" , title: "Tarih"},
+                                // { data: "dateRangeTime" , name: "dateRange" , title: "Aylık"},
+                                { data: "teamLeader" , name: "teamLeader" , title: "Takım Lideri"},
+                                { data: "title" , name: "title" , title: "Kategoriler"},
+                                { data: "sort" , name: "sort" , title: "Puan"},
+                                { data: "maxscore" , name: "maxscore" , title: "Max Puan"},
+                                { data: "totalscore" , name: "totalscore" , title: "totalscore"},
+                            ],
+                            order:[],
+                            data:data
+                        });
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                            },1000);
+                        tableFilling=true;
+                    } else {
+                        modalStart(data);
+                        $("#loadModalAnimation").css("display","none");
+                        $(".modal-content").css("background-color","red");
+                        $(".modal-content").css("color","white");
+                        setTimeout(
+                            function () {
+                                modalFinish();
+                                $("#loadModalAnimation").css("display","block");
+                                $(".modal-content").css("background-color","white");
+                                $(".modal-content").css("color","black");
+                            },2000);
+                    }
+                },
+                error:function (data) {
+                    console.log(data);
+                    var errSms = "Beklemedik bir Hata Oluştu";
+                    modalStart(errSms);
+                    $("#loadModalAnimation").css("display", "none");
+                    $(".modal-content").css("background-color", "red");
+                    $(".modal-content").css("color", "white");
+                    setTimeout(
+                        function () {
+                            modalFinish();
+                            $("#loadModalAnimation").css("display", "block");
+                            $(".modal-content").css("background-color", "white");
+                            $(".modal-content").css("color", "black");
+                        }, 2000);
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="form-group">
+        <h1>Takım Lideri Kategori Bazlı</h1>
+
+        {{ form_start(form, {'attr': {'id': 'formteamLeaderCategoryIdSelect','onsubmit':'return false'}}) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        <input type="button" onclick="teamLeaderCategoryValidateForm()" class="btn" value="Listele" style="background-color: limegreen">
+    </div>
+
+    <div class="table-responsive m-t-40">
+        <div class="dataTables_wrapper dt-bootstrap4">
+            <!-- TABLE & SELECT START -->
+            <div id="teamLeaderCategoryListTableDiv" class="tabcontent">
+                <div class="table-responsive m-t-40">
+                    <table id="teamLeaderCategoryListTable" class="table table-bordered table-striped full-color-table full-primary-table hover-table">
+
+                    </table>
+                </div>
+            </div>
+            <!-- TABLE & SELECT FINISH -->
+
+
+            <!-- MODAL START -->
+            <div class="modal fade" id="loadteamLeaderCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 80%!important;">
+                    <div class="modal-content col-lg-10" style="max-width: 100%!important;">
+                        <div class="modal-body">
+                            <h1 id="loadteamLeaderCategoryText"></h1>
+                            <div class="outer" id="loadModalAnimation">
+                                <div class="inner">
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                                <div class="big">
+                                    <div class="small"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL FINISH -->
+        </div>
+    </div>
+{% endblock %}

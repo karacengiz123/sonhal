@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New EvaluationSource{% endblock %}
+
+{% block body %}
+    <h1>Create new EvaluationSource</h1>
+
+    {{ include('evaluation_source/_form.html.twig') }}
+
+    <a href="{{ path('evaluation_source_index') }}">back to list</a>
+{% endblock %}

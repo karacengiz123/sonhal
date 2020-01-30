@@ -1,0 +1,17 @@
+parameters:
+    env(VARNISH_URL): ''
+
+api_platform:
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    title: Hello API Platform
+    version: 1.0.0
+    # Enable the Varnish integration
+#    http_cache:
+#        invalidation:
+#            enabled: false
+#            varnish_urls: ['%env(VARNISH_URL)%']
+#        max_age: 0
+#        shared_max_age: 3600
+#        vary: ['Content-Type', 'Authorization']
+#        public: true

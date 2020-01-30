@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EvaluationResetReason index{% endblock %}
+
+{% block body %}
+    <h1>EvaluationResetReason index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evaluation_reset_reason in evaluation_reset_reasons %}
+            <tr>
+                <td>{{ evaluation_reset_reason.id }}</td>
+                <td>{{ evaluation_reset_reason.name }}</td>
+                <td>
+                    <a href="{{ path('evaluation_reset_reason_show', {'id': evaluation_reset_reason.id}) }}">show</a>
+                    <a href="{{ path('evaluation_reset_reason_edit', {'id': evaluation_reset_reason.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('evaluation_reset_reason_new') }}">Create new</a>
+{% endblock %}

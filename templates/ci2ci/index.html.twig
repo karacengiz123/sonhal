@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ci2ci index{% endblock %}
+
+{% block body %}
+    <h1>Ci2ci index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CallId</th>
+                <th>ChannelId</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ci2ci in ci2cis %}
+            <tr>
+                <td>{{ ci2ci.id }}</td>
+                <td>{{ ci2ci.callId }}</td>
+                <td>{{ ci2ci.channelId }}</td>
+                <td>
+                    <a href="{{ path('ci2ci_show', {'id': ci2ci.id}) }}">show</a>
+                    <a href="{{ path('ci2ci_edit', {'id': ci2ci.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ci2ci_new') }}">Create new</a>
+{% endblock %}

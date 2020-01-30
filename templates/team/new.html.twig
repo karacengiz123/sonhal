@@ -1,0 +1,15 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block title %}Yeni Takım Oluştur{% endblock %}
+
+{% block body %}
+    <h1 style="padding: 20px">Yeni Takım Oluştur</h1>
+<div class="col-lg-12" style="padding: 20px;background-color: white">
+    <a class=" btn btn-info" style=" float: right;margin-bottom: 20px;" href="{{ path('team_index') }}">Listeye Geri Dön</a>
+
+    {{ include('team/_form.html.twig') }}
+    <br/>
+    <br/>
+</div>
+
+{% endblock %}
