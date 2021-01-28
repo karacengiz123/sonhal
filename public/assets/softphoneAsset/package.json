@@ -23,7 +23,7 @@
   },
   "homepage": "https://gitlab.com/tfontelekom/softphone#README",
   "devDependencies": {
-    "electron": "^3.0.7",
+    "electron": "^9.4.0",
     "electron-builder": "^20.29.0"
   }
 }
